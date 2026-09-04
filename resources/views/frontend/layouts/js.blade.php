@@ -1,0 +1,12 @@
+<script src="{{ asset('frontend/assets/vendor/jquery/jquery-3.7.0.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/owl-carousel/owl.carousel.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/fs-lightbox/fslightbox.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/mean-menu/jquery.meanmenu.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/swiper-js/swiper-bundle.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/slick-slider/slick.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/bx-slider/jquery.bxslider.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/eocjs-newsticker/eocjs-newsticker.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/syotimer/jquery.syotimer.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('frontend/assets/js/main.js') }}"></script>
