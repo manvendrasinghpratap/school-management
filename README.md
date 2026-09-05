@@ -1,59 +1,103 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SMS — Complete User Management Module
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This module is the next layer after RBAC. It provides administrative user CRUD,
+search/filtering, role assignment, password administration, account activation,
+account deactivation, and protection against destructive Super Admin mistakes.
 
-## About Laravel
+## Important existing-schema compatibility
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The original SMS users migration may not contain `is_active`. This package adds
+migration `000071_add_is_active_to_users_table.php`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+If your current users table already has `is_active`, the migration safely skips
+adding it.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## User model requirements
 
-## Learning Laravel
+Your `App\Models\User` must use:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+    use Spatie\Permission\Traits\HasRoles;
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Inside the class:
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+    use HasRoles;
 
-## Agentic Development
+If your User model has `$fillable`, include:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+    'name',
+    'email',
+    'password',
+    'is_active',
 
-```bash
-composer require laravel/boost --dev
+If your application uses `$casts`, include:
 
-php artisan boost:install
-```
+    'is_active' => 'boolean',
+    'email_verified_at' => 'datetime',
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Do not duplicate the `roles()` / `permissions()` relations supplied by HasRoles.
 
-## Contributing
+## Routes
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Register `routes/user-management.php` from your application's route bootstrap
+or merge its routes into `routes/web.php`.
 
-## Code of Conduct
+The module protects every route with:
+- authentication
+- granular RBAC permissions
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Security rules
 
-## Security Vulnerabilities
+1. A user cannot delete their own account.
+2. A user cannot deactivate their own account.
+3. The last Super Admin cannot be deleted or deactivated.
+4. A Super Admin cannot accidentally remove their own Super Admin access through
+   the supplied update guard.
+5. Passwords are always hashed.
+6. Role assignment is validated against existing roles.
+7. Search/filtering occurs server-side.
+8. UI `@can()` checks are only convenience; route and request authorization
+   remain mandatory.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## User lifecycle
 
-## License
+Create → Assign Role(s) → Activate → Update → Password Change → Deactivate or Delete
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# school-management
+For the SMS project, user accounts should normally be linked to student/staff
+records through their respective user_id relationship rather than putting
+student-specific or staff-specific fields into users.
+
+## Student rule
+
+Students should not receive `users.create`, `users.update`, or `users.delete`.
+The student role is intended for portal access and read-only academic/personal
+information, plus password change through the student-facing account workflow.
+
+## Integration with Audit Logs
+
+For production, connect the following actions to the SMS audit log service:
+- user.created
+- user.updated
+- user.deleted
+- user.activated
+- user.deactivated
+- user.password_changed
+- user.roles_changed
+- user.permissions_changed
+
+Do not log raw passwords.
+
+## Views
+
+The included Blade views assume `layouts.app` exists. Adapt Bootstrap/Tailwind
+classes to the project's final UI framework without changing authorization
+logic.
+
+## Testing
+
+Run:
+
+    php artisan test --filter=UserManagementTest
+
+Then run the full suite:
+
+    php artisan test

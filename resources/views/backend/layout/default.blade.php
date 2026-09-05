@@ -26,32 +26,19 @@
             <div class="main-content">
                 <div class="page-content">
                     <div class="container-fluid">
-                        <!-- start page title -->
-                        @include('backend.layout.page_title')                         
-                        <!-- end page title -->
-                         @include('backend.layout.welcome')    
-                        <!-- end row -->
-                         @include('backend.layout.social') 
-                        <!-- end row -->
-                         @include('backend.layout.latest_transaction')                         
-                        <!-- end row -->                        
+                        @yield('content')                      
                     </div> <!-- container-fluid -->
                 </div>
                 <!-- End Page-content -->
-                <!-- Modal -->
-                @include('backend.modal.transaction-detail')
-                <!-- end modal -->
-                <!-- subscribeModal -->
-                @include('backend.modal.subscribe')
-                <!-- end modal -->
                 @include('backend.layout.footer')                
             </div>
             <!-- end main content-->
-        </div>
+        </div> 
         <!-- END layout-wrapper -->
         <!-- Right bar overlay-->
         <div class="rightbar-overlay"></div>
-        <!-- JAVASCRIPT -->
+        @include('backend.modal.transaction-detail')
+       <!-- @include('backend.modal.subscribe')  -->         <!-- JAVASCRIPT -->
         @include('backend.layout.js')
         @yield('js')       
     </body>

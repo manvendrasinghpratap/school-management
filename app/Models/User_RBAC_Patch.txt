@@ -1,0 +1,8 @@
+Add to app/Models/User.php:
+
+use Spatie\Permission\Traits\HasRoles;
+
+Inside the User class:
+    use HasRoles;
+
+Do not add a custom roles() or permissions() relationship.

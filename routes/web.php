@@ -14,6 +14,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Modular Feature Routes
+    require base_path('routes/school-settings.php');
+    // require base_path('routes/schools.php');
+    require base_path('routes/rbac.php');
+    require base_path('routes/user-management.php');
+    require base_path('routes/students.php');
+    require base_path('routes/guardians.php');
 });
 
 require __DIR__.'/auth.php';
