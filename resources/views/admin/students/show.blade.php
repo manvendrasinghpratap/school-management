@@ -15,21 +15,31 @@
                 </h4>
 
                 <div class="page-title-right">
-                    <a
-                        href="{{ route('admin.students.index') }}"
-                        class="btn btn-secondary"
-                    >
-                        <i class="bx bx-arrow-back"></i>
-                        Back to Students
-                    </a>
 
-                    <a
-                        href="{{ route('admin.students.edit', $student) }}"
-                        class="btn btn-primary"
-                    >
-                        <i class="bx bx-edit"></i>
-                        Edit Student
-                    </a>
+                        <a
+                            href="{{ route('admin.students.index') }}"
+                            class="btn btn-secondary"
+                        >
+                            <i class="bx bx-arrow-back"></i>
+                            Back to Students
+                        </a>
+
+                        <a
+                            href="{{ route('admin.students.documents.index', $student) }}"
+                            class="btn btn-info"
+                        >
+                            <i class="bx bx-file"></i>
+                            Documents
+                        </a>
+
+                        <a
+                            href="{{ route('admin.students.edit', $student) }}"
+                            class="btn btn-primary"
+                        >
+                            <i class="bx bx-edit"></i>
+                            Edit Student
+                        </a>
+
                 </div>
 
             </div>
@@ -160,14 +170,20 @@
                         </strong>
                     </div>
 
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center">
+
                         <span class="text-muted">
                             Documents
                         </span>
 
-                        <strong>
+                        <a
+                            href="{{ route('admin.students.documents.index', $student) }}"
+                            class="fw-semibold text-primary"
+                        >
                             {{ $student->documents->count() }}
-                        </strong>
+                            <i class="bx bx-right-arrow-alt"></i>
+                        </a>
+
                     </div>
 
                 </div>
