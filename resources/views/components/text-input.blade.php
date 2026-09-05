@@ -1,3 +1,41 @@
-@props(['disabled' => false])
+@props([
+    'name',
+    'label' => null,
+    'value' => null,
+    'placeholder' => null,
+    'mainrows' => 4,
+    'islabel' => true,
+    'labelclass' => '',
+])
 
-<input @disabled($disabled) {{ $attributes->merge(['class' => 'border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm']) }}>
+<div class="col-xl-{{ $mainrows }} col-md-6 mb-3">
+
+    {{-- Label --}}
+    @if($islabel)
+        <label for="{{ $name }}" class="form-label {{ $labelclass }}">
+            {!! $label ?? Str::title(str_replace('_', ' ', $name)) !!}
+            
+            @if($attributes->has('required'))
+                <span class="text-danger">*</span>
+            @endif
+        </label>
+    @endif
+
+    {{-- Input --}}
+    <input
+        type="{{ $attributes->get('type', 'text') }}"
+        name="{{ $name }}"
+        id="{{ $name }}"
+        value="{{ old($name, $value ?? '') }}"
+        placeholder="{{ $placeholder ?? strip_tags($label ?? '') }}"
+        {{ $attributes->except(['type'])->merge([
+            'class' => 'form-control ' . ($errors->has($name) ? 'is-invalid' : '')
+        ]) }}
+    >
+
+    {{-- Validation Error --}}
+    @error($name)
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+
+</div>

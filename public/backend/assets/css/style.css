@@ -1,0 +1,13 @@
+#loginForm .form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+#loginForm .invalid-feedback {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+#loginForm .input-group .form-control.is-invalid {
+    border-right: 0;
+}

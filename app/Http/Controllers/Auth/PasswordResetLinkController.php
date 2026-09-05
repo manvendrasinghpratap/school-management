@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
 
 class PasswordResetLinkController extends Controller
 {
@@ -24,22 +26,30 @@ class PasswordResetLinkController extends Controller
      *
      * @throws ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'username' => ['required'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        $login = trim($request->input('username'));
+        $user = User::where('username', $login)->orWhere('email', $login)->first();
+        if (!$user) {
+            return response()->json([
+                'status' => true,
+                'message' => 'If an account exists with these details, a password reset link has been sent to the registered email address.',
+            ]);
+        }
+        $status = Password::sendResetLink(['email' => $user->email]);
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'status' => true,
+                'message' => 'If an account exists with these details, a password reset link has been sent to the registered email address.',
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => __($status),
+        ], 422);
     }
 }

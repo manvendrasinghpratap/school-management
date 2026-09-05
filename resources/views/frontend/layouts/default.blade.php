@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>School Management System</title>
     <link rel="shortcut icon" href="{{ asset('frontend/assets/images/logo/favicon.ico') }}" type="image/x-icon" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- STYLESHEETS -->
     @include('frontend.layouts.css')    
   </head>
@@ -65,7 +66,11 @@
 
     <!-- JS FILES ↓ -->
     @include('frontend.layouts.js')
+    <script src="{{ asset('common/js/swal.js') }}"></script> 
+    <script src="{{ asset('common/js/ajax.js') }}"></script> 
+    @stack('scripts')
+    @include('frontend.modal.login')  
+    @include('frontend.modal.forgot_password')  
     
-    @include('frontend.modal.login')    
   </body>
 </html>

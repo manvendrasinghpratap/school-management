@@ -1,0 +1,2383 @@
+
+
+// ============================================================
+// 2026_09_05_000001_create_schools_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('schools', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('code')->nullable()->unique();
+            $table->string('registration_number')->nullable();
+            $table->string('logo')->nullable();
+            $table->text('address')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->string('website')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('schools');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000002_create_users_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('phone')->nullable();
+            $table->string('password');
+            $table->enum('status', ['active','inactive','suspended'])->default('active');
+            $table->timestamp('email_verified_at')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000003_create_roles_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name')->default('web');
+            $table->foreignId('school_id')->nullable()->constrained()->nullOnDelete();
+            $table->unique(['name','guard_name','school_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('roles');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000004_create_permissions_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('permissions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name')->default('web');
+            $table->unique(['name','guard_name']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('permissions');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000005_create_role_has_permissions_table.php
+// ============================================================
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('role_has_permissions', function (Blueprint $table) {
+            $table->foreignId('permission_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('role_id')->constrained()->cascadeOnDelete();
+            $table->primary(['permission_id','role_id']);
+        });
+    }
+    public function down(): void { Schema::dropIfExists('role_has_permissions'); }
+};
+
+// ============================================================
+// 2026_09_05_000006_create_model_has_roles_table.php
+// ============================================================
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('model_has_roles', function (Blueprint $table) {
+            $table->foreignId('role_id')->constrained()->cascadeOnDelete();
+            $table->string('model_type');
+            $table->unsignedBigInteger('model_id');
+            $table->index(['model_id','model_type']);
+            $table->primary(['role_id','model_id','model_type']);
+        });
+    }
+    public function down(): void { Schema::dropIfExists('model_has_roles'); }
+};
+
+// ============================================================
+// 2026_09_05_000007_create_settings_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('settings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('key');
+            $table->text('value')->nullable();
+            $table->unique(['school_id','key']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('settings');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000008_create_academic_years_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('academic_years', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->boolean('is_current')->default(false);
+            $table->unique(['school_id','name']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('academic_years');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000009_create_terms_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('terms', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->unsignedTinyInteger('term_number');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->boolean('is_current')->default(false);
+            $table->unique(['academic_year_id','term_number']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('terms');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000010_create_departments_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('departments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('code')->nullable();
+            $table->text('description')->nullable();
+            $table->unique(['school_id','name']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('departments');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000011_create_levels_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('levels', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('code')->nullable();
+            $table->unsignedInteger('sort_order')->default(0);
+            $table->unique(['school_id','name']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('levels');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000012_create_classes_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('classes', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('level_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('code')->nullable();
+            $table->text('description')->nullable();
+            $table->unsignedInteger('capacity')->nullable();
+            $table->unique(['school_id','name']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('classes');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000013_create_sections_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('sections', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('class_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('code')->nullable();
+            $table->unsignedInteger('capacity')->nullable();
+            $table->unique(['class_id','name']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('sections');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000014_create_students_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('students', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->unique()->constrained()->nullOnDelete();
+            $table->string('student_number')->unique();
+            $table->string('admission_number')->nullable()->unique();
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name');
+            $table->string('photo')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->string('nationality')->nullable();
+            $table->enum('gender', ['male','female','other'])->nullable();
+            $table->string('phone')->nullable();
+            $table->date('admission_date');
+            $table->enum('status', ['active','inactive','graduated','transferred','withdrawn'])->default('active');
+            $table->text('address')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('students');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000015_create_guardians_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('guardians', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('guardian_number')->unique();
+            $table->string('title')->nullable();
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name');
+            $table->text('address')->nullable();
+            $table->string('state_or_local_government')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('whatsapp')->nullable();
+            $table->string('email')->nullable();
+            $table->foreignId('user_id')->nullable()->unique()->constrained()->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('guardians');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000016_create_student_guardians_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('student_guardians', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('guardian_id')->constrained()->cascadeOnDelete();
+            $table->string('relationship');
+            $table->boolean('is_primary')->default(false);
+            $table->boolean('is_emergency')->default(false);
+            $table->unique(['student_id','guardian_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('student_guardians');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000017_create_student_documents_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('student_documents', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->string('document_type');
+            $table->string('document_name')->nullable();
+            $table->string('file_path');
+            $table->text('notes')->nullable();
+            $table->foreignId('uploaded_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('student_documents');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000018_create_student_enrollments_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('student_enrollments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('term_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('class_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('section_id')->nullable()->constrained()->nullOnDelete();
+            $table->date('enrollment_date');
+            $table->enum('status', ['active','completed','withdrawn','transferred'])->default('active');
+            $table->text('notes')->nullable();
+            $table->unique(['student_id','academic_year_id','term_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('student_enrollments');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000019_create_student_promotions_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('student_promotions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('from_class_id')->nullable()->constrained('classes')->nullOnDelete();
+            $table->foreignId('to_class_id')->nullable()->constrained('classes')->nullOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->date('promotion_date');
+            $table->enum('status', ['promoted','repeated','transferred','withdrawn','graduated'])->default('promoted');
+            $table->text('remarks')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('student_promotions');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000020_create_staff_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('staff', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->unique()->constrained()->nullOnDelete();
+            $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('staff_number')->unique();
+            $table->string('title')->nullable();
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name');
+            $table->string('photo')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->string('nationality')->nullable();
+            $table->enum('gender', ['male','female','other'])->nullable();
+            $table->string('phone')->nullable();
+            $table->string('staff_type')->nullable();
+            $table->string('position')->nullable();
+            $table->string('qualification')->nullable();
+            $table->enum('status', ['active','inactive','suspended','resigned','retired'])->default('active');
+            $table->text('address')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('staff');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000021_create_instructors_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('instructors', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('staff_id')->unique()->constrained()->cascadeOnDelete();
+            $table->string('instructor_type')->nullable();
+            $table->text('specialization')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('instructors');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000022_create_staff_documents_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('staff_documents', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('staff_id')->constrained()->cascadeOnDelete();
+            $table->string('document_type');
+            $table->string('document_name')->nullable();
+            $table->string('file_path');
+            $table->text('notes')->nullable();
+            $table->foreignId('uploaded_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('staff_documents');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000023_create_courses_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('courses', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('course_code')->unique();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->decimal('credit_hours', 5, 2)->default(0);
+            $table->boolean('is_compulsory')->default(false);
+            $table->boolean('is_active')->default(true);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('courses');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000024_create_course_assignments_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('course_assignments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('staff_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('class_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('section_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('term_id')->nullable()->constrained()->nullOnDelete();
+            $table->unique(['staff_id','course_id','class_id','section_id','academic_year_id','term_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('course_assignments');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000025_create_student_courses_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('student_courses', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('term_id')->nullable()->constrained()->nullOnDelete();
+            $table->enum('status', ['enrolled','completed','dropped'])->default('enrolled');
+            $table->unique(['student_id','course_id','academic_year_id','term_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('student_courses');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000026_create_timetables_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('timetables', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('class_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('section_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('staff_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('day');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('room')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('timetables');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000027_create_attendance_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('attendance', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('course_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('class_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('section_id')->nullable()->constrained()->nullOnDelete();
+            $table->date('attendance_date');
+            $table->enum('status', ['present','absent','late','excused'])->default('present');
+            $table->text('remarks')->nullable();
+            $table->foreignId('recorded_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->unique(['student_id','course_id','attendance_date']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('attendance');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000028_create_staff_attendance_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('staff_attendance', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('staff_id')->constrained()->cascadeOnDelete();
+            $table->date('attendance_date');
+            $table->enum('status', ['present','absent','late','excused'])->default('present');
+            $table->time('check_in')->nullable();
+            $table->time('check_out')->nullable();
+            $table->text('remarks')->nullable();
+            $table->foreignId('recorded_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->unique(['staff_id','attendance_date']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('staff_attendance');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000029_create_leaves_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('leaves', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('staff_id')->constrained()->cascadeOnDelete();
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->string('leave_type');
+            $table->text('reason')->nullable();
+            $table->enum('status', ['pending','approved','rejected','cancelled'])->default('pending');
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('leaves');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000030_create_examinations_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('examinations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('term_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('name');
+            $table->string('type')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->enum('status', ['draft','scheduled','ongoing','completed','approved','published'])->default('draft');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('examinations');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000031_create_exam_schedules_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('exam_schedules', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('examination_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('class_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('section_id')->nullable()->constrained()->nullOnDelete();
+            $table->date('exam_date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('room')->nullable();
+            $table->foreignId('invigilator_id')->nullable()->constrained('staff')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('exam_schedules');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000032_create_grades_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('grades', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('name');
+            $table->string('code');
+            $table->decimal('min_score', 8, 2);
+            $table->decimal('max_score', 8, 2);
+            $table->decimal('grade_point', 5, 2)->default(0);
+            $table->enum('result', ['pass','fail'])->default('pass');
+            $table->unique(['school_id','code']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('grades');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000033_create_marks_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('marks', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('examination_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->decimal('score', 8, 2);
+            $table->decimal('maximum_score', 8, 2);
+            $table->foreignId('grade_id')->nullable()->constrained()->nullOnDelete();
+            $table->enum('status', ['draft','submitted','approved','published'])->default('draft');
+            $table->foreignId('entered_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at')->nullable();
+            $table->unique(['student_id','examination_id','course_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('marks');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000034_create_results_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('results', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('examination_id')->constrained()->cascadeOnDelete();
+            $table->decimal('total_score', 10, 2)->default(0);
+            $table->decimal('average', 8, 2)->default(0);
+            $table->string('grade')->nullable();
+            $table->enum('status', ['draft','approved','published'])->default('draft');
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('published_at')->nullable();
+            $table->unique(['student_id','examination_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('results');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000035_create_report_cards_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('report_cards', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('term_id')->nullable()->constrained()->nullOnDelete();
+            $table->enum('status', ['draft','generated','published'])->default('draft');
+            $table->string('file_path')->nullable();
+            $table->foreignId('generated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('published_at')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('report_cards');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000036_create_transcripts_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('transcripts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->string('reference_number')->unique();
+            $table->string('file_path')->nullable();
+            $table->foreignId('generated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('generated_at')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('transcripts');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000037_create_fee_categories_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('fee_categories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('code')->nullable();
+            $table->text('description')->nullable();
+            $table->unique(['school_id','name']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('fee_categories');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000038_create_fee_structures_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('fee_structures', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('fee_category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('class_id')->nullable()->constrained()->nullOnDelete();
+            $table->decimal('amount', 12, 2);
+            $table->date('due_date')->nullable();
+            $table->boolean('is_active')->default(true);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('fee_structures');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000039_create_scholarships_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('scholarships', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('code')->nullable();
+            $table->enum('type', ['percentage','fixed'])->default('percentage');
+            $table->decimal('value', 12, 2);
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('scholarships');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000040_create_student_fees_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('student_fees', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('fee_structure_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('scholarship_id')->nullable()->constrained()->nullOnDelete();
+            $table->decimal('amount', 12, 2);
+            $table->enum('status', ['pending','invoiced','paid','waived'])->default('pending');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('student_fees');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000041_create_invoices_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('invoices', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->string('invoice_number')->unique();
+            $table->date('invoice_date');
+            $table->date('due_date')->nullable();
+            $table->decimal('total', 12, 2)->default(0);
+            $table->decimal('paid', 12, 2)->default(0);
+            $table->decimal('balance', 12, 2)->default(0);
+            $table->enum('status', ['draft','issued','partial','paid','overdue','cancelled'])->default('draft');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('invoices');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000042_create_invoice_items_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('invoice_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('fee_category_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('description');
+            $table->decimal('amount', 12, 2);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('invoice_items');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000043_create_payments_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('payments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
+            $table->decimal('amount', 12, 2);
+            $table->string('payment_method');
+            $table->string('transaction_reference')->nullable()->unique();
+            $table->timestamp('paid_at');
+            $table->foreignId('received_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->text('notes')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('payments');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000044_create_receipts_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('receipts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('payment_id')->unique()->constrained()->cascadeOnDelete();
+            $table->string('receipt_number')->unique();
+            $table->timestamp('issued_at');
+            $table->string('file_path')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('receipts');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000045_create_announcements_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('announcements', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->longText('content');
+            $table->timestamp('published_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->enum('status', ['draft','published','archived'])->default('draft');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('announcements');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000046_create_notifications_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->text('message');
+            $table->string('type')->nullable();
+            $table->timestamp('read_at')->nullable();
+            $table->json('data')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('notifications');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000047_create_id_cards_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('id_cards', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('staff_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->string('card_number')->unique();
+            $table->timestamp('issued_at');
+            $table->timestamp('expires_at')->nullable();
+            $table->string('file_path')->nullable();
+            $table->string('verification_code')->nullable()->unique();
+            $table->enum('status', ['active','expired','revoked'])->default('active');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('id_cards');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000048_create_certificates_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('certificates', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->string('certificate_type');
+            $table->string('certificate_number')->unique();
+            $table->timestamp('issued_at');
+            $table->string('verification_reference')->nullable()->unique();
+            $table->string('file_path')->nullable();
+            $table->foreignId('issued_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('certificates');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000049_create_alumni_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('alumni', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->unique()->constrained()->cascadeOnDelete();
+            $table->date('graduation_date')->nullable();
+            $table->string('current_occupation')->nullable();
+            $table->string('employer')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->text('address')->nullable();
+            $table->text('notes')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('alumni');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000050_create_graduations_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('graduations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
+            $table->date('graduation_date');
+            $table->string('qualification')->nullable();
+            $table->string('certificate_number')->nullable();
+            $table->enum('status', ['pending','approved','graduated'])->default('pending');
+            $table->text('remarks')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('graduations');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000051_create_events_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('events', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->longText('description')->nullable();
+            $table->timestamp('start_at');
+            $table->timestamp('end_at')->nullable();
+            $table->string('location')->nullable();
+            $table->enum('status', ['draft','published','cancelled'])->default('draft');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('events');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000052_create_complaints_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('complaints', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('submitted_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('subject');
+            $table->longText('description');
+            $table->enum('status', ['open','assigned','in_progress','resolved','closed','rejected'])->default('open');
+            $table->foreignId('assigned_to')->nullable()->constrained('users')->nullOnDelete();
+            $table->longText('response')->nullable();
+            $table->timestamp('resolved_at')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('complaints');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000053_create_visitors_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('visitors', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('phone')->nullable();
+            $table->string('identification_reference')->nullable();
+            $table->string('purpose');
+            $table->foreignId('host_user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('arrival_at');
+            $table->timestamp('departure_at')->nullable();
+            $table->text('notes')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('visitors');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000054_create_disciplinary_records_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('disciplinary_records', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('reported_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->date('incident_date');
+            $table->string('incident_type');
+            $table->longText('description');
+            $table->text('action_taken')->nullable();
+            $table->text('outcome')->nullable();
+            $table->boolean('parent_notified')->default(false);
+            $table->enum('status', ['open','resolved','closed'])->default('open');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('disciplinary_records');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000055_create_medical_records_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('medical_records', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('staff_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->date('record_date');
+            $table->string('record_type');
+            $table->longText('description')->nullable();
+            $table->text('medical_alerts')->nullable();
+            $table->text('treatment')->nullable();
+            $table->foreignId('recorded_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('medical_records');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000056_create_suppliers_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('suppliers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('contact_person')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->text('address')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('suppliers');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000057_create_inventory_items_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('inventory_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('supplier_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('name');
+            $table->string('sku')->nullable()->unique();
+            $table->string('category')->nullable();
+            $table->unsignedInteger('quantity')->default(0);
+            $table->decimal('unit_cost', 12, 2)->nullable();
+            $table->string('unit')->nullable();
+            $table->enum('status', ['active','inactive','out_of_stock'])->default('active');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('inventory_items');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000058_create_assets_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('assets', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('supplier_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('asset_number')->unique();
+            $table->string('name');
+            $table->string('category')->nullable();
+            $table->decimal('purchase_cost', 12, 2)->nullable();
+            $table->date('purchase_date')->nullable();
+            $table->string('location')->nullable();
+            $table->enum('status', ['active','maintenance','disposed','lost'])->default('active');
+            $table->text('notes')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('assets');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000059_create_books_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('books', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('isbn')->nullable()->unique();
+            $table->string('title');
+            $table->string('author')->nullable();
+            $table->string('category')->nullable();
+            $table->string('publisher')->nullable();
+            $table->unsignedInteger('quantity')->default(1);
+            $table->decimal('fine_per_day', 8, 2)->default(0);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('books');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000060_create_book_issues_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('book_issues', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('book_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('student_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('staff_id')->nullable()->constrained()->nullOnDelete();
+            $table->date('issued_at');
+            $table->date('due_at');
+            $table->date('returned_at')->nullable();
+            $table->decimal('fine_amount', 10, 2)->default(0);
+            $table->enum('status', ['issued','returned','overdue','lost'])->default('issued');
+            $table->foreignId('issued_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('book_issues');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000061_create_vehicles_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('vehicles', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('vehicle_number')->unique();
+            $table->string('registration_number')->nullable()->unique();
+            $table->string('vehicle_type')->nullable();
+            $table->unsignedInteger('capacity')->nullable();
+            $table->string('driver_name')->nullable();
+            $table->string('driver_phone')->nullable();
+            $table->enum('status', ['active','inactive','maintenance'])->default('active');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('vehicles');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000062_create_routes_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('routes', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('vehicle_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->decimal('fee', 12, 2)->default(0);
+            $table->enum('status', ['active','inactive'])->default('active');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('routes');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000063_create_route_students_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('route_students', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('route_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->string('pickup_point')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->unique(['route_id','student_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('route_students');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000064_create_hostels_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('hostels', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('school_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('building')->nullable();
+            $table->string('gender')->nullable();
+            $table->decimal('fee', 12, 2)->default(0);
+            $table->enum('status', ['active','inactive'])->default('active');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('hostels');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000065_create_rooms_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('rooms', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('hostel_id')->constrained()->cascadeOnDelete();
+            $table->string('room_number');
+            $table->unsignedInteger('capacity')->default(1);
+            $table->enum('status', ['available','full','maintenance'])->default('available');
+            $table->unique(['hostel_id','room_number']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('rooms');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000066_create_hostel_allocations_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('hostel_allocations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('hostel_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('room_id')->constrained()->cascadeOnDelete();
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+            $table->enum('status', ['active','completed','cancelled'])->default('active');
+            $table->unique(['student_id','room_id','start_date']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('hostel_allocations');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000067_create_audit_logs_table.php
+// ============================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('audit_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('action');
+            $table->string('module')->nullable();
+            $table->string('auditable_type')->nullable();
+            $table->unsignedBigInteger('auditable_id')->nullable();
+            $table->json('old_values')->nullable();
+            $table->json('new_values')->nullable();
+            $table->ipAddress('ip_address')->nullable();
+            $table->text('user_agent')->nullable();
+            $table->index(['auditable_type','auditable_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('audit_logs');
+    }
+};
+
+
+// ============================================================
+// 2026_09_05_000068_create_password_reset_tokens_table.php
+// ============================================================
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+    }
+    public function down(): void { Schema::dropIfExists('password_reset_tokens'); }
+};
+
+// ============================================================
+// 2026_09_05_000069_create_sessions_table.php
+// ============================================================
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+    }
+    public function down(): void { Schema::dropIfExists('sessions'); }
+};

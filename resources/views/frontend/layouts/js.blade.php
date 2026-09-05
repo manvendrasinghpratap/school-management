@@ -10,3 +10,4 @@
     <script src="{{ asset('frontend/assets/vendor/syotimer/jquery.syotimer.min.js') }}"></script>
     <script src="{{ asset('frontend/assets/vendor/aos/aos.js') }}"></script>
     <script src="{{ asset('frontend/assets/js/main.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

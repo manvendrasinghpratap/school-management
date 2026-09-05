@@ -164,9 +164,14 @@
                   <input type="search" name="Search" class="tl-nav-search" placeholder="Search items" />
                   <button class="tl-searh-btn"><i class="fa-light fa-magnifying-glass"></i></button>
                 </form>
-                <a href="#" class="tl-def-btn tl-4-def-btn" data-bs-toggle="modal" data-bs-target="#loginModal">
-                  <i class="fa-light fa-user"></i> Login
-                </a>
+                @auth
+                  <form method="POST" action="{{ route('logout') }}" class="d-inline"> 
+                      @csrf
+                      <button type="submit" class="tl-def-btn tl-4-def-btn border-0 bg-transparent"><i class="fa-light fa-right-from-bracket"></i> Logout</button>
+                  </form>
+                @else
+                  <a href="#" class="tl-def-btn tl-4-def-btn" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fa-light fa-user"></i> Login</a>
+                @endauth
               </div>
             </div>
           </div>
