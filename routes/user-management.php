@@ -11,66 +11,129 @@ Route::middleware(['auth'])
 
         /*
         |--------------------------------------------------------------------------
-        | Users
+        | User Management
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        | Specific routes such as users/create must be declared BEFORE
+        | the users/{user} wildcard route.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Users - List
         |--------------------------------------------------------------------------
         */
 
-        Route::resource('users', UserController::class)
+        Route::get('users', [UserController::class, 'index'])
+            ->name('users.index')
             ->middleware('permission:users.view');
 
 
         /*
         |--------------------------------------------------------------------------
-        | Activate User
+        | Users - Create
+        |--------------------------------------------------------------------------
+        |
+        | These routes MUST come before users/{user}.
+        |
+        */
+
+        Route::get('users/create', [UserController::class, 'create'])
+            ->name('users.create')
+            ->middleware('permission:users.create');
+
+        Route::post('users', [UserController::class, 'store'])
+            ->name('users.store')
+            ->middleware('permission:users.create');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Users - View
         |--------------------------------------------------------------------------
         */
 
-        Route::put(
-            'users/{user}/activate',
-            [UserController::class, 'activate']
-        )
+        Route::get('users/{user}', [UserController::class, 'show'])
+            ->name('users.show')
+            ->middleware('permission:users.view');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Users - Edit
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('users/{user}/edit', [UserController::class, 'edit'])
+            ->name('users.edit')
+            ->middleware('permission:users.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Users - Update
+        |--------------------------------------------------------------------------
+        */
+
+        Route::put('users/{user}', [UserController::class, 'update'])
+            ->name('users.update')
+            ->middleware('permission:users.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Users - Delete
+        |--------------------------------------------------------------------------
+        */
+
+        Route::delete('users/{user}', [UserController::class, 'destroy'])
+            ->name('users.destroy')
+            ->middleware('permission:users.delete');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Users - Activate
+        |--------------------------------------------------------------------------
+        */
+
+        Route::put('users/{user}/activate', [UserController::class, 'activate'])
             ->name('users.activate')
             ->middleware('permission:users.update');
 
 
         /*
         |--------------------------------------------------------------------------
-        | Deactivate User
+        | Users - Deactivate
         |--------------------------------------------------------------------------
         */
 
-        Route::put(
-            'users/{user}/deactivate',
-            [UserController::class, 'deactivate']
-        )
+        Route::put('users/{user}/deactivate', [UserController::class, 'deactivate'])
             ->name('users.deactivate')
             ->middleware('permission:users.update');
 
 
         /*
         |--------------------------------------------------------------------------
-        | Restore User
+        | Users - Restore
         |--------------------------------------------------------------------------
         */
 
-        Route::put(
-            'users/{user}/restore',
-            [UserController::class, 'restore']
-        )
+        Route::put('users/{user}/restore', [UserController::class, 'restore'])
             ->name('users.restore')
             ->middleware('permission:users.update');
 
 
         /*
         |--------------------------------------------------------------------------
-        | Change User Password
+        | Users - Password
         |--------------------------------------------------------------------------
         */
 
-        Route::put(
-            'users/{user}/password',
-            [UserPasswordController::class, 'update']
-        )
+        Route::put('users/{user}/password', [UserPasswordController::class, 'update'])
             ->name('users.password.update')
             ->middleware('permission:users.update');
 

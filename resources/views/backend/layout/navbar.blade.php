@@ -268,57 +268,80 @@
 
 
                     {{-- ===================================================== --}}
-                    {{-- Administration --}}
-                    {{-- ===================================================== --}}
-                    <li class="nav-item dropdown">
+{{-- Administration --}}
+{{-- ===================================================== --}}
 
-                        <a class="nav-link dropdown-toggle arrow-none"
-                           href="#"
-                           id="topnav-administration"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">
+@if(
+    auth()->user()?->can('users.view') ||
+    auth()->user()?->can('roles.view') ||
+    auth()->user()?->can('permissions.view')
+)
 
-                            <i class="bx bx-cog me-2"></i>
-                            <span>Administration</span>
+    <li class="nav-item dropdown">
 
-                            <div class="arrow-down"></div>
+        <a class="nav-link dropdown-toggle arrow-none"
+           href="#"
+           id="topnav-administration"
+           role="button"
+           data-bs-toggle="dropdown"
+           aria-expanded="false">
 
-                        </a>
+            <i class="bx bx-cog me-2"></i>
+            <span>Administration</span>
 
-                        <div class="dropdown-menu"
-                             aria-labelledby="topnav-administration">
+            <div class="arrow-down"></div>
 
-                            {{-- Users --}}
-                            <a href="{{ route('admin.users.index') }}"
-                               class="dropdown-item">
+        </a>
 
-                                <i class="bx bx-user me-2"></i>
-                                Users
+        <div class="dropdown-menu"
+             aria-labelledby="topnav-administration">
 
-                            </a>
+            {{-- Users --}}
+            @if(auth()->user()?->can('users.view'))
 
-                            {{-- Roles --}}
-                            <a href="{{ route('admin.roles.index') }}"
-                               class="dropdown-item">
+                <a href="{{ route('admin.users.index') }}"
+                   class="dropdown-item">
 
-                                <i class="bx bx-shield me-2"></i>
-                                Roles
+                    <i class="bx bx-user me-2"></i>
+                    Users
 
-                            </a>
+                </a>
 
-                            {{-- Permissions --}}
-                            <a href="{{ route('admin.permissions.index') }}"
-                               class="dropdown-item">
+            @endif
 
-                                <i class="bx bx-lock-alt me-2"></i>
-                                Permissions
 
-                            </a>
+            {{-- Roles --}}
+            @if(auth()->user()?->can('roles.view'))
 
-                        </div>
+                <a href="{{ route('admin.roles.index') }}"
+                   class="dropdown-item">
 
-                    </li>
+                    <i class="bx bx-shield me-2"></i>
+                    Roles
+
+                </a>
+
+            @endif
+
+
+            {{-- Permissions --}}
+            @if(auth()->user()?->can('permissions.view'))
+
+                <a href="{{ route('admin.permissions.index') }}"
+                   class="dropdown-item">
+
+                    <i class="bx bx-lock-alt me-2"></i>
+                    Permissions
+
+                </a>
+
+            @endif
+
+        </div>
+
+    </li>
+
+@endif
 
                 </ul>
 

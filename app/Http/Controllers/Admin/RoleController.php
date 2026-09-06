@@ -24,7 +24,10 @@ class RoleController extends Controller
 
     public function create(): View
     {
-        $permissions = Permission::query()->orderBy('name')->get();
+        $permissions = Permission::query()
+            ->where('guard_name', 'web')
+            ->orderBy('name')
+            ->get();
 
         return view('admin.roles.create', compact('permissions'));
     }
@@ -36,40 +39,155 @@ class RoleController extends Controller
             'guard_name' => 'web',
         ]);
 
-        $role->syncPermissions($request->input('permissions', []));
+        $permissionIds = $request->input('permissions', []);
 
-        return redirect()->route('admin.roles.index')
+        $permissions = Permission::query()
+            ->where('guard_name', 'web')
+            ->whereIn('id', $permissionIds)
+            ->get();
+
+        $role->syncPermissions($permissions);
+
+        return redirect()
+            ->route('admin.roles.index')
             ->with('success', 'Role created successfully.');
+    }
+
+    public function show(Role $role): View
+    {
+        $role->load([
+            'permissions',
+            'users',
+        ]);
+
+        return view('admin.roles.show', compact('role'));
     }
 
     public function edit(Role $role): View
     {
-        $permissions = Permission::query()->orderBy('name')->get();
+        $permissions = Permission::query()
+            ->where('guard_name', 'web')
+            ->orderBy('name')
+            ->get();
+
         $role->load('permissions');
 
-        return view('admin.roles.edit', compact('role', 'permissions'));
+        return view('admin.roles.edit', compact(
+            'role',
+            'permissions'
+        ));
     }
 
-    public function update(RoleRequest $request, Role $role): RedirectResponse
-    {
-        abort_if($role->name === 'Super Admin' && $request->string('name')->toString() !== 'Super Admin', 422, 'The Super Admin role cannot be renamed.');
+    public function permissions(Role $role): View
+{
+    $permissions = Permission::query()
+        ->where('guard_name', 'web')
+        ->orderBy('name')
+        ->get()
+        ->groupBy(function ($permission) {
+            $parts = explode('.', $permission->name);
 
-        $role->update([
-            'name' => $request->string('name')->toString(),
+            if (count($parts) >= 2) {
+                return ucfirst(
+                    str_replace(
+                        ['-', '_'],
+                        ' ',
+                        $parts[0]
+                    )
+                );
+            }
+
+            return 'Other';
+        });
+
+    $role->load('permissions');
+
+    $assignedPermissionIds = $role->permissions
+        ->pluck('id')
+        ->map(fn ($id) => (string) $id)
+        ->all();
+
+    return view('admin.roles.permissions', compact(
+        'role',
+        'permissions',
+        'assignedPermissionIds'
+    ));
+}
+
+        public function updatePermissions(
+        \Illuminate\Http\Request $request,
+        Role $role
+        ): RedirectResponse {
+        $validated = $request->validate([
+            'permissions' => [
+                'nullable',
+                'array',
+            ],
+
+            'permissions.*' => [
+                'integer',
+                'exists:permissions,id',
+            ],
         ]);
 
-        $role->syncPermissions($request->input('permissions', []));
+        $permissionIds = $validated['permissions'] ?? [];
 
-        return redirect()->route('admin.roles.index')
+        $permissions = Permission::query()
+            ->where('guard_name', 'web')
+            ->whereIn('id', $permissionIds)
+            ->get();
+
+        $role->syncPermissions($permissions);
+
+        return redirect()
+            ->route('admin.roles.permissions.edit', $role)
+            ->with('success', 'Role permissions updated successfully.');
+        }
+
+
+    public function update(
+        RoleRequest $request,
+        Role $role
+    ): RedirectResponse {
+
+        $newName = $request->string('name')->toString();
+
+        abort_if(
+            $role->name === 'Super Admin'
+            && $newName !== 'Super Admin',
+            422,
+            'The Super Admin role cannot be renamed.'
+        );
+
+        $role->update([
+            'name' => $newName,
+        ]);
+
+        $permissionIds = $request->input('permissions', []);
+
+        $permissions = Permission::query()
+            ->where('guard_name', 'web')
+            ->whereIn('id', $permissionIds)
+            ->get();
+
+        $role->syncPermissions($permissions);
+
+        return redirect()
+            ->route('admin.roles.index')
             ->with('success', 'Role updated successfully.');
     }
 
     public function destroy(Role $role): RedirectResponse
     {
-        abort_if($role->name === 'Super Admin', 422, 'The Super Admin role cannot be deleted.');
+        abort_if(
+            $role->name === 'Super Admin',
+            422,
+            'The Super Admin role cannot be deleted.'
+        );
 
         $role->delete();
 
-        return back()->with('success', 'Role deleted successfully.');
+        return back()
+            ->with('success', 'Role deleted successfully.');
     }
 }

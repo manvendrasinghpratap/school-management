@@ -5,7 +5,9 @@
 @section('content')
 <div class="container-fluid">
 
+    {{-- ========================================================= --}}
     {{-- Page Header --}}
+    {{-- ========================================================= --}}
     <div class="row mb-3">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
@@ -17,17 +19,23 @@
                     </p>
                 </div>
 
-                <a href="{{ route('admin.users.create') }}"
-                   class="btn btn-primary">
-                    <i class="bx bx-user-plus me-1"></i>
-                    Add User
-                </a>
+                {{-- Add User --}}
+                @can('users.create')
+                    <a href="{{ route('admin.users.create') }}"
+                       class="btn btn-primary">
+                        <i class="bx bx-user-plus me-1"></i>
+                        Add User
+                    </a>
+                @endcan
 
             </div>
         </div>
     </div>
 
+
+    {{-- ========================================================= --}}
     {{-- Success Message --}}
+    {{-- ========================================================= --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show">
             <i class="bx bx-check-circle me-1"></i>
@@ -39,7 +47,10 @@
         </div>
     @endif
 
+
+    {{-- ========================================================= --}}
     {{-- Error Message --}}
+    {{-- ========================================================= --}}
     @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show">
 
@@ -58,7 +69,9 @@
     @endif
 
 
+    {{-- ========================================================= --}}
     {{-- Statistics --}}
+    {{-- ========================================================= --}}
     <div class="row">
 
         {{-- Total --}}
@@ -183,7 +196,9 @@
     </div>
 
 
+    {{-- ========================================================= --}}
     {{-- Filters --}}
+    {{-- ========================================================= --}}
     <div class="card">
 
         <div class="card-header">
@@ -303,7 +318,9 @@
     </div>
 
 
+    {{-- ========================================================= --}}
     {{-- Users Table --}}
+    {{-- ========================================================= --}}
     <div class="card">
 
         <div class="card-header">
@@ -319,6 +336,7 @@
 
             </div>
         </div>
+
 
         <div class="card-body">
 
@@ -340,13 +358,16 @@
 
                     </thead>
 
+
                     <tbody>
 
                     @forelse($users as $user)
 
                         <tr>
 
+                            {{-- ================================================= --}}
                             {{-- User --}}
+                            {{-- ================================================= --}}
                             <td>
 
                                 <div class="d-flex align-items-center">
@@ -387,7 +408,9 @@
                             </td>
 
 
+                            {{-- ================================================= --}}
                             {{-- Username --}}
+                            {{-- ================================================= --}}
                             <td>
                                 <span class="fw-semibold">
                                     {{ $user->username }}
@@ -395,13 +418,17 @@
                             </td>
 
 
+                            {{-- ================================================= --}}
                             {{-- Email --}}
+                            {{-- ================================================= --}}
                             <td>
                                 {{ $user->email }}
                             </td>
 
 
+                            {{-- ================================================= --}}
                             {{-- Role --}}
+                            {{-- ================================================= --}}
                             <td>
 
                                 @forelse($user->roles as $role)
@@ -421,7 +448,9 @@
                             </td>
 
 
+                            {{-- ================================================= --}}
                             {{-- Staff --}}
+                            {{-- ================================================= --}}
                             <td>
 
                                 @if($user->is_staff)
@@ -441,7 +470,9 @@
                             </td>
 
 
+                            {{-- ================================================= --}}
                             {{-- Status --}}
+                            {{-- ================================================= --}}
                             <td>
 
                                 @if($user->is_active)
@@ -461,100 +492,164 @@
                             </td>
 
 
+                            {{-- ================================================= --}}
                             {{-- Actions --}}
+                            {{-- ================================================= --}}
                             <td>
 
                                 <div class="d-flex justify-content-end gap-1">
 
+                                    {{-- ----------------------------------------- --}}
                                     {{-- View --}}
-                                    <a href="{{ route('admin.users.show', $user) }}"
-                                       class="btn btn-sm btn-info"
-                                       title="View User">
+                                    {{-- ----------------------------------------- --}}
+                                    @can('users.view')
 
-                                        <i class="bx bx-show-alt"></i>
+                                        <a href="{{ route('admin.users.show', $user) }}"
+                                           class="btn btn-sm btn-info"
+                                           title="View User">
 
-                                    </a>
+                                            <i class="bx bx-show-alt"></i>
+
+                                        </a>
+
+                                    @endcan
 
 
+                                    {{-- ----------------------------------------- --}}
                                     {{-- Edit --}}
-                                    <a href="{{ route('admin.users.edit', $user) }}"
-                                       class="btn btn-sm btn-primary"
-                                       title="Edit User">
+                                    {{-- ----------------------------------------- --}}
+                                    @can('users.update')
 
-                                        <i class="bx bx-edit-alt"></i>
+                                        <a href="{{ route('admin.users.edit', $user) }}"
+                                           class="btn btn-sm btn-primary"
+                                           title="Edit User">
 
-                                    </a>
+                                            <i class="bx bx-edit-alt"></i>
+
+                                        </a>
+
+                                    @endcan
 
 
+                                    {{-- ----------------------------------------- --}}
                                     {{-- Activate --}}
-                                    @if(!$user->is_active)
+                                    {{-- ----------------------------------------- --}}
+                                    @can('users.update')
 
-                                        <form method="POST"
-                                              action="{{ route('admin.users.activate', $user) }}"
-                                              class="d-inline">
+                                        @if(!$user->is_active)
 
-                                            @csrf
-                                            @method('PUT')
+                                            <form method="POST"
+                                                  action="{{ route('admin.users.activate', $user) }}"
+                                                  class="d-inline">
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-success"
-                                                    title="Activate User">
+                                                @csrf
+                                                @method('PUT')
 
-                                                <i class="bx bx-check"></i>
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-success"
+                                                        title="Activate User">
 
-                                            </button>
+                                                    <i class="bx bx-check"></i>
 
-                                        </form>
+                                                </button>
 
-                                    @endif
+                                            </form>
+
+                                        @endif
+
+                                    @endcan
 
 
+                                    {{-- ----------------------------------------- --}}
                                     {{-- Deactivate --}}
-                                    @if($user->is_active && $user->id !== auth()->id())
+                                    {{-- ----------------------------------------- --}}
+                                    @can('users.update')
 
-                                        <form method="POST"
-                                              action="{{ route('admin.users.deactivate', $user) }}"
-                                              class="d-inline">
+                                        @if($user->is_active && $user->id !== auth()->id())
 
-                                            @csrf
-                                            @method('PUT')
+                                            <form method="POST"
+                                                  action="{{ route('admin.users.deactivate', $user) }}"
+                                                  class="d-inline">
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-warning"
-                                                    title="Deactivate User"
-                                                    onclick="return confirm('Deactivate {{ $user->name }}?')">
+                                                @csrf
+                                                @method('PUT')
 
-                                                <i class="bx bx-block"></i>
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-warning"
+                                                        title="Deactivate User"
+                                                        onclick="return confirm('Deactivate {{ $user->name }}?')">
 
-                                            </button>
+                                                    <i class="bx bx-block"></i>
 
-                                        </form>
+                                                </button>
 
-                                    @endif
+                                            </form>
+
+                                        @endif
+
+                                    @endcan
 
 
+                                    {{-- ----------------------------------------- --}}
                                     {{-- Delete --}}
-                                    @if($user->id !== auth()->id())
+                                    {{-- ----------------------------------------- --}}
+                                    @can('users.delete')
 
-                                        <form method="POST"
-                                              action="{{ route('admin.users.destroy', $user) }}"
-                                              class="d-inline">
+                                        @if($user->id !== auth()->id())
 
-                                            @csrf
-                                            @method('DELETE')
+                                            <form method="POST"
+                                                  action="{{ route('admin.users.destroy', $user) }}"
+                                                  class="d-inline">
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-danger"
-                                                    title="Delete User"
-                                                    onclick="return confirm('Are you sure you want to delete {{ $user->name }}?')">
+                                                @csrf
+                                                @method('DELETE')
 
-                                                <i class="bx bx-trash"></i>
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-danger"
+                                                        title="Delete User"
+                                                        onclick="return confirm('Are you sure you want to delete {{ $user->name }}?')">
 
-                                            </button>
+                                                    <i class="bx bx-trash"></i>
 
-                                        </form>
+                                                </button>
 
-                                    @endif
+                                            </form>
+
+                                        @endif
+
+                                    @endcan
+
+
+                                    {{-- ----------------------------------------- --}}
+                                    {{-- Manage Roles --}}
+                                    {{-- ----------------------------------------- --}}
+                                    @can('users.assign-roles')
+
+                                        <a href="{{ route('admin.users.roles.edit', $user) }}"
+                                           class="btn btn-sm btn-secondary"
+                                           title="Manage Roles">
+
+                                            <i class="bx bx-shield"></i>
+
+                                        </a>
+
+                                    @endcan
+
+
+                                    {{-- ----------------------------------------- --}}
+                                    {{-- Manage Permissions --}}
+                                    {{-- ----------------------------------------- --}}
+                                    @can('users.assign-permissions')
+
+                                        <a href="{{ route('admin.users.permissions.edit', $user) }}"
+                                           class="btn btn-sm btn-dark"
+                                           title="Manage Permissions">
+
+                                            <i class="bx bx-lock-alt"></i>
+
+                                        </a>
+
+                                    @endcan
 
                                 </div>
 
@@ -592,7 +687,9 @@
             </div>
 
 
+            {{-- ================================================= --}}
             {{-- Pagination --}}
+            {{-- ================================================= --}}
             <div class="mt-3">
 
                 {{ $users->links() }}

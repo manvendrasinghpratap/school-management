@@ -144,7 +144,6 @@ class AuthenticatedSessionController extends Controller
                 $request->boolean('remember')
             );
         }
-
         if (!$authenticated) {
             return response()->json([
                 'status' => false,
@@ -218,7 +217,8 @@ class AuthenticatedSessionController extends Controller
                 return route('dashboard');
 
             default:
-                return route('home');
+                return url('/');
+                //return route('home');
         }
     }
 }
