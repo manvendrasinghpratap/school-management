@@ -5,31 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Courses extends Model
+class Department extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'courses';
+    protected $table = 'departments';
 
     protected $fillable = [
         'school_id',
-        'department_id',
-        'course_code',
         'name',
+        'code',
         'description',
-        'credit_hours',
-        'is_compulsory',
         'is_active',
     ];
 
     protected function casts(): array
     {
         return [
-            'credit_hours' => 'decimal:2',
-            'is_compulsory' => 'boolean',
             'is_active' => 'boolean',
         ];
     }
@@ -39,17 +34,8 @@ class Courses extends Model
         return $this->belongsTo(School::class);
     }
 
-    public function department(): BelongsTo
+    public function classes(): HasMany
     {
-        return $this->belongsTo(Department::class);
+        return $this->hasMany(Classes::class, 'department_id');
     }
-    public function students(): BelongsToMany
-{
-    return $this->belongsToMany(
-        Student::class,
-        'student_courses',
-        'course_id',
-        'student_id'
-    )->withTimestamps();
-}
 }

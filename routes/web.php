@@ -22,6 +22,11 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/user-management.php');
     require base_path('routes/students.php');
     require base_path('routes/guardians.php');
+    require base_path('routes/classes.php');
+    require base_path('routes/sections.php');
+    require base_path('routes/departments.php');
+    require base_path('routes/courses.php');
+    require base_path('routes/staff.php');
 });
 
 require __DIR__.'/auth.php';

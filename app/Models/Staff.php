@@ -4,27 +4,74 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Staff extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'staff';
 
     protected $fillable = [
-        'department_id',
         'school_id',
         'user_id',
+        'department_id',
+        'staff_number',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'photo',
+        'date_of_birth',
+        'nationality',
+        'gender',
+        'phone',
+        'staff_type',
+        'employment_date',
+        'status',
     ];
 
-    public function school() { return $this->belongsTo(School::class, 'school_id'); }
-    public function user() { return $this->belongsTo(User::class, 'user_id'); }
-    public function department() { return $this->belongsTo(Department::class, 'department_id'); }
-    public function instructor() { return $this->hasOne(Instructor::class, 'staff_id'); }
-    public function documents() { return $this->hasMany(StaffDocument::class, 'staff_id'); }
-    public function courseAssignments() { return $this->hasMany(CourseAssignment::class, 'staff_id'); }
-    public function timetables() { return $this->hasMany(Timetable::class, 'staff_id'); }
-    public function attendance() { return $this->hasMany(StaffAttendance::class, 'staff_id'); }
-    public function leaves() { return $this->hasMany(Leave::class, 'staff_id'); }
-    public function bookIssues() { return $this->hasMany(BookIssue::class, 'staff_id'); }
-    public function idCards() { return $this->hasMany(IdCard::class, 'staff_id'); }
-    public function medicalRecords() { return $this->hasMany(MedicalRecord::class, 'staff_id'); }
+    protected function casts(): array
+    {
+        return [
+            'date_of_birth' => 'date',
+            'employment_date' => 'date',
+        ];
+    }
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function instructor(): HasOne
+    {
+        return $this->hasOne(Instructor::class);
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return trim(
+            $this->first_name
+            . ' '
+            . ($this->middle_name ? $this->middle_name . ' ' : '')
+            . $this->last_name
+        );
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
 }
