@@ -3,119 +3,303 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\UserStoreRequest;
-use App\Http\Requests\Admin\UserUpdateRequest;
-use App\Models\Role;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use App\Services\UserManagementService;
-use Illuminate\Http\RedirectResponse;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     public function __construct(
-        private readonly UserManagementService $users
-    ) {}
+        protected UserService $userService
+    ) {
+    }
 
-    public function index(Request $request): View
+    /**
+     * Display users.
+     */
+    public function index(Request $request)
     {
-        $query = User::query()->with('roles')->latest();
+        $schoolId = $this->schoolId();
 
-        if ($search = $request->string('search')->trim()->toString()) {
+        $query = User::query()
+            ->where('school_id', $schoolId)
+            ->where('is_deleted', false)
+            ->with('roles');
+
+        /*
+         * Search
+         */
+        if ($request->filled('search')) {
+
+            $search = trim($request->search);
+
             $query->where(function ($q) use ($search) {
+
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%");
             });
         }
 
-        if ($role = $request->string('role')->trim()->toString()) {
-            $query->role($role);
+        /*
+         * Active / inactive filter
+         */
+        if ($request->filled('status')) {
+
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            }
+
+            if ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
         }
 
-        if ($request->filled('status') && \Schema::hasColumn('users', 'is_active')) {
-            $query->where('is_active', $request->boolean('status'));
+        /*
+         * Staff / non-staff filter
+         */
+        if ($request->filled('staff')) {
+
+            if ($request->staff === 'yes') {
+                $query->where('is_staff', true);
+            }
+
+            if ($request->staff === 'no') {
+                $query->where('is_staff', false);
+            }
         }
 
-        $users = $query->paginate(20)->withQueryString();
-        $roles = Role::query()->orderBy('name')->get();
+        $users = $query
+            ->latest('id')
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('admin.users.index', compact('users', 'roles'));
+        /*
+         * Dashboard statistics
+         */
+        $statistics = [
+
+            'total' => User::query()
+                ->where('school_id', $schoolId)
+                ->where('is_deleted', false)
+                ->count(),
+
+            'active' => User::query()
+                ->where('school_id', $schoolId)
+                ->where('is_deleted', false)
+                ->where('is_active', true)
+                ->count(),
+
+            'inactive' => User::query()
+                ->where('school_id', $schoolId)
+                ->where('is_deleted', false)
+                ->where('is_active', false)
+                ->count(),
+
+            'staff' => User::query()
+                ->where('school_id', $schoolId)
+                ->where('is_deleted', false)
+                ->where('is_staff', true)
+                ->count(),
+        ];
+
+        return view(
+            'admin.users.index',
+            compact('users', 'statistics')
+        );
     }
 
-    public function create(): View
+    /**
+     * Show create form.
+     */
+    public function create()
     {
-        $roles = Role::query()->orderBy('name')->get();
-
-        return view('admin.users.create', compact('roles'));
+        return view('admin.users.create');
     }
 
-    public function store(UserStoreRequest $request): RedirectResponse
+    /**
+     * Store new user.
+     */
+    public function store(StoreUserRequest $request)
     {
-        $user = $this->users->create($request->validated());
+        $data = $request->validated();
 
-        return redirect()->route('admin.users.index')
-            ->with('success', "User {$user->name} created successfully.");
+        /*
+         * Handle avatar upload.
+         */
+        if ($request->hasFile('avatar')) {
+
+            $data['avatar'] = $request
+                ->file('avatar')
+                ->store('users/avatars', 'public');
+        }
+
+        $user = $this->userService->create($data);
+
+        return redirect()
+            ->route('admin.users.show', $user)
+            ->with('success', 'User created successfully.');
     }
 
-    public function edit(User $user): View
+    /**
+     * Display user.
+     */
+    public function show(User $user)
     {
-        $roles = Role::query()->orderBy('name')->get();
-        $user->load('roles');
+        $this->ensureSameSchool($user);
 
-        return view('admin.users.edit', compact('user', 'roles'));
+        $user->load([
+            'school',
+            'staff',
+            'roles',
+        ]);
+
+        return view(
+            'admin.users.show',
+            compact('user')
+        );
     }
 
-    public function update(UserUpdateRequest $request, User $user): RedirectResponse
-    {
-        abort_if(
-            $user->id === $request->user()->id &&
-            empty($request->input('roles')) &&
-            $user->hasRole('Super Admin'),
-            422,
-            'You cannot remove your own Super Admin access.'
+    /**
+     * Show edit form.
+     */
+   public function edit(User $user)
+{
+    $this->ensureSameSchool($user);
+
+    $roles = \Spatie\Permission\Models\Role::query()
+        ->where('guard_name', 'web')
+        ->orderBy('name')
+        ->get();
+
+    return view('admin.users.edit', compact('user', 'roles'));
+}
+
+    /**
+     * Update user.
+     */
+    public function update(
+        UpdateUserRequest $request,
+        User $user
+    ) {
+        $this->ensureSameSchool($user);
+
+        $data = $request->validated();
+
+        /*
+         * Handle avatar upload.
+         */
+        if ($request->hasFile('avatar')) {
+
+            /*
+             * Delete old avatar if it is a custom uploaded file.
+             */
+            if (
+                $user->avatar &&
+                $user->avatar !== 'default.png'
+            ) {
+                Storage::disk('public')
+                    ->delete($user->avatar);
+            }
+
+            $data['avatar'] = $request
+                ->file('avatar')
+                ->store('users/avatars', 'public');
+        }
+
+        $this->userService->update(
+            $user,
+            $data
         );
 
-        $this->users->update($user, $request->validated());
-
-        return redirect()->route('admin.users.index')
+        return redirect()
+            ->route('admin.users.show', $user)
             ->with('success', 'User updated successfully.');
     }
 
-    public function destroy(Request $request, User $user): RedirectResponse
+    /**
+     * Soft-delete user.
+     */
+    public function destroy(User $user)
     {
-        abort_if($user->id === $request->user()->id, 422, 'You cannot delete your own account.');
+        $this->ensureSameSchool($user);
 
-        abort_if(
-            $user->hasRole('Super Admin') &&
-            User::role('Super Admin')->count() <= 1,
-            422,
-            'The last Super Admin cannot be deleted.'
-        );
+        $this->userService->delete($user);
 
-        $user->delete();
-
-        return back()->with('success', 'User deleted successfully.');
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User deleted successfully.');
     }
 
-    public function activate(Request $request, User $user): RedirectResponse
+    /**
+     * Activate user.
+     */
+    public function activate(User $user)
     {
-        abort_unless(\Schema::hasColumn('users', 'is_active'), 422, 'Add an is_active column to users before using account activation.');
+        $this->ensureSameSchool($user);
 
-        $this->users->activate($user);
+        $this->userService->activate($user);
 
-        return back()->with('success', 'User account activated.');
+        return back()
+            ->with('success', 'User activated successfully.');
     }
 
-    public function deactivate(Request $request, User $user): RedirectResponse
+    /**
+     * Deactivate user.
+     */
+    public function deactivate(User $user)
     {
-        abort_if($user->id === $request->user()->id, 422, 'You cannot deactivate your own account.');
-        abort_if($user->hasRole('Super Admin') && User::role('Super Admin')->count() <= 1, 422, 'The last Super Admin cannot be deactivated.');
+        $this->ensureSameSchool($user);
 
-        abort_unless(\Schema::hasColumn('users', 'is_active'), 422, 'Add an is_active column to users before using account activation.');
+        $this->userService->deactivate($user);
 
-        $this->users->deactivate($user);
+        return back()
+            ->with('success', 'User deactivated successfully.');
+    }
 
-        return back()->with('success', 'User account deactivated.');
+    /**
+     * Restore deleted user.
+     */
+    public function restore(User $user)
+    {
+        $this->ensureSameSchool($user);
+
+        $this->userService->restore($user);
+
+        return back()
+            ->with('success', 'User restored successfully.');
+    }
+
+    /**
+     * Get current school ID.
+     */
+    protected function schoolId(): int
+    {
+        $schoolId = auth()->user()?->school_id;
+
+        if (!$schoolId) {
+            abort(
+                403,
+                'No school is assigned to this user.'
+            );
+        }
+
+        return (int) $schoolId;
+    }
+
+    /**
+     * Verify user belongs to current school.
+     */
+    protected function ensureSameSchool(User $user): void
+    {
+        if ((int) $user->school_id !== $this->schoolId()) {
+            abort(
+                403,
+                'You are not authorized to access this user.'
+            );
+        }
     }
 }

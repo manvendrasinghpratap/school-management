@@ -4,22 +4,74 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StudentEnrollment extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'student_enrollments';
 
     protected $fillable = [
+        'school_id',
+        'student_id',
         'academic_year_id',
+        'term_id',
         'class_id',
         'section_id',
-        'student_id',
-        'term_id',
+        'enrollment_number',
+        'enrollment_date',
+        'status',
+        'notes',
+        'created_by',
+        'updated_by',
     ];
 
-    public function student() { return $this->belongsTo(Student::class, 'student_id'); }
-    public function academicYear() { return $this->belongsTo(AcademicYear::class, 'academic_year_id'); }
-    public function term() { return $this->belongsTo(Term::class, 'term_id'); }
-    public function classModel() { return $this->belongsTo(ClassModel::class, 'class_id'); }
-    public function section() { return $this->belongsTo(Section::class, 'section_id'); }
+    protected function casts(): array
+    {
+        return [
+            'enrollment_date' => 'date',
+        ];
+    }
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(Student::class);
+    }
+
+    public function academicYear(): BelongsTo
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+
+    public function term(): BelongsTo
+    {
+        return $this->belongsTo(Term::class);
+    }
+
+    public function class(): BelongsTo
+    {
+        return $this->belongsTo(Classes::class, 'class_id');
+    }
+
+    public function section(): BelongsTo
+    {
+        return $this->belongsTo(Section::class);
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
 }

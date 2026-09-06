@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () { return view('frontend'); });
 Route::get('/backend', function () { return view('backend'); }); 
 
-Route::get('/dashboard', function () {
+Route::get('/admin/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -27,6 +27,10 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/departments.php');
     require base_path('routes/courses.php');
     require base_path('routes/staff.php');
+    require base_path('routes/instructors.php');
+    require base_path('routes/academic-years.php');
+    require base_path('routes/terms.php');
+    require base_path('routes/dashboard.php');
 });
 
 require __DIR__.'/auth.php';
