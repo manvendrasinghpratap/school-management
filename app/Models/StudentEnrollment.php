@@ -35,6 +35,12 @@ class StudentEnrollment extends Model
         ];
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
@@ -47,31 +53,49 @@ class StudentEnrollment extends Model
 
     public function academicYear(): BelongsTo
     {
-        return $this->belongsTo(AcademicYear::class);
+        return $this->belongsTo(
+            AcademicYears::class,
+            'academic_year_id'
+        );
     }
 
     public function term(): BelongsTo
     {
-        return $this->belongsTo(Term::class);
+        return $this->belongsTo(
+            Terms::class,
+            'term_id'
+        );
     }
 
     public function class(): BelongsTo
     {
-        return $this->belongsTo(Classes::class, 'class_id');
+        return $this->belongsTo(
+            Classes::class,
+            'class_id'
+        );
     }
 
     public function section(): BelongsTo
     {
-        return $this->belongsTo(Section::class);
+        return $this->belongsTo(
+            Section::class,
+            'section_id'
+        );
     }
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(
+            User::class,
+            'created_by'
+        );
     }
 
     public function updatedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'updated_by');
+        return $this->belongsTo(
+            User::class,
+            'updated_by'
+        );
     }
 }

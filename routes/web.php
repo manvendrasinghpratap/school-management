@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/courses.php');
     require base_path('routes/staff.php');
     require base_path('routes/instructors.php');
+    require base_path('routes/student-enrollments.php');
     require base_path('routes/academic-years.php');
     require base_path('routes/terms.php');
     require base_path('routes/dashboard.php');

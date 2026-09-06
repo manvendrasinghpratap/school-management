@@ -4,9 +4,16 @@
 
 <div class="container-fluid">
 
+    {{-- ===================================================== --}}
+    {{-- Page Header --}}
+    {{-- ===================================================== --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
+
         <div>
-            <h1 class="h3 mb-1">Register Parent / Guardian</h1>
+            <h1 class="h3 mb-1">
+                Register Parent / Guardian
+            </h1>
+
             <p class="text-muted mb-0">
                 Add a new parent or guardian to the school.
             </p>
@@ -16,29 +23,54 @@
             href="{{ route('admin.guardians.index') }}"
             class="btn btn-secondary"
         >
+            <i class="bx bx-arrow-back me-1"></i>
             Back to Guardians
         </a>
+
     </div>
 
+
+    {{-- ===================================================== --}}
+    {{-- Validation Errors --}}
+    {{-- ===================================================== --}}
     @if($errors->any())
-        <div class="alert alert-danger">
+
+        <div class="alert alert-danger alert-dismissible fade show">
 
             <strong>Please correct the following errors:</strong>
 
             <ul class="mb-0 mt-2">
+
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
+
             </ul>
 
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+            ></button>
+
         </div>
+
     @endif
 
+
+    {{-- ===================================================== --}}
+    {{-- Guardian Information --}}
+    {{-- ===================================================== --}}
     <div class="card">
 
         <div class="card-header">
-            <h5 class="mb-0">Guardian Information</h5>
+
+            <h5 class="mb-0">
+                Guardian Information
+            </h5>
+
         </div>
+
 
         <div class="card-body">
 
@@ -46,18 +78,23 @@
                 method="POST"
                 action="{{ route('admin.guardians.store') }}"
             >
+
                 @csrf
+
 
                 <div class="row">
 
+                    {{-- ================================================= --}}
                     {{-- Guardian Number --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-6 mb-3">
 
                         <label
                             for="guardian_number"
                             class="form-label"
                         >
-                            Guardian Number <span class="text-danger">*</span>
+                            Guardian Number
+                            <span class="text-danger">*</span>
                         </label>
 
                         <input
@@ -77,7 +114,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- Title --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-6 mb-3">
 
                         <label
@@ -92,13 +132,53 @@
                             id="title"
                             class="form-select @error('title') is-invalid @enderror"
                         >
-                            <option value="">Select title</option>
-                            <option value="Mr." @selected(old('title') === 'Mr.')>Mr.</option>
-                            <option value="Mrs." @selected(old('title') === 'Mrs.')>Mrs.</option>
-                            <option value="Miss" @selected(old('title') === 'Miss')>Miss</option>
-                            <option value="Ms." @selected(old('title') === 'Ms.')>Ms.</option>
-                            <option value="Dr." @selected(old('title') === 'Dr.')>Dr.</option>
-                            <option value="Prof." @selected(old('title') === 'Prof.')>Prof.</option>
+
+                            <option value="">
+                                Select title
+                            </option>
+
+                            <option
+                                value="Mr."
+                                @selected(old('title') === 'Mr.')
+                            >
+                                Mr.
+                            </option>
+
+                            <option
+                                value="Mrs."
+                                @selected(old('title') === 'Mrs.')
+                            >
+                                Mrs.
+                            </option>
+
+                            <option
+                                value="Miss"
+                                @selected(old('title') === 'Miss')
+                            >
+                                Miss
+                            </option>
+
+                            <option
+                                value="Ms."
+                                @selected(old('title') === 'Ms.')
+                            >
+                                Ms.
+                            </option>
+
+                            <option
+                                value="Dr."
+                                @selected(old('title') === 'Dr.')
+                            >
+                                Dr.
+                            </option>
+
+                            <option
+                                value="Prof."
+                                @selected(old('title') === 'Prof.')
+                            >
+                                Prof.
+                            </option>
+
                         </select>
 
                         @error('title')
@@ -109,14 +189,18 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- First Name --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-4 mb-3">
 
                         <label
                             for="first_name"
                             class="form-label"
                         >
-                            First Name <span class="text-danger">*</span>
+                            First Name
+                            <span class="text-danger">*</span>
                         </label>
 
                         <input
@@ -136,7 +220,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- Middle Name --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-4 mb-3">
 
                         <label
@@ -162,14 +249,18 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- Last Name --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-4 mb-3">
 
                         <label
                             for="last_name"
                             class="form-label"
                         >
-                            Last Name <span class="text-danger">*</span>
+                            Last Name
+                            <span class="text-danger">*</span>
                         </label>
 
                         <input
@@ -189,7 +280,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- Phone --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-6 mb-3">
 
                         <label
@@ -215,7 +309,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- WhatsApp --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-6 mb-3">
 
                         <label
@@ -241,7 +338,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- Email --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-6 mb-3">
 
                         <label
@@ -267,7 +367,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- Occupation --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-6 mb-3">
 
                         <label
@@ -293,7 +396,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- State --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-6 mb-3">
 
                         <label
@@ -319,7 +425,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- Local Government --}}
+                    {{-- ================================================= --}}
                     <div class="col-md-6 mb-3">
 
                         <label
@@ -345,7 +454,10 @@
 
                     </div>
 
+
+                    {{-- ================================================= --}}
                     {{-- Address --}}
+                    {{-- ================================================= --}}
                     <div class="col-12 mb-4">
 
                         <label
@@ -372,14 +484,23 @@
 
                 </div>
 
+
+                {{-- ================================================= --}}
+                {{-- Form Actions --}}
+                {{-- ================================================= --}}
                 <div class="d-flex gap-2">
 
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                    >
-                        Register Guardian
-                    </button>
+                    @can('guardians.create')
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            <i class="bx bx-save me-1"></i>
+                            Register Guardian
+                        </button>
+
+                    @endcan
 
                     <a
                         href="{{ route('admin.guardians.index') }}"
@@ -393,6 +514,7 @@
             </form>
 
         </div>
+
     </div>
 
 </div>

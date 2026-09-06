@@ -10,338 +10,485 @@
                     {{-- ===================================================== --}}
                     {{-- Dashboard --}}
                     {{-- ===================================================== --}}
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="{{ route('admin.dashboard') }}">
+                    @if(auth()->user()?->can('dashboard.view'))
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="{{ route('admin.dashboard') }}">
 
-                            <i class="bx bx-home-circle me-2"></i>
-                            <span>Dashboard</span>
+                                <i class="bx bx-home-circle me-2"></i>
+                                <span>Dashboard</span>
 
-                        </a>
-                    </li>
+                            </a>
+                        </li>
+                    @endif
 
 
                     {{-- ===================================================== --}}
                     {{-- School --}}
                     {{-- ===================================================== --}}
-                    <li class="nav-item dropdown">
+                    @if(
+                        auth()->user()?->can('schools.view') ||
+                        auth()->user()?->can('schools.update') ||
+                        auth()->user()?->can('settings.view')
+                    )
 
-                        <a class="nav-link dropdown-toggle arrow-none"
-                           href="#"
-                           id="topnav-school"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">
+                        <li class="nav-item dropdown">
 
-                            <i class="bx bx-building-house me-2"></i>
-                            <span>School</span>
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-school"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
 
-                            <div class="arrow-down"></div>
+                                <i class="bx bx-building-house me-2"></i>
+                                <span>School</span>
 
-                        </a>
-
-                        <div class="dropdown-menu"
-                             aria-labelledby="topnav-school">
-
-                            <a href="{{ route('admin.school.setup') }}"
-                               class="dropdown-item">
-
-                                <i class="bx bx-building me-2"></i>
-                                School Setup
+                                <div class="arrow-down"></div>
 
                             </a>
 
-                            @if(auth()->user()?->school_id)
+                            <div class="dropdown-menu"
+                                 aria-labelledby="topnav-school">
 
-                                <a href="{{ route('admin.school.settings.edit', auth()->user()->school_id) }}"
-                                   class="dropdown-item">
+                                {{-- School Setup --}}
+                                @if(
+                                    auth()->user()?->can('schools.view') ||
+                                    auth()->user()?->can('schools.update')
+                                )
 
-                                    <i class="bx bx-cog me-2"></i>
-                                    System Settings
+                                    <a href="{{ route('admin.school.setup') }}"
+                                       class="dropdown-item">
 
-                                </a>
+                                        <i class="bx bx-building me-2"></i>
+                                        School Setup
 
-                            @endif
+                                    </a>
 
-                        </div>
+                                @endif
 
-                    </li>
+
+                                {{-- System Settings --}}
+                                @if(
+                                    auth()->user()?->school_id &&
+                                    auth()->user()?->can('settings.view')
+                                )
+
+                                    <a href="{{ route('admin.school.settings.edit', auth()->user()->school_id) }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-cog me-2"></i>
+                                        System Settings
+
+                                    </a>
+
+                                @endif
+
+                            </div>
+
+                        </li>
+
+                    @endif
 
 
                     {{-- ===================================================== --}}
                     {{-- Students --}}
                     {{-- ===================================================== --}}
-                    <li class="nav-item dropdown">
+                    @if(
+                        auth()->user()?->can('students.view') ||
+                        auth()->user()?->can('students.create') ||
+                        auth()->user()?->can('students.update') ||
+                        auth()->user()?->can('students.delete') ||
+                        auth()->user()?->can('students.documents.view') ||
+                        auth()->user()?->can('students.documents.manage') ||
+                        auth()->user()?->can('guardians.view')
+                    )
 
-                        <a class="nav-link dropdown-toggle arrow-none"
-                           href="#"
-                           id="topnav-students"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">
+                        <li class="nav-item dropdown">
 
-                            <i class="bx bx-user me-2"></i>
-                            <span>Students</span>
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-students"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
 
-                            <div class="arrow-down"></div>
+                                <i class="bx bx-user me-2"></i>
+                                <span>Students</span>
 
-                        </a>
-
-                        <div class="dropdown-menu"
-                             aria-labelledby="topnav-students">
-
-                            <a href="{{ route('admin.students.index') }}"
-                               class="dropdown-item">
-
-                                <i class="bx bx-list-ul me-2"></i>
-                                Student List
-
-                            </a>
-
-                            <a href="{{ route('admin.students.create') }}"
-                               class="dropdown-item">
-
-                                <i class="bx bx-user-plus me-2"></i>
-                                Student Registration
+                                <div class="arrow-down"></div>
 
                             </a>
 
-                            <a href="{{ route('admin.guardians.index') }}"
-                               class="dropdown-item">
+                            <div class="dropdown-menu"
+                                 aria-labelledby="topnav-students">
 
-                                <i class="bx bx-group me-2"></i>
-                                Guardians
+                                {{-- Student List --}}
+                                @if(auth()->user()?->can('students.view'))
 
-                            </a>
+                                    <a href="{{ route('admin.students.index') }}"
+                                       class="dropdown-item">
 
-                        </div>
+                                        <i class="bx bx-list-ul me-2"></i>
+                                        Student List
 
-                    </li>
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Student Registration --}}
+                                @if(auth()->user()?->can('students.create'))
+
+                                    <a href="{{ route('admin.students.create') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-user-plus me-2"></i>
+                                        Student Registration
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Student Documents --}}
+                                @if(
+                                    auth()->user()?->can('students.documents.view') ||
+                                    auth()->user()?->can('students.documents.manage')
+                                )
+
+                                    @if(auth()->user()?->can('students.view'))
+
+                                        <div class="dropdown-divider"></div>
+
+                                        {{-- Documents are accessed from Student Profile --}}
+                                        <span class="dropdown-item-text text-muted font-size-12">
+                                            <i class="bx bx-file me-2"></i>
+                                            Student Documents
+                                        </span>
+
+                                    @endif
+
+                                @endif
+
+
+                                {{-- Guardians --}}
+                                @if(auth()->user()?->can('guardians.view'))
+
+                                    <div class="dropdown-divider"></div>
+
+                                    <a href="{{ route('admin.guardians.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-group me-2"></i>
+                                        Guardians
+
+                                    </a>
+
+                                @endif
+
+                            </div>
+
+                        </li>
+
+                    @endif
 
 
                     {{-- ===================================================== --}}
                     {{-- Academic --}}
                     {{-- ===================================================== --}}
-                    <li class="nav-item dropdown">
+                    @if(
+                        auth()->user()?->can('academic-years.view') ||
+                        auth()->user()?->can('terms.view') ||
+                        auth()->user()?->can('departments.view') ||
+                        auth()->user()?->can('classes.view') ||
+                        auth()->user()?->can('sections.view') ||
+                        auth()->user()?->can('courses.view')
+                    )
 
-                        <a class="nav-link dropdown-toggle arrow-none"
-                           href="#"
-                           id="topnav-academics"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">
+                        <li class="nav-item dropdown">
 
-                            <i class="bx bx-book-open me-2"></i>
-                            <span>Academics</span>
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-academics"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
 
-                            <div class="arrow-down"></div>
+                                <i class="bx bx-book-open me-2"></i>
+                                <span>Academics</span>
 
-                        </a>
-
-                        <div class="dropdown-menu"
-                             aria-labelledby="topnav-academics">
-
-                            {{-- Academic Years --}}
-                            <a href="{{ route('admin.academic-years.index') }}"
-                               class="dropdown-item">
-
-                                <i class="bx bx-calendar me-2"></i>
-                                Academic Years
+                                <div class="arrow-down"></div>
 
                             </a>
 
-                            {{-- Terms --}}
-                            <a href="{{ route('admin.terms.index') }}"
-                               class="dropdown-item">
+                            <div class="dropdown-menu"
+                                 aria-labelledby="topnav-academics">
 
-                                <i class="bx bx-calendar-event me-2"></i>
-                                Terms / Semesters
+                                {{-- Academic Years --}}
+                                @if(auth()->user()?->can('academic-years.view'))
 
-                            </a>
+                                    <a href="{{ route('admin.academic-years.index') }}"
+                                       class="dropdown-item">
 
-                            <div class="dropdown-divider"></div>
+                                        <i class="bx bx-calendar me-2"></i>
+                                        Academic Years
 
-                            {{-- Departments --}}
-                            <a href="{{ route('admin.departments.index') }}"
-                               class="dropdown-item">
+                                    </a>
 
-                                <i class="bx bx-sitemap me-2"></i>
-                                Departments
+                                @endif
 
-                            </a>
 
-                            {{-- Classes --}}
-                            <a href="{{ route('admin.classes.index') }}"
-                               class="dropdown-item">
+                                {{-- Terms --}}
+                                @if(auth()->user()?->can('terms.view'))
 
-                                <i class="bx bx-building me-2"></i>
-                                Classes
+                                    <a href="{{ route('admin.terms.index') }}"
+                                       class="dropdown-item">
 
-                            </a>
+                                        <i class="bx bx-calendar-event me-2"></i>
+                                        Terms / Semesters
 
-                            {{-- Sections --}}
-                            <a href="{{ route('admin.sections.index') }}"
-                               class="dropdown-item">
+                                    </a>
 
-                                <i class="bx bx-grid-alt me-2"></i>
-                                Sections / Streams
+                                @endif
 
-                            </a>
 
-                            {{-- Subjects --}}
-                            <a href="{{ route('admin.courses.index') }}"
-                               class="dropdown-item">
+                                {{-- Departments --}}
+                                @if(auth()->user()?->can('departments.view'))
 
-                                <i class="bx bx-book me-2"></i>
-                                Subjects / Courses
+                                    <div class="dropdown-divider"></div>
 
-                            </a>
+                                    <a href="{{ route('admin.departments.index') }}"
+                                       class="dropdown-item">
 
-                        </div>
+                                        <i class="bx bx-sitemap me-2"></i>
+                                        Departments
 
-                    </li>
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Classes --}}
+                                @if(auth()->user()?->can('classes.view'))
+
+                                    <a href="{{ route('admin.classes.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-building me-2"></i>
+                                        Classes
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Sections --}}
+                                @if(auth()->user()?->can('sections.view'))
+
+                                    <a href="{{ route('admin.sections.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-grid-alt me-2"></i>
+                                        Sections / Streams
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Subjects --}}
+                                @if(auth()->user()?->can('courses.view'))
+
+                                    <a href="{{ route('admin.courses.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-book me-2"></i>
+                                        Subjects / Courses
+
+                                    </a>
+
+                                @endif
+
+                            </div>
+
+                        </li>
+
+                    @endif
 
 
                     {{-- ===================================================== --}}
                     {{-- Staff --}}
                     {{-- ===================================================== --}}
-                    <li class="nav-item dropdown">
+                    @if(
+                        auth()->user()?->can('staff.view') ||
+                        auth()->user()?->can('staff.create') ||
+                        auth()->user()?->can('staff.update') ||
+                        auth()->user()?->can('staff.delete') ||
+                        auth()->user()?->can('instructors.view') ||
+                        auth()->user()?->can('instructors.create') ||
+                        auth()->user()?->can('instructors.update') ||
+                        auth()->user()?->can('instructors.delete')
+                    )
 
-                        <a class="nav-link dropdown-toggle arrow-none"
-                           href="#"
-                           id="topnav-staff"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">
+                        <li class="nav-item dropdown">
 
-                            <i class="bx bx-group me-2"></i>
-                            <span>Staff</span>
-
-                            <div class="arrow-down"></div>
-
-                        </a>
-
-                        <div class="dropdown-menu"
-                             aria-labelledby="topnav-staff">
-
-                            {{-- All Staff --}}
-                            <a href="{{ route('admin.staff.index') }}"
-                               class="dropdown-item">
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-staff"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
 
                                 <i class="bx bx-group me-2"></i>
-                                Staff List
+                                <span>Staff</span>
+
+                                <div class="arrow-down"></div>
 
                             </a>
 
-                            {{-- Add Staff --}}
-                            <a href="{{ route('admin.staff.create') }}"
-                               class="dropdown-item">
+                            <div class="dropdown-menu"
+                                 aria-labelledby="topnav-staff">
 
-                                <i class="bx bx-user-plus me-2"></i>
-                                Add Staff
+                                {{-- Staff List --}}
+                                @if(auth()->user()?->can('staff.view'))
 
-                            </a>
+                                    <a href="{{ route('admin.staff.index') }}"
+                                       class="dropdown-item">
 
-                            <div class="dropdown-divider"></div>
+                                        <i class="bx bx-group me-2"></i>
+                                        Staff List
 
-                            {{-- Instructors --}}
-                            <a href="{{ route('admin.instructors.index') }}"
-                               class="dropdown-item">
+                                    </a>
 
-                                <i class="bx bx-chalkboard me-2"></i>
-                                Instructors
+                                @endif
 
-                            </a>
 
-                            {{-- Add Instructor --}}
-                            <a href="{{ route('admin.instructors.create') }}"
-                               class="dropdown-item">
+                                {{-- Add Staff --}}
+                                @if(auth()->user()?->can('staff.create'))
 
-                                <i class="bx bx-user-check me-2"></i>
-                                Add Instructor
+                                    <a href="{{ route('admin.staff.create') }}"
+                                       class="dropdown-item">
 
-                            </a>
+                                        <i class="bx bx-user-plus me-2"></i>
+                                        Add Staff
 
-                        </div>
+                                    </a>
 
-                    </li>
+                                @endif
+
+
+                                {{-- Instructors --}}
+                                @if(auth()->user()?->can('instructors.view'))
+
+                                    <div class="dropdown-divider"></div>
+
+                                    <a href="{{ route('admin.instructors.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-chalkboard me-2"></i>
+                                        Instructors
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Add Instructor --}}
+                                @if(auth()->user()?->can('instructors.create'))
+
+                                    <a href="{{ route('admin.instructors.create') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-user-check me-2"></i>
+                                        Add Instructor
+
+                                    </a>
+
+                                @endif
+
+                            </div>
+
+                        </li>
+
+                    @endif
 
 
                     {{-- ===================================================== --}}
-{{-- Administration --}}
-{{-- ===================================================== --}}
+                    {{-- Administration --}}
+                    {{-- ===================================================== --}}
+                    @if(
+                        auth()->user()?->can('users.view') ||
+                        auth()->user()?->can('users.create') ||
+                        auth()->user()?->can('roles.view') ||
+                        auth()->user()?->can('permissions.view')
+                    )
 
-@if(
-    auth()->user()?->can('users.view') ||
-    auth()->user()?->can('roles.view') ||
-    auth()->user()?->can('permissions.view')
-)
+                        <li class="nav-item dropdown">
 
-    <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-administration"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
 
-        <a class="nav-link dropdown-toggle arrow-none"
-           href="#"
-           id="topnav-administration"
-           role="button"
-           data-bs-toggle="dropdown"
-           aria-expanded="false">
+                                <i class="bx bx-cog me-2"></i>
+                                <span>Administration</span>
 
-            <i class="bx bx-cog me-2"></i>
-            <span>Administration</span>
+                                <div class="arrow-down"></div>
 
-            <div class="arrow-down"></div>
+                            </a>
 
-        </a>
+                            <div class="dropdown-menu"
+                                 aria-labelledby="topnav-administration">
 
-        <div class="dropdown-menu"
-             aria-labelledby="topnav-administration">
+                                {{-- Users --}}
+                                @if(auth()->user()?->can('users.view'))
 
-            {{-- Users --}}
-            @if(auth()->user()?->can('users.view'))
+                                    <a href="{{ route('admin.users.index') }}"
+                                       class="dropdown-item">
 
-                <a href="{{ route('admin.users.index') }}"
-                   class="dropdown-item">
+                                        <i class="bx bx-user me-2"></i>
+                                        Users
 
-                    <i class="bx bx-user me-2"></i>
-                    Users
+                                    </a>
 
-                </a>
-
-            @endif
-
-
-            {{-- Roles --}}
-            @if(auth()->user()?->can('roles.view'))
-
-                <a href="{{ route('admin.roles.index') }}"
-                   class="dropdown-item">
-
-                    <i class="bx bx-shield me-2"></i>
-                    Roles
-
-                </a>
-
-            @endif
+                                @endif
 
 
-            {{-- Permissions --}}
-            @if(auth()->user()?->can('permissions.view'))
+                                {{-- Roles --}}
+                                @if(auth()->user()?->can('roles.view'))
 
-                <a href="{{ route('admin.permissions.index') }}"
-                   class="dropdown-item">
+                                    <a href="{{ route('admin.roles.index') }}"
+                                       class="dropdown-item">
 
-                    <i class="bx bx-lock-alt me-2"></i>
-                    Permissions
+                                        <i class="bx bx-shield me-2"></i>
+                                        Roles
 
-                </a>
+                                    </a>
 
-            @endif
+                                @endif
 
-        </div>
 
-    </li>
+                                {{-- Permissions --}}
+                                @if(auth()->user()?->can('permissions.view'))
 
-@endif
+                                    <a href="{{ route('admin.permissions.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-lock-alt me-2"></i>
+                                        Permissions
+
+                                    </a>
+
+                                @endif
+
+                            </div>
+
+                        </li>
+
+                    @endif
 
                 </ul>
 

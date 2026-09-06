@@ -15,7 +15,6 @@
                 </h4>
 
                 <div class="page-title-right">
-
                     <a
                         href="{{ route('admin.students.show', $student) }}"
                         class="btn btn-secondary"
@@ -23,7 +22,6 @@
                         <i class="bx bx-arrow-back"></i>
                         Back to Student
                     </a>
-
                 </div>
 
             </div>
@@ -46,6 +44,21 @@
         </div>
     @endif
 
+    {{-- Error Message --}}
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show">
+
+            {{ session('error') }}
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+            ></button>
+
+        </div>
+    @endif
+
     {{-- Validation Errors --}}
     @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show">
@@ -53,11 +66,9 @@
             <strong>Please correct the following errors:</strong>
 
             <ul class="mb-0 mt-2">
-
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
-
             </ul>
 
             <button
@@ -81,6 +92,7 @@
 
                     <div class="d-flex align-items-center">
 
+                        {{-- Student Photo --}}
                         @if($student->photo)
 
                             <img
@@ -137,242 +149,245 @@
     </div>
 
 
-    {{-- Upload Document --}}
+    {{-- Main Content --}}
     <div class="row">
 
-        <div class="col-lg-5">
+        {{-- Upload Document --}}
+        @can('students.documents.manage')
+            <div class="col-lg-5">
 
-            <div class="card">
+                <div class="card">
 
-                <div class="card-body">
+                    <div class="card-body">
 
-                    <h5 class="card-title mb-4">
-                        Upload Document
-                    </h5>
+                        <h5 class="card-title mb-4">
+                            Upload Document
+                        </h5>
 
-                    <form
-                        action="{{ route('admin.students.documents.store', $student) }}"
-                        method="POST"
-                        enctype="multipart/form-data"
-                    >
+                        <form
+                            action="{{ route('admin.students.documents.store', $student) }}"
+                            method="POST"
+                            enctype="multipart/form-data"
+                        >
 
-                        @csrf
+                            @csrf
 
-                        {{-- Document Type --}}
-                        <div class="mb-3">
+                            {{-- Document Type --}}
+                            <div class="mb-3">
 
-                            <label
-                                for="document_type"
-                                class="form-label"
-                            >
-                                Document Type
-                                <span class="text-danger">*</span>
-                            </label>
-
-                            <select
-                                name="document_type"
-                                id="document_type"
-                                class="form-select @error('document_type') is-invalid @enderror"
-                                required
-                            >
-
-                                <option value="">
-                                    Select document type
-                                </option>
-
-                                <option
-                                    value="Birth Certificate"
-                                    @selected(old('document_type') === 'Birth Certificate')
+                                <label
+                                    for="document_type"
+                                    class="form-label"
                                 >
-                                    Birth Certificate
-                                </option>
+                                    Document Type
+                                    <span class="text-danger">*</span>
+                                </label>
 
-                                <option
-                                    value="Passport"
-                                    @selected(old('document_type') === 'Passport')
+                                <select
+                                    name="document_type"
+                                    id="document_type"
+                                    class="form-select @error('document_type') is-invalid @enderror"
+                                    required
                                 >
-                                    Passport
-                                </option>
 
-                                <option
-                                    value="National ID"
-                                    @selected(old('document_type') === 'National ID')
+                                    <option value="">
+                                        Select document type
+                                    </option>
+
+                                    <option
+                                        value="Birth Certificate"
+                                        @selected(old('document_type') === 'Birth Certificate')
+                                    >
+                                        Birth Certificate
+                                    </option>
+
+                                    <option
+                                        value="Passport"
+                                        @selected(old('document_type') === 'Passport')
+                                    >
+                                        Passport
+                                    </option>
+
+                                    <option
+                                        value="National ID"
+                                        @selected(old('document_type') === 'National ID')
+                                    >
+                                        National ID
+                                    </option>
+
+                                    <option
+                                        value="Admission Letter"
+                                        @selected(old('document_type') === 'Admission Letter')
+                                    >
+                                        Admission Letter
+                                    </option>
+
+                                    <option
+                                        value="Previous School Record"
+                                        @selected(old('document_type') === 'Previous School Record')
+                                    >
+                                        Previous School Record
+                                    </option>
+
+                                    <option
+                                        value="Medical Record"
+                                        @selected(old('document_type') === 'Medical Record')
+                                    >
+                                        Medical Record
+                                    </option>
+
+                                    <option
+                                        value="Guardian ID"
+                                        @selected(old('document_type') === 'Guardian ID')
+                                    >
+                                        Guardian ID
+                                    </option>
+
+                                    <option
+                                        value="Result / Transcript"
+                                        @selected(old('document_type') === 'Result / Transcript')
+                                    >
+                                        Result / Transcript
+                                    </option>
+
+                                    <option
+                                        value="Other"
+                                        @selected(old('document_type') === 'Other')
+                                    >
+                                        Other
+                                    </option>
+
+                                </select>
+
+                                @error('document_type')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- Document Name --}}
+                            <div class="mb-3">
+
+                                <label
+                                    for="document_name"
+                                    class="form-label"
                                 >
-                                    National ID
-                                </option>
+                                    Document Name
+                                </label>
 
-                                <option
-                                    value="Admission Letter"
-                                    @selected(old('document_type') === 'Admission Letter')
+                                <input
+                                    type="text"
+                                    name="document_name"
+                                    id="document_name"
+                                    class="form-control @error('document_name') is-invalid @enderror"
+                                    value="{{ old('document_name') }}"
+                                    maxlength="255"
+                                    placeholder="e.g. Birth Certificate - John Doe"
                                 >
-                                    Admission Letter
-                                </option>
 
-                                <option
-                                    value="Previous School Record"
-                                    @selected(old('document_type') === 'Previous School Record')
+                                <small class="text-muted">
+                                    Leave blank to use the uploaded file name.
+                                </small>
+
+                                @error('document_name')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- File --}}
+                            <div class="mb-3">
+
+                                <label
+                                    for="document"
+                                    class="form-label"
                                 >
-                                    Previous School Record
-                                </option>
+                                    File
+                                    <span class="text-danger">*</span>
+                                </label>
 
-                                <option
-                                    value="Medical Record"
-                                    @selected(old('document_type') === 'Medical Record')
+                                <input
+                                    type="file"
+                                    name="document"
+                                    id="document"
+                                    class="form-control @error('document') is-invalid @enderror"
+                                    accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+                                    required
                                 >
-                                    Medical Record
-                                </option>
 
-                                <option
-                                    value="Guardian ID"
-                                    @selected(old('document_type') === 'Guardian ID')
+                                <small class="text-muted">
+                                    PDF, JPG, JPEG, PNG, WEBP, DOC or DOCX.
+                                    Maximum size: 10 MB.
+                                </small>
+
+                                @error('document')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- Description --}}
+                            <div class="mb-4">
+
+                                <label
+                                    for="description"
+                                    class="form-label"
                                 >
-                                    Guardian ID
-                                </option>
+                                    Description
+                                </label>
 
-                                <option
-                                    value="Result / Transcript"
-                                    @selected(old('document_type') === 'Result / Transcript')
+                                <textarea
+                                    name="description"
+                                    id="description"
+                                    rows="4"
+                                    class="form-control @error('description') is-invalid @enderror"
+                                    maxlength="5000"
+                                    placeholder="Optional description or notes about this document..."
+                                >{{ old('description') }}</textarea>
+
+                                @error('description')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- Submit --}}
+                            <div class="d-grid">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
                                 >
-                                    Result / Transcript
-                                </option>
+                                    <i class="bx bx-upload me-1"></i>
+                                    Upload Document
+                                </button>
 
-                                <option
-                                    value="Other"
-                                    @selected(old('document_type') === 'Other')
-                                >
-                                    Other
-                                </option>
+                            </div>
 
-                            </select>
+                        </form>
 
-                            @error('document_type')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- Document Name --}}
-                        <div class="mb-3">
-
-                            <label
-                                for="document_name"
-                                class="form-label"
-                            >
-                                Document Name
-                            </label>
-
-                            <input
-                                type="text"
-                                name="document_name"
-                                id="document_name"
-                                class="form-control @error('document_name') is-invalid @enderror"
-                                value="{{ old('document_name') }}"
-                                maxlength="255"
-                                placeholder="e.g. Birth Certificate - John Doe"
-                            >
-
-                            <small class="text-muted">
-                                Leave blank to use the uploaded file name.
-                            </small>
-
-                            @error('document_name')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- File --}}
-                        <div class="mb-3">
-
-                            <label
-                                for="document"
-                                class="form-label"
-                            >
-                                File
-                                <span class="text-danger">*</span>
-                            </label>
-
-                            <input
-                                type="file"
-                                name="document"
-                                id="document"
-                                class="form-control @error('document') is-invalid @enderror"
-                                accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
-                                required
-                            >
-
-                            <small class="text-muted">
-                                PDF, JPG, JPEG, PNG, WEBP, DOC or DOCX.
-                                Maximum size: 10 MB.
-                            </small>
-
-                            @error('document')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- Description --}}
-                        <div class="mb-4">
-
-                            <label
-                                for="description"
-                                class="form-label"
-                            >
-                                Description
-                            </label>
-
-                            <textarea
-                                name="description"
-                                id="description"
-                                rows="4"
-                                class="form-control @error('description') is-invalid @enderror"
-                                maxlength="5000"
-                                placeholder="Optional description or notes about this document..."
-                            >{{ old('description') }}</textarea>
-
-                            @error('description')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- Submit --}}
-                        <div class="d-grid">
-
-                            <button
-                                type="submit"
-                                class="btn btn-primary"
-                            >
-                                <i class="bx bx-upload me-1"></i>
-                                Upload Document
-                            </button>
-
-                        </div>
-
-                    </form>
+                    </div>
 
                 </div>
 
             </div>
-
-        </div>
+        @endcan
 
 
         {{-- Documents List --}}
-        <div class="col-lg-7">
+        <div class="@can('students.documents.manage') col-lg-7 @else col-lg-12 @endcan">
 
             <div class="card">
 
@@ -401,6 +416,7 @@
                                 <div
                                     class="avatar-sm bg-light rounded d-flex align-items-center justify-content-center me-3"
                                 >
+
                                     @php
                                         $extension = strtolower(
                                             pathinfo($document->file_path, PATHINFO_EXTENSION)
@@ -423,9 +439,7 @@
                                 <div class="flex-grow-1">
 
                                     <h6 class="mb-1">
-
                                         {{ $document->document_name ?: basename($document->file_path) }}
-
                                     </h6>
 
                                     <div class="mb-2">
@@ -463,36 +477,54 @@
 
 
                                 {{-- Actions --}}
-                                <div class="ms-3 d-flex gap-2">
+                                @if(
+                                    auth()->user()?->can('students.documents.view') ||
+                                    auth()->user()?->can('students.documents.manage')
+                                )
 
-                                    <a
-                                        href="{{ route('admin.students.documents.download', [$student, $document]) }}"
-                                        class="btn btn-sm btn-outline-primary"
-                                        title="Download"
-                                    >
-                                        <i class="bx bx-download"></i>
-                                    </a>
+                                    <div class="ms-3 d-flex gap-2">
 
-                                    <form
-                                        action="{{ route('admin.students.documents.destroy', [$student, $document]) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Are you sure you want to delete this document?');"
-                                    >
+                                        {{-- Download --}}
+                                        @can('students.documents.view')
 
-                                        @csrf
-                                        @method('DELETE')
+                                            <a
+                                                href="{{ route('admin.students.documents.download', [$student, $document]) }}"
+                                                class="btn btn-sm btn-outline-primary"
+                                                title="Download"
+                                            >
+                                                <i class="bx bx-download"></i>
+                                            </a>
 
-                                        <button
-                                            type="submit"
-                                            class="btn btn-sm btn-outline-danger"
-                                            title="Delete"
-                                        >
-                                            <i class="bx bx-trash"></i>
-                                        </button>
+                                        @endcan
 
-                                    </form>
 
-                                </div>
+                                        {{-- Delete --}}
+                                        @can('students.documents.manage')
+
+                                            <form
+                                                action="{{ route('admin.students.documents.destroy', [$student, $document]) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Are you sure you want to delete this document?');"
+                                            >
+
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Delete"
+                                                >
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+
+                                            </form>
+
+                                        @endcan
+
+                                    </div>
+
+                                @endif
 
                             </div>
 
