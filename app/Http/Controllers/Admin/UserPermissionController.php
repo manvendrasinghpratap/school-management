@@ -3,31 +3,131 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Permission;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Spatie\Permission\Models\Permission;
 
 class UserPermissionController extends Controller
 {
-    public function edit(User $user): View
+    /**
+     * Display the permissions assigned directly to a user.
+     */
+    public function edit(User $user)
     {
-        $permissions = Permission::query()->orderBy('name')->get();
-        $user->load('permissions');
+        $this->ensureSameSchool($user);
 
-        return view('admin.users.permissions', compact('user', 'permissions'));
+        $permissions = Permission::query()
+            ->where('guard_name', 'web')
+            ->orderBy('name')
+            ->get()
+            ->groupBy(function ($permission) {
+                return $this->permissionGroup($permission->name);
+            });
+
+        $user->load('roles');
+
+        /*
+         * Only direct permissions are selected here.
+         *
+         * Permissions inherited through roles are NOT selected.
+         */
+        $directPermissions = $user->getDirectPermissions()
+            ->pluck('name')
+            ->toArray();
+
+        return view(
+            'admin.users.permissions',
+            compact(
+                'user',
+                'permissions',
+                'directPermissions'
+            )
+        );
     }
 
-    public function update(Request $request, User $user): RedirectResponse
+
+    /**
+     * Update direct permissions assigned to a user.
+     */
+    public function update(Request $request, User $user)
     {
-        $data = $request->validate([
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', 'exists:permissions,name'],
+        $this->ensureSameSchool($user);
+
+        $validated = $request->validate([
+            'permissions' => [
+                'nullable',
+                'array',
+            ],
+
+            'permissions.*' => [
+                'integer',
+                'exists:permissions,id',
+            ],
         ]);
 
-        $user->syncPermissions($data['permissions'] ?? []);
+        $permissionIds = $validated['permissions'] ?? [];
 
-        return back()->with('success', 'Direct user permissions updated successfully.');
+        $permissions = Permission::query()
+            ->where('guard_name', 'web')
+            ->whereIn('id', $permissionIds)
+            ->get();
+
+        /*
+         * Synchronize ONLY direct permissions.
+         *
+         * User roles remain untouched.
+         */
+        $user->syncPermissions($permissions);
+
+        return redirect()
+            ->route('admin.users.permissions.edit', $user)
+            ->with(
+                'success',
+                'User permissions updated successfully.'
+            );
+    }
+
+
+    /**
+     * Group permissions for display.
+     */
+    protected function permissionGroup(string $permission): string
+    {
+        $parts = explode('.', $permission);
+
+        if (count($parts) >= 2) {
+            return ucfirst(
+                str_replace(
+                    ['-', '_'],
+                    ' ',
+                    $parts[0]
+                )
+            );
+        }
+
+        return 'Other';
+    }
+
+
+    /**
+     * Ensure the user belongs to the current school.
+     */
+    protected function ensureSameSchool(User $user): void
+    {
+        $schoolId = auth()->user()?->school_id;
+
+        if (!$schoolId) {
+            abort(
+                403,
+                'No school is assigned to this user.'
+            );
+        }
+
+        if ((int) $user->school_id !== (int) $schoolId) {
+            abort(
+                403,
+                'You are not authorized to access this user.'
+            );
+        }
     }
 }

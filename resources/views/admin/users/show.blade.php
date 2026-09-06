@@ -217,7 +217,7 @@
                             @if($user->is_staff)
                                 <span class="badge bg-info">
                                     Yes
-                                </span>
+                                </span> 
                             @else
                                 <span class="badge bg-light text-dark">
                                     No
@@ -401,6 +401,13 @@
                             <i class="mdi mdi-pencil-outline me-1"></i>
                             Edit
                         </a>
+                        <a
+    href="{{ route('admin.users.permissions.edit', $user) }}"
+    class="btn btn-info btn-sm"
+>
+    <i class="mdi mdi-shield-key-outline me-1"></i>
+    Permissions
+</a>
 
                         @if(!$user->is_deleted)
 
