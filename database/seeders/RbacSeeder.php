@@ -93,10 +93,15 @@ class RbacSeeder extends Seeder
             'enrollments.update',
             'enrollments.delete',
 
-            // Student lifecycle
+            // Student Promotion
             'promotions.view',
             'promotions.create',
+            'promotions.update',
+            'promotions.delete',
+            'promotions.approve',
+            'promotions.reject',
 
+            // Graduation / Alumni
             'graduation.view',
             'graduation.manage',
 
@@ -242,6 +247,12 @@ class RbacSeeder extends Seeder
             'backup.create',
 
             'api.access',
+
+            'graduation.view',
+            'graduation.create',
+            'graduation.approve',
+            'graduation.complete',
+            'graduation.delete',
         ];
 
         /*
@@ -267,6 +278,7 @@ class RbacSeeder extends Seeder
             | Super Admin
             |--------------------------------------------------------------------------
             */
+
             'Super Admin' => $permissions,
 
             /*
@@ -279,6 +291,7 @@ class RbacSeeder extends Seeder
             | - api.access
             |
             */
+
             'Administrator' => array_values(array_filter(
                 $permissions,
                 fn ($p) =>
@@ -290,7 +303,12 @@ class RbacSeeder extends Seeder
             |--------------------------------------------------------------------------
             | Principal
             |--------------------------------------------------------------------------
+            |
+            | Principal can review and approve/reject promotions.
+            | Principal cannot create, update, or delete promotion records.
+            |
             */
+
             'Principal' => [
                 'dashboard.view',
 
@@ -328,6 +346,11 @@ class RbacSeeder extends Seeder
 
                 'events.view',
                 'events.manage',
+
+                // Student Promotion
+                'promotions.view',
+                'promotions.approve',
+                'promotions.reject',
             ],
 
             /*
@@ -335,6 +358,7 @@ class RbacSeeder extends Seeder
             | Examinations Officer
             |--------------------------------------------------------------------------
             */
+
             'Examinations Officer' => [
                 'dashboard.view',
 
@@ -374,6 +398,7 @@ class RbacSeeder extends Seeder
             | Teacher
             |--------------------------------------------------------------------------
             */
+
             'Teacher' => [
                 'dashboard.view',
 
@@ -410,6 +435,7 @@ class RbacSeeder extends Seeder
             | Accountant
             |--------------------------------------------------------------------------
             */
+
             'Accountant' => [
                 'dashboard.view',
 
@@ -442,9 +468,14 @@ class RbacSeeder extends Seeder
             | Registrar
             |--------------------------------------------------------------------------
             |
-            | Registrar can create/update enrollments but cannot delete them.
+            | Registrar can create and update promotions.
+            | Registrar CANNOT:
+            | - delete promotions
+            | - approve promotions
+            | - reject promotions
             |
             */
+
             'Registrar' => [
                 'dashboard.view',
 
@@ -464,8 +495,10 @@ class RbacSeeder extends Seeder
                 'enrollments.create',
                 'enrollments.update',
 
+                // Student Promotion
                 'promotions.view',
                 'promotions.create',
+                'promotions.update',
 
                 'graduation.view',
                 'graduation.manage',
@@ -487,6 +520,7 @@ class RbacSeeder extends Seeder
             | Student
             |--------------------------------------------------------------------------
             */
+
             'Student' => [
                 'dashboard.view',
 
@@ -518,6 +552,7 @@ class RbacSeeder extends Seeder
             | Parent
             |--------------------------------------------------------------------------
             */
+
             'Parent' => [
                 'dashboard.view',
 
@@ -564,6 +599,8 @@ class RbacSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app(
+            \Spatie\Permission\PermissionRegistrar::class
+        )->forgetCachedPermissions();
     }
 }

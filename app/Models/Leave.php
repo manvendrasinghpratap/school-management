@@ -7,28 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class StaffAttendance extends Model
+class Leave extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'staff_attendance';
+    protected $table = 'leaves';
 
     protected $fillable = [
         'school_id',
         'staff_id',
-        'attendance_date',
+        'leave_type',
+        'start_date',
+        'end_date',
+        'reason',
         'status',
-        'check_in',
-        'check_out',
-        'recorded_by',
-        'remarks',
+        'approved_by',
     ];
 
     protected $casts = [
         'school_id' => 'integer',
         'staff_id' => 'integer',
-        'attendance_date' => 'date',
-        'recorded_by' => 'integer',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'approved_by' => 'integer',
     ];
 
     public function staff(): BelongsTo
@@ -39,11 +40,11 @@ class StaffAttendance extends Model
         );
     }
 
-    public function recordedBy(): BelongsTo
+    public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(
             User::class,
-            'recorded_by'
+            'approved_by'
         );
     }
 }

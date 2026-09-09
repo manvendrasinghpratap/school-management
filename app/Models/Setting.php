@@ -9,32 +9,40 @@ class Setting extends Model
 {
     protected $fillable = [
         'school_id',
-        'key',
-        'value',
-        'type',
-        'group',
-        'description',
+        'setting_key',
+        'setting_value',
+        'setting_type',
     ];
 
     protected $casts = [
-        'value' => 'json',
+        'school_id' => 'integer',
     ];
 
     public function school(): BelongsTo
     {
-        return $this->belongsTo(School::class);
+        return $this->belongsTo(School::class, 'school_id');
     }
 
+    /**
+     * Get the setting value converted to its configured type.
+     */
     public function getTypedValueAttribute(): mixed
     {
-        return match ($this->type) {
-            'boolean' => filter_var($this->value, FILTER_VALIDATE_BOOLEAN),
-            'integer' => (int) $this->value,
-            'float' => (float) $this->value,
-            'json' => is_array($this->value)
-                ? $this->value
-                : json_decode($this->value, true),
-            default => $this->value,
+        return match ($this->setting_type) {
+            'boolean' => filter_var(
+                $this->setting_value,
+                FILTER_VALIDATE_BOOLEAN
+            ),
+
+            'integer' => (int) $this->setting_value,
+
+            'float' => (float) $this->setting_value,
+
+            'json' => is_array($this->setting_value)
+                ? $this->setting_value
+                : json_decode($this->setting_value, true),
+
+            default => $this->setting_value,
         };
     }
 }

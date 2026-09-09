@@ -21,15 +21,18 @@ class SystemSettingsController extends Controller
         $this->authorizeSchool($school);
 
         $settings = $school->settings()
-    ->whereIn('setting_key', [
-        'timezone',
-        'date_format',
-        'currency',
-        'language',
-        'attendance_enabled',
-        'grading_enabled',
-    ])
-    ->pluck('setting_value', 'setting_key');
+            ->whereIn('setting_key', [
+                'timezone',
+                'date_format',
+                'currency',
+                'language',
+                'attendance_enabled',
+                'attendance_mode',
+                'attendance_allow_late',
+                'attendance_allow_excused',
+                'grading_enabled',
+            ])
+            ->pluck('setting_value', 'setting_key');
 
         return view(
             'admin.schools.settings',

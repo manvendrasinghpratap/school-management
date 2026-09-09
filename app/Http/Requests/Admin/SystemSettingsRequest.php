@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SystemSettingsRequest extends FormRequest
 {
@@ -41,6 +42,24 @@ class SystemSettingsRequest extends FormRequest
                 'nullable',
                 'boolean',
             ],
+
+            'attendance_mode' => [
+                'nullable',
+                Rule::in([
+                    'daily',
+                    'subject',
+                    'both',
+                ]),
+            ],
+            'attendance_allow_late' => [    
+                'nullable',
+                'boolean',
+            ], 
+
+            'attendance_allow_excused' => [
+                'nullable',
+                'boolean',     
+            ], 
 
             'grading_enabled' => [
                 'nullable',

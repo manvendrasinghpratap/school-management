@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Student extends Model
 {
@@ -84,9 +85,12 @@ class Student extends Model
     }
 
     public function enrollments(): HasMany
-    {
-        return $this->hasMany(StudentEnrollment::class);
-    }
+{
+    return $this->hasMany(
+        StudentEnrollment::class,
+        'student_id'
+    )->latest('enrollment_date');
+}
 
     public function promotions(): HasMany
     {
@@ -126,4 +130,14 @@ class Student extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function graduations(): HasMany
+    {
+        return $this->hasMany(Graduation::class, 'student_id')
+            ->latest('graduation_date');
+    }
+    public function alumni(): HasOne
+{
+    return $this->hasOne(Alumni::class, 'student_id');
+}
 }

@@ -5,25 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Alumni extends Model
+class Graduation extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    protected $table = 'alumni';
+    protected $table = 'graduations';
 
     protected $fillable = [
         'school_id',
         'student_id',
+        'academic_year_id',
         'graduation_date',
-        'graduation_year',
-        'current_occupation',
-        'current_employer',
-        'phone',
-        'email',
-        'address',
+        'qualification',
+        'status',
+        'approved_by',
+        'remarks',
     ];
 
     protected function casts(): array
@@ -42,8 +39,20 @@ class Alumni extends Model
     {
         return $this->belongsTo(Student::class);
     }
-    public function alumni(): HasOne
-{
-    return $this->hasOne(Alumni::class, 'student_id');
-}
+
+    public function academicYear(): BelongsTo
+    {
+        return $this->belongsTo(
+            AcademicYears::class,
+            'academic_year_id'
+        );
+    }
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(
+            User::class,
+            'approved_by'
+        );
+    }
 }

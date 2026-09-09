@@ -42,9 +42,12 @@ class Classes extends Model
     }
 
     public function level(): BelongsTo
-    {
-        return $this->belongsTo(Level::class);
-    }
+{
+    return $this->belongsTo(
+        Level::class,
+        'level_id'
+    );
+}
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class, 'class_id');

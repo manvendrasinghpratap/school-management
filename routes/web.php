@@ -28,10 +28,19 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/courses.php');
     require base_path('routes/staff.php');
     require base_path('routes/instructors.php');
+    require base_path('routes/student-promotions.php');
     require base_path('routes/student-enrollments.php');
     require base_path('routes/academic-years.php');
     require base_path('routes/terms.php');
     require base_path('routes/dashboard.php');
+    require base_path('routes/graduations.php');
+    require base_path('routes/alumni.php');
+    require base_path('routes/timetable.php');
+    require base_path('routes/attendance.php');
+    require base_path('routes/leaves.php');
+    require base_path('routes/staff-attendance.php');
+    
+
 });
 
 require __DIR__.'/auth.php';

@@ -17,12 +17,14 @@
 
     </div>
 
+    {{-- SUCCESS MESSAGE --}}
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
     @endif
 
+    {{-- VALIDATION ERRORS --}}
     @if($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -33,6 +35,7 @@
         </div>
     @endif
 
+
     <form
         method="POST"
         action="{{ route('admin.school.settings.update', $school) }}"
@@ -42,7 +45,10 @@
         @method('PUT')
 
 
-        {{-- General Settings --}}
+        {{-- ========================================================= --}}
+        {{-- GENERAL SETTINGS --}}
+        {{-- ========================================================= --}}
+
         <div class="card mb-4">
 
             <div class="card-header">
@@ -213,7 +219,10 @@
         </div>
 
 
-        {{-- Module Settings --}}
+        {{-- ========================================================= --}}
+        {{-- MODULE SETTINGS --}}
+        {{-- ========================================================= --}}
+
         <div class="card mb-4">
 
             <div class="card-header">
@@ -222,49 +231,246 @@
 
             <div class="card-body">
 
-                {{-- Attendance --}}
-                <div class="form-check mb-3">
 
-                    <input
-                        type="hidden"
-                        name="attendance_enabled"
-                        value="0"
-                    >
+                {{-- ================================================= --}}
+                {{-- ATTENDANCE SETTINGS --}}
+                {{-- ================================================= --}}
 
-                    <input
-                        type="checkbox"
-                        name="attendance_enabled"
-                        value="1"
-                        class="form-check-input @error('attendance_enabled') is-invalid @enderror"
-                        id="attendance_enabled"
-                        @checked(
-                            old(
-                                'attendance_enabled',
-                                filter_var(
-                                    $settings['attendance_enabled'] ?? true,
-                                    FILTER_VALIDATE_BOOLEAN
+                <div class="mb-4">
+
+                    <h5 class="mb-3">
+                        Attendance
+                    </h5>
+
+
+                    {{-- Attendance Enabled --}}
+                    <div class="form-check mb-3">
+
+                        <input
+                            type="hidden"
+                            name="attendance_enabled"
+                            value="0"
+                        >
+
+                        <input
+                            type="checkbox"
+                            name="attendance_enabled"
+                            value="1"
+                            class="form-check-input @error('attendance_enabled') is-invalid @enderror"
+                            id="attendance_enabled"
+                            @checked(
+                                old(
+                                    'attendance_enabled',
+                                    filter_var(
+                                        $settings['attendance_enabled'] ?? true,
+                                        FILTER_VALIDATE_BOOLEAN
+                                    )
                                 )
                             )
-                        )
+                        >
+
+                        <label
+                            for="attendance_enabled"
+                            class="form-check-label"
+                        >
+                            Enable Attendance Module
+                        </label>
+
+                        @error('attendance_enabled')
+                            <div class="text-danger small">
+                                {{ $message }}
+                            </div>
+                        @enderror
+
+                    </div>
+
+
+                    {{-- Attendance Configuration --}}
+                    <div
+                        id="attendance_configuration"
+                        class="ms-4"
                     >
 
-                    <label
-                        for="attendance_enabled"
-                        class="form-check-label"
-                    >
-                        Enable Attendance Module
-                    </label>
 
-                    @error('attendance_enabled')
-                        <div class="text-danger small">
-                            {{ $message }}
+                        {{-- ----------------------------------------- --}}
+                        {{-- Attendance Mode --}}
+                        {{-- ----------------------------------------- --}}
+
+                        <div class="mb-3">
+
+                            <label
+                                for="attendance_mode"
+                                class="form-label"
+                            >
+                                Attendance Mode
+                            </label>
+
+                            <select
+                                id="attendance_mode"
+                                name="attendance_mode"
+                                class="form-select @error('attendance_mode') is-invalid @enderror"
+                            >
+
+                                <option
+                                    value="daily"
+                                    @selected(
+                                        old(
+                                            'attendance_mode',
+                                            $settings['attendance_mode'] ?? 'both'
+                                        ) === 'daily'
+                                    )
+                                >
+                                    Daily / Class Attendance
+                                </option>
+
+                                <option
+                                    value="subject"
+                                    @selected(
+                                        old(
+                                            'attendance_mode',
+                                            $settings['attendance_mode'] ?? 'both'
+                                        ) === 'subject'
+                                    )
+                                >
+                                    Subject / Course Attendance
+                                </option>
+
+                                <option
+                                    value="both"
+                                    @selected(
+                                        old(
+                                            'attendance_mode',
+                                            $settings['attendance_mode'] ?? 'both'
+                                        ) === 'both'
+                                    )
+                                >
+                                    Both
+                                </option>
+
+                            </select>
+
+                            @error('attendance_mode')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                            <div class="form-text">
+                                Choose whether attendance is recorded daily,
+                                by subject/course, or using both methods.
+                            </div>
+
                         </div>
-                    @enderror
+
+
+                        {{-- ----------------------------------------- --}}
+                        {{-- Allow Late Attendance --}}
+                        {{-- ----------------------------------------- --}}
+
+                        <div class="form-check mb-3">
+
+                            <input
+                                type="hidden"
+                                name="attendance_allow_late"
+                                value="0"
+                            >
+
+                            <input
+                                type="checkbox"
+                                name="attendance_allow_late"
+                                value="1"
+                                class="form-check-input @error('attendance_allow_late') is-invalid @enderror"
+                                id="attendance_allow_late"
+                                @checked(
+                                    old(
+                                        'attendance_allow_late',
+                                        filter_var(
+                                            $settings['attendance_allow_late'] ?? true,
+                                            FILTER_VALIDATE_BOOLEAN
+                                        )
+                                    )
+                                )
+                            >
+
+                            <label
+                                for="attendance_allow_late"
+                                class="form-check-label"
+                            >
+                                Allow Late Attendance
+                            </label>
+
+                            @error('attendance_allow_late')
+                                <div class="text-danger small">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                            <div class="form-text">
+                                Allow teachers or authorized staff to mark
+                                a student as late.
+                            </div>
+
+                        </div>
+
+
+                        {{-- ----------------------------------------- --}}
+                        {{-- Allow Excused Attendance --}}
+                        {{-- ----------------------------------------- --}}
+
+                        <div class="form-check mb-3">
+
+                            <input
+                                type="hidden"
+                                name="attendance_allow_excused"
+                                value="0"
+                            >
+
+                            <input
+                                type="checkbox"
+                                name="attendance_allow_excused"
+                                value="1"
+                                class="form-check-input @error('attendance_allow_excused') is-invalid @enderror"
+                                id="attendance_allow_excused"
+                                @checked(
+                                    old(
+                                        'attendance_allow_excused',
+                                        filter_var(
+                                            $settings['attendance_allow_excused'] ?? true,
+                                            FILTER_VALIDATE_BOOLEAN
+                                        )
+                                    )
+                                )
+                            >
+
+                            <label
+                                for="attendance_allow_excused"
+                                class="form-check-label"
+                            >
+                                Allow Excused Attendance
+                            </label>
+
+                            @error('attendance_allow_excused')
+                                <div class="text-danger small">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                            <div class="form-text">
+                                Allow authorized staff to mark a student
+                                as excused.
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
 
-                {{-- Grading --}}
+                {{-- ================================================= --}}
+                {{-- GRADING SETTINGS --}}
+                {{-- ================================================= --}}
+
                 <div class="form-check">
 
                     <input
@@ -310,7 +516,10 @@
         </div>
 
 
-        {{-- Actions --}}
+        {{-- ========================================================= --}}
+        {{-- ACTIONS --}}
+        {{-- ========================================================= --}}
+
         <div class="d-flex gap-2 mb-4">
 
             <button
@@ -332,5 +541,101 @@
     </form>
 
 </div>
+
+
+{{-- =============================================================== --}}
+{{-- ATTENDANCE CONFIGURATION TOGGLE --}}
+{{-- =============================================================== --}}
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const attendanceEnabled = document.getElementById(
+        'attendance_enabled'
+    );
+
+    const attendanceConfiguration = document.getElementById(
+        'attendance_configuration'
+    );
+
+    const attendanceMode = document.getElementById(
+        'attendance_mode'
+    );
+
+    const attendanceAllowLate = document.getElementById(
+        'attendance_allow_late'
+    );
+
+    const attendanceAllowExcused = document.getElementById(
+        'attendance_allow_excused'
+    );
+
+
+    function toggleAttendanceConfiguration() {
+
+        if (
+            !attendanceEnabled ||
+            !attendanceConfiguration
+        ) {
+            return;
+        }
+
+
+        if (attendanceEnabled.checked) {
+
+            attendanceConfiguration.style.display = '';
+
+
+            if (attendanceMode) {
+                attendanceMode.disabled = false;
+            }
+
+
+            if (attendanceAllowLate) {
+                attendanceAllowLate.disabled = false;
+            }
+
+
+            if (attendanceAllowExcused) {
+                attendanceAllowExcused.disabled = false;
+            }
+
+
+        } else {
+
+            attendanceConfiguration.style.display = 'none';
+
+
+            if (attendanceMode) {
+                attendanceMode.disabled = true;
+            }
+
+
+            if (attendanceAllowLate) {
+                attendanceAllowLate.disabled = true;
+            }
+
+
+            if (attendanceAllowExcused) {
+                attendanceAllowExcused.disabled = true;
+            }
+
+        }
+
+    }
+
+
+    attendanceEnabled.addEventListener(
+        'change',
+        toggleAttendanceConfiguration
+    );
+
+
+    toggleAttendanceConfiguration();
+
+});
+
+</script>
 
 @endsection

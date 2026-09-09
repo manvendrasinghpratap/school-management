@@ -93,7 +93,18 @@ class SchoolSetupService
                     ),
                     'type' => 'boolean',
                 ],
-
+                'attendance_mode' => [
+                    'value' => $data['attendance_mode'] ?? 'both',
+                    'type' => 'string',
+                ],
+                'attendance_allow_late' => [
+                    'value' => !empty($data['attendance_allow_late']),
+                    'type' => 'boolean',
+                ],
+                'attendance_allow_excused' => [
+                    'value' => !empty($data['attendance_allow_excused']),
+                    'type' => 'boolean',
+                ],
                 'grading_enabled' => [
                     'value' => !empty(
                         $data['grading_enabled']
