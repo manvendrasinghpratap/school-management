@@ -4,20 +4,49 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StudentCourse extends Model
 {
     use HasFactory;
 
+    protected $table = 'student_courses';
+
     protected $fillable = [
-        'academic_year_id',
-        'course_id',
         'student_id',
+        'course_id',
+        'academic_year_id',
         'term_id',
+        'status',
     ];
 
-    public function student() { return $this->belongsTo(Student::class, 'student_id'); }
-    public function course() { return $this->belongsTo(Course::class, 'course_id'); }
-    public function academicYear() { return $this->belongsTo(AcademicYear::class, 'academic_year_id'); }
-    public function term() { return $this->belongsTo(Term::class, 'term_id'); }
+    protected function casts(): array
+    {
+        return [
+            'student_id' => 'integer',
+            'course_id' => 'integer',
+            'academic_year_id' => 'integer',
+            'term_id' => 'integer',
+        ];
+    }
+
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(Student::class, 'student_id');
+    }
+
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Courses::class, 'course_id');
+    }
+
+    public function academicYear(): BelongsTo
+    {
+        return $this->belongsTo(AcademicYears::class, 'academic_year_id');
+    }
+
+    public function term(): BelongsTo
+    {
+        return $this->belongsTo(Terms::class, 'term_id');
+    }
 }

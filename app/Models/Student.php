@@ -13,6 +13,8 @@ class Student extends Model
 {
     use HasFactory;
 
+    protected $table = 'students';
+
     protected $fillable = [
         'school_id',
         'user_id',
@@ -49,29 +51,43 @@ class Student extends Model
 
     public function school(): BelongsTo
     {
-        return $this->belongsTo(School::class);
+        return $this->belongsTo(
+            School::class,
+            'school_id'
+        );
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class,
+            'user_id'
+        );
     }
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(
+            User::class,
+            'created_by'
+        );
     }
 
     public function updatedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'updated_by');
+        return $this->belongsTo(
+            User::class,
+            'updated_by'
+        );
     }
 
     public function guardians(): BelongsToMany
     {
         return $this->belongsToMany(
             Guardian::class,
-            'student_guardians'
+            'student_guardians',
+            'student_id',
+            'guardian_id'
         )->withPivot([
             'relationship',
             'is_primary',
@@ -81,28 +97,55 @@ class Student extends Model
 
     public function documents(): HasMany
     {
-        return $this->hasMany(StudentDocument::class);
+        return $this->hasMany(
+            StudentDocument::class,
+            'student_id'
+        );
     }
 
     public function enrollments(): HasMany
-{
-    return $this->hasMany(
-        StudentEnrollment::class,
-        'student_id'
-    )->latest('enrollment_date');
-}
+    {
+        return $this->hasMany(
+            StudentEnrollment::class,
+            'student_id'
+        )->latest('enrollment_date');
+    }
 
     public function promotions(): HasMany
     {
-        return $this->hasMany(StudentPromotion::class);
+        return $this->hasMany(
+            StudentPromotion::class,
+            'student_id'
+        );
     }
 
     public function courses(): BelongsToMany
     {
         return $this->belongsToMany(
-            Course::class,
-            'student_courses'
-        )->withTimestamps();
+            Courses::class,
+            'student_courses',
+            'student_id',
+            'course_id'
+        )->withPivot([
+            'academic_year_id',
+            'term_id',
+        ])->withTimestamps();
+    }
+
+    public function graduations(): HasMany
+    {
+        return $this->hasMany(
+            Graduation::class,
+            'student_id'
+        )->latest('graduation_date');
+    }
+
+    public function alumni(): HasOne
+    {
+        return $this->hasOne(
+            Alumni::class,
+            'student_id'
+        );
     }
 
     /*
@@ -115,7 +158,9 @@ class Student extends Model
     {
         return trim(
             $this->first_name . ' ' .
-            ($this->middle_name ? $this->middle_name . ' ' : '') .
+            ($this->middle_name
+                ? $this->middle_name . ' '
+                : '') .
             $this->last_name
         );
     }
@@ -130,14 +175,4 @@ class Student extends Model
     {
         return $query->where('status', 'active');
     }
-
-    public function graduations(): HasMany
-    {
-        return $this->hasMany(Graduation::class, 'student_id')
-            ->latest('graduation_date');
-    }
-    public function alumni(): HasOne
-{
-    return $this->hasOne(Alumni::class, 'student_id');
-}
 }

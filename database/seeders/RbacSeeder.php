@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Spatie\Permission\PermissionRegistrar;
 
 class RbacSeeder extends Seeder
 {
@@ -92,6 +92,12 @@ class RbacSeeder extends Seeder
             'enrollments.create',
             'enrollments.update',
             'enrollments.delete',
+
+            // Student Course Registration
+            'student-courses.view',
+            'student-courses.create',
+            'student-courses.update',
+            'student-courses.delete',
 
             // Student Promotion
             'promotions.view',
@@ -248,6 +254,7 @@ class RbacSeeder extends Seeder
 
             'api.access',
 
+            // Graduation
             'graduation.view',
             'graduation.create',
             'graduation.approve',
@@ -310,6 +317,7 @@ class RbacSeeder extends Seeder
             */
 
             'Principal' => [
+
                 'dashboard.view',
 
                 'students.view',
@@ -319,6 +327,8 @@ class RbacSeeder extends Seeder
                 'staff.view',
 
                 'courses.view',
+
+                'student-courses.view',
 
                 'attendance.view',
                 'attendance.reports',
@@ -360,11 +370,17 @@ class RbacSeeder extends Seeder
             */
 
             'Examinations Officer' => [
+
                 'dashboard.view',
 
                 'students.view',
 
                 'courses.view',
+
+                // Student Course Registration
+                'student-courses.view',
+                'student-courses.create',
+                'student-courses.update',
 
                 'examinations.view',
                 'examinations.create',
@@ -400,12 +416,16 @@ class RbacSeeder extends Seeder
             */
 
             'Teacher' => [
+
                 'dashboard.view',
 
                 'students.view',
                 'guardians.view',
 
                 'courses.view',
+
+                // Student Course Registration - view only
+                'student-courses.view',
 
                 'course-assignments.view',
 
@@ -437,6 +457,7 @@ class RbacSeeder extends Seeder
             */
 
             'Accountant' => [
+
                 'dashboard.view',
 
                 'students.view',
@@ -468,15 +489,13 @@ class RbacSeeder extends Seeder
             | Registrar
             |--------------------------------------------------------------------------
             |
-            | Registrar can create and update promotions.
-            | Registrar CANNOT:
-            | - delete promotions
-            | - approve promotions
-            | - reject promotions
+            | Registrar manages student registration-related records.
+            | Registrar cannot delete course registrations.
             |
             */
 
             'Registrar' => [
+
                 'dashboard.view',
 
                 'students.view',
@@ -494,6 +513,11 @@ class RbacSeeder extends Seeder
                 'enrollments.view',
                 'enrollments.create',
                 'enrollments.update',
+
+                // Student Course Registration
+                'student-courses.view',
+                'student-courses.create',
+                'student-courses.update',
 
                 // Student Promotion
                 'promotions.view',
@@ -522,6 +546,7 @@ class RbacSeeder extends Seeder
             */
 
             'Student' => [
+
                 'dashboard.view',
 
                 'students.view',
@@ -554,6 +579,7 @@ class RbacSeeder extends Seeder
             */
 
             'Parent' => [
+
                 'dashboard.view',
 
                 'students.view',
@@ -599,8 +625,6 @@ class RbacSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        app(
-            \Spatie\Permission\PermissionRegistrar::class
-        )->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

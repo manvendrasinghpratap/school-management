@@ -5,32 +5,42 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ExamSchedule extends Model
+class Mark extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    protected $table = 'exam_schedules';
+    protected $table = 'marks';
 
     protected $fillable = [
+        'student_id',
         'examination_id',
         'course_id',
-        'class_id',
-        'section_id',
-        'exam_date',
-        'start_time',
-        'end_time',
-        'room',
+        'score',
+        'maximum_score',
+        'grade',
+        'status',
+        'entered_by',
+        'approved_by',
     ];
 
     protected $casts = [
+        'student_id' => 'integer',
         'examination_id' => 'integer',
         'course_id' => 'integer',
-        'class_id' => 'integer',
-        'section_id' => 'integer',
-        'exam_date' => 'date',
+        'score' => 'decimal:2',
+        'maximum_score' => 'decimal:2',
+        'entered_by' => 'integer',
+        'approved_by' => 'integer',
     ];
+
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(
+            Student::class,
+            'student_id'
+        );
+    }
 
     public function examination(): BelongsTo
     {
@@ -48,19 +58,19 @@ class ExamSchedule extends Model
         );
     }
 
-    public function classModel(): BelongsTo
+    public function enteredBy(): BelongsTo
     {
         return $this->belongsTo(
-            Classes::class,
-            'class_id'
+            User::class,
+            'entered_by'
         );
     }
 
-    public function section(): BelongsTo
+    public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(
-            Section::class,
-            'section_id'
+            User::class,
+            'approved_by'
         );
     }
 }

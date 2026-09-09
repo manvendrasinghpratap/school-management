@@ -39,7 +39,10 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/attendance.php');
     require base_path('routes/leaves.php');
     require base_path('routes/staff-attendance.php');
-    
+    require base_path('routes/examinations.php');
+    require base_path('routes/exam-schedules.php');
+    require base_path('routes/marks.php'); 
+    require base_path('routes/student-courses.php');
 
 });
 
