@@ -42,8 +42,18 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/examinations.php');
     require base_path('routes/exam-schedules.php');
     require base_path('routes/marks.php'); 
+    require base_path('routes/grading.php');
+    require base_path('routes/grade-calculation.php');
+    require base_path('routes/results.php');
     require base_path('routes/student-courses.php');
-
+    require base_path('routes/report-cards.php');
+    require base_path('routes/transcripts.php');
+    require base_path('routes/fee-categories.php');
+    require base_path('routes/fee-structures.php');
+    require base_path('routes/fee-installments.php');
+    require base_path('routes/student-fees.php');
+    require base_path('routes/invoices.php');
 });
+
 
 require __DIR__.'/auth.php';

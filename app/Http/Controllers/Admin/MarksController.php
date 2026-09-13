@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Models\Grade;
+
 
 class MarksController extends Controller
 {
@@ -764,7 +766,8 @@ class MarksController extends Controller
         $courseQuery = DB::table('student_courses')
             ->where('student_id', $student->id)
             ->where('course_id', $schedule->course_id)
-            ->where('academic_year_id', $examination->academic_year_id);
+            ->where('academic_year_id', $examination->academic_year_id)
+            ->where('status', 'enrolled');
 
         if ($examination->term_id !== null) {
             $courseQuery->where(
@@ -833,22 +836,20 @@ class MarksController extends Controller
 
     private function calculateGrade(float $percentage): string
     {
-        /*
-         * Temporary default grading scale for Phase 3.
-         *
-         * We will move this into the dedicated Grading Setup
-         * module later so the school can configure its own
-         * grading rules.
-         */
+        $grade = Grade::query()
+            ->where('school_id', Auth::user()->school_id)
+            ->where('minimum_score', '<=', $percentage)
+            ->where('maximum_score', '>=', $percentage)
+            ->orderBy('minimum_score', 'desc')
+            ->first();
 
-        return match (true) {
-            $percentage >= 80 => 'A',
-            $percentage >= 70 => 'B',
-            $percentage >= 60 => 'C',
-            $percentage >= 50 => 'D',
-            $percentage >= 40 => 'E',
-            default => 'F',
-        };
+        if (!$grade) {
+            throw ValidationException::withMessages([
+                'score' => 'No grading scale is configured for this score percentage.',
+            ]);
+        }
+
+        return $grade->code;
     }
 
     private function eligibleStudentsForSchedule(

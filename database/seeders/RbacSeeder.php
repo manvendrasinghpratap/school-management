@@ -82,6 +82,7 @@ class RbacSeeder extends Seeder
             'students.documents.view',
             'students.documents.manage',
 
+            // Guardians
             'guardians.view',
             'guardians.create',
             'guardians.update',
@@ -107,10 +108,14 @@ class RbacSeeder extends Seeder
             'promotions.approve',
             'promotions.reject',
 
-            // Graduation / Alumni
+            // Graduation
             'graduation.view',
-            'graduation.manage',
+            'graduation.create',
+            'graduation.approve',
+            'graduation.complete',
+            'graduation.delete',
 
+            // Alumni
             'alumni.view',
             'alumni.manage',
 
@@ -184,10 +189,14 @@ class RbacSeeder extends Seeder
             'fee-structures.view',
             'fee-structures.manage',
 
+            'fee-installments.view',
+            'fee-installments.manage',
+
             'scholarships.view',
             'scholarships.manage',
 
             'invoices.view',
+            'invoices.manage',
             'invoices.create',
             'invoices.update',
             'invoices.delete',
@@ -253,13 +262,6 @@ class RbacSeeder extends Seeder
             'backup.create',
 
             'api.access',
-
-            // Graduation
-            'graduation.view',
-            'graduation.create',
-            'graduation.approve',
-            'graduation.complete',
-            'graduation.delete',
         ];
 
         /*
@@ -361,6 +363,9 @@ class RbacSeeder extends Seeder
                 'promotions.view',
                 'promotions.approve',
                 'promotions.reject',
+
+                'invoices.view',
+                'invoices.manage',
             ],
 
             /*
@@ -382,6 +387,7 @@ class RbacSeeder extends Seeder
                 'student-courses.create',
                 'student-courses.update',
 
+                // Examination
                 'examinations.view',
                 'examinations.create',
                 'examinations.update',
@@ -431,10 +437,12 @@ class RbacSeeder extends Seeder
 
                 'timetable.view',
 
+                // Student Attendance
                 'attendance.view',
                 'attendance.mark',
                 'attendance.update',
 
+                // Marks
                 'marks.view',
                 'marks.enter',
                 'marks.update',
@@ -462,25 +470,37 @@ class RbacSeeder extends Seeder
 
                 'students.view',
 
+                // Fees
                 'fees.view',
                 'fees.manage',
 
+                // Fee Structures
                 'fee-structures.view',
                 'fee-structures.manage',
 
+                // Fee Installments
+                'fee-installments.view',
+                'fee-installments.manage',
+
+                // Scholarships / Discounts
                 'scholarships.view',
                 'scholarships.manage',
 
+                // Invoices
                 'invoices.view',
+                'invoices.manage',
                 'invoices.create',
                 'invoices.update',
 
+                // Payments
                 'payments.view',
                 'payments.create',
 
+                // Receipts
                 'receipts.view',
                 'receipts.generate',
 
+                // Finance Reports
                 'finance.reports',
             ],
 

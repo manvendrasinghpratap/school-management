@@ -454,7 +454,29 @@
                         auth()->user()?->can('departments.view') ||
                         auth()->user()?->can('classes.view') ||
                         auth()->user()?->can('sections.view') ||
-                        auth()->user()?->can('courses.view')
+                        auth()->user()?->can('courses.view') ||
+
+                        {{-- Examination --}}
+                        auth()->user()?->can('examinations.view') ||
+                        auth()->user()?->can('examinations.create') ||
+                        auth()->user()?->can('examinations.update') ||
+                        auth()->user()?->can('examinations.delete') ||
+                        auth()->user()?->can('exam-schedules.view') ||
+                        auth()->user()?->can('exam-schedules.manage') ||
+                        auth()->user()?->can('marks.view') ||
+                        auth()->user()?->can('marks.enter') ||
+                        auth()->user()?->can('marks.update') ||
+                        auth()->user()?->can('marks.approve') ||
+                        auth()->user()?->can('grading.view') ||
+                        auth()->user()?->can('grading.manage') ||
+                        auth()->user()?->can('results.view') ||
+                        auth()->user()?->can('results.calculate') ||
+                        auth()->user()?->can('results.approve') ||
+                        auth()->user()?->can('results.publish') ||
+                        auth()->user()?->can('report-cards.view') ||
+                        auth()->user()?->can('report-cards.generate') ||
+                        auth()->user()?->can('transcripts.view') ||
+                        auth()->user()?->can('transcripts.generate')
                     )
 
                         <li class="nav-item dropdown">
@@ -579,6 +601,181 @@
                                         Subjects / Courses
 
                                     </a>
+
+                                @endif
+
+
+                                {{-- ================================================= --}}
+                                {{-- Examination Management --}}
+                                {{-- ================================================= --}}
+                                @if(
+                                    auth()->user()?->can('examinations.view') ||
+                                    auth()->user()?->can('examinations.create') ||
+                                    auth()->user()?->can('examinations.update') ||
+                                    auth()->user()?->can('examinations.delete') ||
+                                    auth()->user()?->can('exam-schedules.view') ||
+                                    auth()->user()?->can('exam-schedules.manage') ||
+                                    auth()->user()?->can('marks.view') ||
+                                    auth()->user()?->can('marks.enter') ||
+                                    auth()->user()?->can('marks.update') ||
+                                    auth()->user()?->can('marks.approve') ||
+                                    auth()->user()?->can('grading.view') ||
+                                    auth()->user()?->can('grading.manage') ||
+                                    auth()->user()?->can('results.view') ||
+                                    auth()->user()?->can('results.calculate') ||
+                                    auth()->user()?->can('results.approve') ||
+                                    auth()->user()?->can('results.publish') ||
+                                    auth()->user()?->can('report-cards.view') ||
+                                    auth()->user()?->can('report-cards.generate') ||
+                                    auth()->user()?->can('transcripts.view') ||
+                                    auth()->user()?->can('transcripts.generate')
+                                )
+
+                                    <div class="dropdown-divider"></div>
+
+
+                                    {{-- ================================================= --}}
+                                    {{-- Examinations --}}
+                                    {{-- ================================================= --}}
+                                    @if(
+                                        auth()->user()?->can('examinations.view') ||
+                                        auth()->user()?->can('examinations.create')
+                                    )
+
+                                        <a href="{{ route('admin.examinations.index') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-edit-alt me-2"></i>
+
+                                            Examinations
+
+                                        </a>
+
+                                    @endif
+
+
+                                    {{-- ================================================= --}}
+                                    {{-- Exam Schedules --}}
+                                    {{-- ================================================= --}}
+                                    @if(
+                                        auth()->user()?->can('exam-schedules.view') ||
+                                        auth()->user()?->can('exam-schedules.manage')
+                                    )
+
+                                        <a href="{{ route('admin.exam-schedules.index') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-calendar-event me-2"></i>
+
+                                            Exam Schedules
+
+                                        </a>
+
+                                    @endif
+
+
+                                    {{-- ================================================= --}}
+                                    {{-- Subject Marks --}}
+                                    {{-- ================================================= --}}
+                                    @if(
+                                        auth()->user()?->can('marks.view') ||
+                                        auth()->user()?->can('marks.enter') ||
+                                        auth()->user()?->can('marks.update') ||
+                                        auth()->user()?->can('marks.approve')
+                                    )
+
+                                        <a href="{{ route('admin.marks.index') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-pencil me-2"></i>
+
+                                            Subject Marks
+
+                                        </a>
+
+                                    @endif
+
+
+                                    {{-- ================================================= --}}
+                                    {{-- Grading --}}
+                                    {{-- ================================================= --}}
+                                    @if(
+                                        auth()->user()?->can('grading.view') ||
+                                        auth()->user()?->can('grading.manage')
+                                    )
+
+                                        <a href="{{ route('admin.grading.index') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-bar-chart-alt-2 me-2"></i>
+
+                                            Grading
+
+                                        </a>
+
+                                    @endif
+
+
+                                    {{-- ================================================= --}}
+                                    {{-- Results --}}
+                                    {{-- ================================================= --}}
+                                    @if(
+                                        auth()->user()?->can('results.view') ||
+                                        auth()->user()?->can('results.calculate') ||
+                                        auth()->user()?->can('results.approve') ||
+                                        auth()->user()?->can('results.publish')
+                                    )
+
+                                        <a href="{{ route('admin.results.index') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-spreadsheet me-2"></i>
+
+                                            Results
+
+                                        </a>
+
+                                    @endif
+
+
+                                    {{-- ================================================= --}}
+                                    {{-- Report Cards --}}
+                                    {{-- ================================================= --}}
+                                    @if(
+                                        auth()->user()?->can('report-cards.view') ||
+                                        auth()->user()?->can('report-cards.generate')
+                                    )
+
+                                        <a href="{{ route('admin.report-cards.index') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-file me-2"></i>
+
+                                            Report Cards
+
+                                        </a>
+
+                                    @endif
+
+
+                                    {{-- ================================================= --}}
+                                    {{-- Transcripts --}}
+                                    {{-- ================================================= --}}
+                                    @if(
+                                        auth()->user()?->can('transcripts.view') ||
+                                        auth()->user()?->can('transcripts.generate')
+                                    )
+
+                                        <a href="{{ route('admin.transcripts.index') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-file-blank me-2"></i>
+
+                                            Transcripts
+
+                                        </a>
+
+                                    @endif
 
                                 @endif
 
