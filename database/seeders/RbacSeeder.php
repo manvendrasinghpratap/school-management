@@ -113,6 +113,7 @@ class RbacSeeder extends Seeder
             'graduation.create',
             'graduation.approve',
             'graduation.complete',
+            'graduation.manage',
             'graduation.delete',
 
             // Alumni
@@ -373,7 +374,6 @@ class RbacSeeder extends Seeder
                 'promotions.reject',
 
                 'invoices.view',
-                'invoices.manage',
             ],
 
             /*
@@ -658,5 +658,8 @@ class RbacSeeder extends Seeder
         */
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        // Seed default scholarship definitions after RBAC is synchronized.
+        $this->call(ScholarshipSeeder::class);
     }
 }
