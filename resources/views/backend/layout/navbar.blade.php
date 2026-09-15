@@ -1034,6 +1034,191 @@
 
 
                     {{-- ===================================================== --}}
+                    {{-- Finance --}}
+                    {{-- ===================================================== --}}
+                    @if(
+                        auth()->user()?->can('fees.view') ||
+                        auth()->user()?->can('fees.manage') ||
+                        auth()->user()?->can('fee-structures.view') ||
+                        auth()->user()?->can('fee-structures.manage') ||
+                        auth()->user()?->can('invoices.view') ||
+                        auth()->user()?->can('invoices.create') ||
+                        auth()->user()?->can('invoices.update') ||
+                        auth()->user()?->can('invoices.delete') ||
+                        auth()->user()?->can('payments.view') ||
+                        auth()->user()?->can('payments.create') ||
+                        auth()->user()?->can('payment-refunds.view') ||
+                        auth()->user()?->can('payment-refunds.approve') ||
+                        auth()->user()?->can('payment-refunds.reject') ||
+                        auth()->user()?->can('payment-refunds.process') ||
+                        auth()->user()?->can('payment-refunds.cancel')
+                    )
+
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-finance"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                <i class="bx bx-wallet me-2"></i>
+
+                                <span>Finance</span>
+
+                                <div class="arrow-down"></div>
+
+                            </a>
+
+
+                            <div class="dropdown-menu"
+                                 aria-labelledby="topnav-finance">
+
+
+                                {{-- ================================================= --}}
+                                {{-- Fee Categories --}}
+                                {{-- ================================================= --}}
+                                @if(
+                                    auth()->user()?->can('fees.view') ||
+                                    auth()->user()?->can('fees.manage')
+                                )
+
+                                    <a href="{{ route('admin.fee-categories.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-category me-2"></i>
+
+                                        Fee Categories
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- ================================================= --}}
+                                {{-- Fee Structures --}}
+                                {{-- ================================================= --}}
+                                @if(
+                                    auth()->user()?->can('fee-structures.view') ||
+                                    auth()->user()?->can('fee-structures.manage')
+                                )
+
+                                    <a href="{{ route('admin.fee-structures.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-layer me-2"></i>
+
+                                        Fee Structures
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- ================================================= --}}
+                                {{-- Fee Installments --}}
+                                {{-- ================================================= --}}
+                                @if(
+                                    auth()->user()?->can('fees.view') ||
+                                    auth()->user()?->can('fees.manage')
+                                )
+
+                                    <a href="{{ route('admin.fee-installments.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-calendar me-2"></i>
+
+                                        Fee Installments
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- ================================================= --}}
+                                {{-- Student Fee Assignment --}}
+                                {{-- ================================================= --}}
+                                @if(
+                                    auth()->user()?->can('fees.view') ||
+                                    auth()->user()?->can('fees.manage')
+                                )
+
+                                    <div class="dropdown-divider"></div>
+
+                                    <a href="{{-- route('admin.student-fee-assignments.index') --}}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-user-check me-2"></i>
+
+                                        Student Fee Assignment
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- ================================================= --}}
+                                {{-- Invoices --}}
+                                {{-- ================================================= --}}
+                                @if(auth()->user()?->can('invoices.view'))
+
+                                    <div class="dropdown-divider"></div>
+
+                                    <a href="{{ route('admin.invoices.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-file me-2"></i>
+
+                                        Invoices
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- ================================================= --}}
+                                {{-- Payments --}}
+                                {{-- ================================================= --}}
+                                @if(auth()->user()?->can('payments.view'))
+
+                                    <a href="{{ route('admin.payments.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-money me-2"></i>
+
+                                        Payments
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- ================================================= --}}
+                                {{-- Payment Refunds --}}
+                                {{-- ================================================= --}}
+                                @if(auth()->user()?->can('payment-refunds.view'))
+
+                                    <a href="{{ route('admin.payment-refunds.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-revision me-2"></i>
+
+                                        Payment Refunds
+
+                                    </a>
+
+                                @endif
+
+
+                            </div>
+
+                        </li>
+
+                    @endif
+
+
+                    {{-- ===================================================== --}}
                     {{-- Administration --}}
                     {{-- ===================================================== --}}
                     @if(

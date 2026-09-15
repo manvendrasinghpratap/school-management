@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PaymentRefund extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'payment_refunds';
 
@@ -40,35 +41,60 @@ class PaymentRefund extends Model
         'requested_at' => 'datetime',
         'approved_at' => 'datetime',
         'processed_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
 
     public function school(): BelongsTo
     {
-        return $this->belongsTo(School::class, 'school_id');
+        return $this->belongsTo(
+            School::class,
+            'school_id'
+        );
     }
 
     public function payment(): BelongsTo
     {
-        return $this->belongsTo(Payment::class, 'payment_id');
+        return $this->belongsTo(
+            Payment::class,
+            'payment_id'
+        );
     }
 
     public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class, 'student_id');
+        return $this->belongsTo(
+            Student::class,
+            'student_id'
+        );
     }
 
-    public function requestedBy(): BelongsTo
+    public function requester(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'requested_by');
+        return $this->belongsTo(
+            User::class,
+            'requested_by'
+        );
     }
 
-    public function approvedBy(): BelongsTo
+    public function approver(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(
+            User::class,
+            'approved_by'
+        );
     }
 
-    public function processedBy(): BelongsTo
+    public function processor(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'processed_by');
+        return $this->belongsTo(
+            User::class,
+            'processed_by'
+        );
     }
 }

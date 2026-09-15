@@ -205,6 +205,14 @@ class RbacSeeder extends Seeder
             'payments.create',
             'payments.reverse',
 
+            // Payment Refunds / Reversals
+            'payment-refunds.view',
+            'payment-refunds.create',
+            'payment-refunds.approve',
+            'payment-refunds.reject',
+            'payment-refunds.process',
+            'payment-refunds.cancel',
+
             'receipts.view',
             'receipts.generate',
 
@@ -495,6 +503,10 @@ class RbacSeeder extends Seeder
                 // Payments
                 'payments.view',
                 'payments.create',
+
+                // Payment Refunds / Reversals
+                'payment-refunds.view',
+                'payment-refunds.create',
 
                 // Receipts
                 'receipts.view',

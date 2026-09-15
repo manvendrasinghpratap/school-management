@@ -53,6 +53,8 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/fee-installments.php');
     require base_path('routes/student-fees.php');
     require base_path('routes/invoices.php');
+    require base_path('routes/payments.php');
+    require base_path('routes/payment-refunds.php');
 });
 
 
