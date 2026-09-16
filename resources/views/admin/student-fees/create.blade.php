@@ -871,6 +871,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const feeStructureSelect =
         document.getElementById('fee_structure_id');
 
+    const scholarshipSelect =
+        document.getElementById('scholarship_id');
+
     const structureAmount =
         document.getElementById('structure_amount');
 
@@ -1455,6 +1458,88 @@ document.addEventListener('DOMContentLoaded', function () {
     |--------------------------------------------------------------------------
     */
 
+    function selectedScholarship() {
+
+        const option =
+            scholarshipSelect.options[
+                scholarshipSelect.selectedIndex
+            ];
+
+        if (!option || !option.value) {
+            return null;
+        }
+
+        return {
+            type: option.dataset.type || '',
+            value: parseFloat(option.dataset.value || '0') || 0
+        };
+    }
+
+
+    function calculateScholarshipDiscount(amount) {
+
+        const scholarship = selectedScholarship();
+
+        if (!scholarship || amount <= 0) {
+            return 0;
+        }
+
+        if (scholarship.type === 'percentage') {
+            const percentage =
+                Math.min(
+                    Math.max(scholarship.value, 0),
+                    100
+                );
+
+            return Math.min(
+                amount,
+                Math.round((amount * percentage / 100) * 100) / 100
+            );
+        }
+
+        if (scholarship.type === 'fixed') {
+            return Math.min(
+                amount,
+                Math.max(scholarship.value, 0)
+            );
+        }
+
+        return 0;
+    }
+
+
+    function updateDiscountState(recalculate = true) {
+
+        const scholarship = selectedScholarship();
+
+        if (scholarship) {
+
+            discountInput.readOnly = true;
+            discountInput.classList.add('bg-light');
+
+            if (recalculate) {
+                const amount =
+                    parseFloat(amountInput.value) || 0;
+
+                discountInput.value =
+                    calculateScholarshipDiscount(amount).toFixed(2);
+            }
+
+        } else {
+
+            discountInput.readOnly = false;
+            discountInput.classList.remove('bg-light');
+
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE FEE STRUCTURE AMOUNT
+    |--------------------------------------------------------------------------
+    */
+
     function updateStructureAmount() {
 
         const option =
@@ -1462,45 +1547,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 feeStructureSelect.selectedIndex
             ];
 
-
-        if (
-            !option ||
-            !option.value
-        ) {
+        if (!option || !option.value) {
 
             structureAmount.value = '';
+
+            updateDiscountState();
+            updateNetPayable();
 
             return;
 
         }
 
-
         const amount =
-            parseFloat(
-                option.dataset.amount
-            ) || 0;
-
+            parseFloat(option.dataset.amount) || 0;
 
         structureAmount.value =
             amount.toFixed(2);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Automatically populate assigned amount
-        |--------------------------------------------------------------------------
-        */
-
         if (!amountInput.value) {
-
-            amountInput.value =
-                amount.toFixed(2);
-
+            amountInput.value = amount.toFixed(2);
         }
 
-
+        updateDiscountState();
         updateNetPayable();
-
     }
 
 
@@ -1513,34 +1582,31 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateNetPayable() {
 
         const amount =
-            parseFloat(
-                amountInput.value
-            ) || 0;
+            parseFloat(amountInput.value) || 0;
 
+        let discount =
+            parseFloat(discountInput.value) || 0;
 
-        const discount =
-            parseFloat(
-                discountInput.value
-            ) || 0;
+        const scholarship = selectedScholarship();
 
+        if (scholarship) {
+            discount = calculateScholarshipDiscount(amount);
+            discountInput.value = discount.toFixed(2);
+        }
 
-        const net =
-            Math.max(
-                0,
-                amount - discount
-            );
-
+        discount = Math.min(
+            Math.max(discount, 0),
+            amount
+        );
 
         previewAmount.textContent =
             amount.toFixed(2);
 
-
         previewDiscount.textContent =
             discount.toFixed(2);
 
-
         previewNet.textContent =
-            net.toFixed(2);
+            Math.max(0, amount - discount).toFixed(2);
 
     }
 
@@ -1591,10 +1657,22 @@ document.addEventListener('DOMContentLoaded', function () {
     );
 
 
+    scholarshipSelect.addEventListener(
+        'change',
+        function () {
+
+            updateDiscountState(true);
+            updateNetPayable();
+
+        }
+    );
+
+
     amountInput.addEventListener(
         'input',
         function () {
 
+            updateDiscountState(true);
             updateNetPayable();
 
         }
@@ -1630,6 +1708,8 @@ document.addEventListener('DOMContentLoaded', function () {
     );
 
     updateStructureAmount();
+
+    updateDiscountState(true);
 
     updateNetPayable();
 

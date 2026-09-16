@@ -1,4 +1,5 @@
 <div class="topnav">
+
     <div class="container-fluid">
 
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
@@ -8,9 +9,10 @@
                 <ul class="navbar-nav">
 
 
-                    {{-- ===================================================== --}}
-                    {{-- Dashboard --}}
-                    {{-- ===================================================== --}}
+                    {{-- =========================================================
+                         DASHBOARD
+                         ========================================================= --}}
+
                     @if(auth()->user()?->can('dashboard.view'))
 
                         <li class="nav-item">
@@ -29,9 +31,10 @@
                     @endif
 
 
-                    {{-- ===================================================== --}}
-                    {{-- School --}}
-                    {{-- ===================================================== --}}
+                    {{-- =========================================================
+                         SCHOOL
+                         ========================================================= --}}
+
                     @if(
                         auth()->user()?->can('schools.view') ||
                         auth()->user()?->can('schools.update') ||
@@ -55,14 +58,9 @@
 
                             </a>
 
-
                             <div class="dropdown-menu"
                                  aria-labelledby="topnav-school">
 
-
-                                {{-- ================================================= --}}
-                                {{-- School Setup --}}
-                                {{-- ================================================= --}}
                                 @if(
                                     auth()->user()?->can('schools.view') ||
                                     auth()->user()?->can('schools.update')
@@ -71,18 +69,15 @@
                                     <a href="{{ route('admin.school.setup') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-building me-2"></i>
+                                        <i class="bx bx-building"></i>
 
-                                        School Setup
+                                        <span>School Setup</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- System Settings --}}
-                                {{-- ================================================= --}}
                                 @if(
                                     auth()->user()?->school_id &&
                                     auth()->user()?->can('settings.view')
@@ -91,14 +86,13 @@
                                     <a href="{{ route('admin.school.settings.edit', auth()->user()->school_id) }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-cog me-2"></i>
+                                        <i class="bx bx-cog"></i>
 
-                                        System Settings
+                                        <span>System Settings</span>
 
                                     </a>
 
                                 @endif
-
 
                             </div>
 
@@ -107,9 +101,10 @@
                     @endif
 
 
-                    {{-- ===================================================== --}}
-                    {{-- Students --}}
-                    {{-- ===================================================== --}}
+                    {{-- =========================================================
+                         STUDENTS
+                         ========================================================= --}}
+
                     @if(
                         auth()->user()?->can('students.view') ||
                         auth()->user()?->can('students.create') ||
@@ -150,142 +145,124 @@
                             </a>
 
 
-                            <div class="dropdown-menu"
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
                                  aria-labelledby="topnav-students">
 
 
-                                {{-- ================================================= --}}
                                 {{-- Student List --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('students.view'))
 
                                     <a href="{{ route('admin.students.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-list-ul me-2"></i>
+                                        <i class="bx bx-list-ul"></i>
 
-                                        Student List
+                                        <span>Student List</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Student Registration --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('students.create'))
 
                                     <a href="{{ route('admin.students.create') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-user-plus me-2"></i>
+                                        <i class="bx bx-user-plus"></i>
 
-                                        Student Registration
+                                        <span>Student Registration</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Student Documents --}}
-                                {{-- ================================================= --}}
+                                {{-- Student Information Heading --}}
+
                                 @if(
                                     auth()->user()?->can('students.documents.view') ||
-                                    auth()->user()?->can('students.documents.manage')
+                                    auth()->user()?->can('students.documents.manage') ||
+                                    auth()->user()?->can('guardians.view')
                                 )
 
-                                    @if(auth()->user()?->can('students.view'))
+                                    <div class="sms-menu-heading">
 
-                                        <div class="dropdown-divider"></div>
+                                        <i class="bx bx-file"></i>
 
-                                        <span class="dropdown-item-text text-muted font-size-12">
+                                        <span>Student Information</span>
 
-                                            <i class="bx bx-file me-2"></i>
-
-                                            Student Documents
-
-                                        </span>
-
-                                    @endif
+                                    </div>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Guardians --}}
-                                {{-- ================================================= --}}
-                                @if(auth()->user()?->can('guardians.view'))
 
-                                    <div class="dropdown-divider"></div>
+                                @if(auth()->user()?->can('guardians.view'))
 
                                     <a href="{{ route('admin.guardians.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-group me-2"></i>
+                                        <i class="bx bx-group"></i>
 
-                                        Guardians
+                                        <span>Guardians</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Student Enrollments --}}
-                                {{-- ================================================= --}}
-                                @if(auth()->user()?->can('enrollments.view'))
+                                {{-- Enrollments --}}
 
-                                    <div class="dropdown-divider"></div>
+                                @if(auth()->user()?->can('enrollments.view'))
 
                                     <a href="{{ route('admin.student-enrollments.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-book-add me-2"></i>
+                                        <i class="bx bx-book-add"></i>
 
-                                        Enrollments
+                                        <span>Enrollments</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Add Student Enrollment --}}
-                                {{-- ================================================= --}}
+                                {{-- Add Enrollment --}}
+
                                 @if(auth()->user()?->can('enrollments.create'))
 
                                     <a href="{{ route('admin.student-enrollments.create') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-user-check me-2"></i>
+                                        <i class="bx bx-user-check"></i>
 
-                                        Add Enrollment
+                                        <span>Add Enrollment</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Student Promotions --}}
-                                {{-- ================================================= --}}
+                                {{-- Promotions --}}
+
                                 @if(
                                     auth()->user()?->can('promotions.view') ||
                                     auth()->user()?->can('promotions.create')
                                 )
-
-                                    <div class="dropdown-divider"></div>
 
                                     @if(auth()->user()?->can('promotions.view'))
 
                                         <a href="{{ route('admin.student-promotions.index') }}"
                                            class="dropdown-item">
 
-                                            <i class="bx bx-transfer me-2"></i>
+                                            <i class="bx bx-transfer"></i>
 
-                                            Promotions
+                                            <span>Promotions</span>
 
                                         </a>
 
@@ -294,9 +271,9 @@
                                         <a href="{{ route('admin.student-promotions.create') }}"
                                            class="dropdown-item">
 
-                                            <i class="bx bx-transfer me-2"></i>
+                                            <i class="bx bx-transfer"></i>
 
-                                            Promotions
+                                            <span>Promotions</span>
 
                                         </a>
 
@@ -305,24 +282,21 @@
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Graduation --}}
-                                {{-- ================================================= --}}
+
                                 @if(
                                     auth()->user()?->can('graduation.view') ||
                                     auth()->user()?->can('graduation.manage')
                                 )
-
-                                    <div class="dropdown-divider"></div>
 
                                     @if(auth()->user()?->can('graduation.view'))
 
                                         <a href="{{ route('admin.graduations.index') }}"
                                            class="dropdown-item">
 
-                                            <i class="bx bx-award me-2"></i>
+                                            <i class="bx bx-award"></i>
 
-                                            Graduation
+                                            <span>Graduation</span>
 
                                         </a>
 
@@ -331,9 +305,9 @@
                                         <a href="{{ route('admin.graduations.create') }}"
                                            class="dropdown-item">
 
-                                            <i class="bx bx-award me-2"></i>
+                                            <i class="bx bx-award"></i>
 
-                                            Graduation
+                                            <span>Graduation</span>
 
                                         </a>
 
@@ -342,24 +316,21 @@
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Alumni --}}
-                                {{-- ================================================= --}}
+
                                 @if(
                                     auth()->user()?->can('alumni.view') ||
                                     auth()->user()?->can('alumni.manage')
                                 )
-
-                                    <div class="dropdown-divider"></div>
 
                                     @if(auth()->user()?->can('alumni.view'))
 
                                         <a href="{{ route('admin.alumni.index') }}"
                                            class="dropdown-item">
 
-                                            <i class="bx bx-group me-2"></i>
+                                            <i class="bx bx-group"></i>
 
-                                            Alumni
+                                            <span>Alumni</span>
 
                                         </a>
 
@@ -368,9 +339,9 @@
                                         <a href="{{ route('admin.alumni.create') }}"
                                            class="dropdown-item">
 
-                                            <i class="bx bx-group me-2"></i>
+                                            <i class="bx bx-group"></i>
 
-                                            Alumni
+                                            <span>Alumni</span>
 
                                         </a>
 
@@ -379,59 +350,67 @@
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Student Attendance --}}
-                                {{-- ================================================= --}}
+                                {{-- Attendance Heading --}}
+
                                 @if(
                                     auth()->user()?->can('attendance.view') ||
                                     auth()->user()?->can('attendance.mark') ||
                                     auth()->user()?->can('attendance.reports')
                                 )
 
-                                    <div class="dropdown-divider"></div>
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-calendar-check"></i>
+
+                                        <span>Attendance</span>
+
+                                    </div>
 
                                 @endif
 
 
-                                {{-- Student Attendance List --}}
+                                {{-- Student Attendance --}}
+
                                 @if(auth()->user()?->can('attendance.view'))
 
                                     <a href="{{ route('admin.attendance.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-calendar-check me-2"></i>
+                                        <i class="bx bx-calendar-check"></i>
 
-                                        Student Attendance
+                                        <span>Student Attendance</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- Mark Student Attendance --}}
+                                {{-- Mark Attendance --}}
+
                                 @if(auth()->user()?->can('attendance.mark'))
 
                                     <a href="{{ route('admin.attendance.create') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-user-check me-2"></i>
+                                        <i class="bx bx-user-check"></i>
 
-                                        Mark Student Attendance
+                                        <span>Mark Attendance</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- Student Attendance Reports --}}
+                                {{-- Attendance Reports --}}
+
                                 @if(auth()->user()?->can('attendance.reports'))
 
                                     <a href="{{ route('admin.attendance.reports') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-bar-chart-alt-2 me-2"></i>
+                                        <i class="bx bx-bar-chart-alt-2"></i>
 
-                                        Attendance Reports
+                                        <span>Attendance Reports</span>
 
                                     </a>
 
@@ -445,9 +424,10 @@
                     @endif
 
 
-                    {{-- ===================================================== --}}
-                    {{-- Academic --}}
-                    {{-- ===================================================== --}}
+                    {{-- =========================================================
+                         ACADEMICS
+                         ========================================================= --}}
+
                     @if(
                         auth()->user()?->can('academic-years.view') ||
                         auth()->user()?->can('terms.view') ||
@@ -456,25 +436,30 @@
                         auth()->user()?->can('sections.view') ||
                         auth()->user()?->can('courses.view') ||
 
-                        {{-- Examination --}}
                         auth()->user()?->can('examinations.view') ||
                         auth()->user()?->can('examinations.create') ||
                         auth()->user()?->can('examinations.update') ||
                         auth()->user()?->can('examinations.delete') ||
+
                         auth()->user()?->can('exam-schedules.view') ||
                         auth()->user()?->can('exam-schedules.manage') ||
+
                         auth()->user()?->can('marks.view') ||
                         auth()->user()?->can('marks.enter') ||
                         auth()->user()?->can('marks.update') ||
                         auth()->user()?->can('marks.approve') ||
+
                         auth()->user()?->can('grading.view') ||
                         auth()->user()?->can('grading.manage') ||
+
                         auth()->user()?->can('results.view') ||
                         auth()->user()?->can('results.calculate') ||
                         auth()->user()?->can('results.approve') ||
                         auth()->user()?->can('results.publish') ||
+
                         auth()->user()?->can('report-cards.view') ||
                         auth()->user()?->can('report-cards.generate') ||
+
                         auth()->user()?->can('transcripts.view') ||
                         auth()->user()?->can('transcripts.generate')
                     )
@@ -497,285 +482,276 @@
                             </a>
 
 
-                            <div class="dropdown-menu"
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
                                  aria-labelledby="topnav-academics">
 
 
-                                {{-- ================================================= --}}
+                                {{-- Academic Setup Heading --}}
+
+                                <div class="sms-menu-heading">
+
+                                    <i class="bx bx-book"></i>
+
+                                    <span>Academic Setup</span>
+
+                                </div>
+
+
                                 {{-- Academic Years --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('academic-years.view'))
 
                                     <a href="{{ route('admin.academic-years.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-calendar me-2"></i>
+                                        <i class="bx bx-calendar"></i>
 
-                                        Academic Years
+                                        <span>Academic Years</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Terms --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('terms.view'))
 
                                     <a href="{{ route('admin.terms.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-calendar-event me-2"></i>
+                                        <i class="bx bx-calendar-event"></i>
 
-                                        Terms / Semesters
+                                        <span>Terms / Semesters</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Departments --}}
-                                {{-- ================================================= --}}
-                                @if(auth()->user()?->can('departments.view'))
 
-                                    <div class="dropdown-divider"></div>
+                                @if(auth()->user()?->can('departments.view'))
 
                                     <a href="{{ route('admin.departments.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-sitemap me-2"></i>
+                                        <i class="bx bx-sitemap"></i>
 
-                                        Departments
+                                        <span>Departments</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Classes --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('classes.view'))
 
                                     <a href="{{ route('admin.classes.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-building me-2"></i>
+                                        <i class="bx bx-building"></i>
 
-                                        Classes
+                                        <span>Classes</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Sections --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('sections.view'))
 
                                     <a href="{{ route('admin.sections.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-grid-alt me-2"></i>
+                                        <i class="bx bx-grid-alt"></i>
 
-                                        Sections / Streams
+                                        <span>Sections / Streams</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Subjects --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('courses.view'))
 
                                     <a href="{{ route('admin.courses.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-book me-2"></i>
+                                        <i class="bx bx-book"></i>
 
-                                        Subjects / Courses
+                                        <span>Subjects / Courses</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Examination Management --}}
-                                {{-- ================================================= --}}
+                                {{-- Examination Heading --}}
+
                                 @if(
                                     auth()->user()?->can('examinations.view') ||
                                     auth()->user()?->can('examinations.create') ||
-                                    auth()->user()?->can('examinations.update') ||
-                                    auth()->user()?->can('examinations.delete') ||
                                     auth()->user()?->can('exam-schedules.view') ||
                                     auth()->user()?->can('exam-schedules.manage') ||
                                     auth()->user()?->can('marks.view') ||
                                     auth()->user()?->can('marks.enter') ||
-                                    auth()->user()?->can('marks.update') ||
-                                    auth()->user()?->can('marks.approve') ||
                                     auth()->user()?->can('grading.view') ||
-                                    auth()->user()?->can('grading.manage') ||
+                                    auth()->user()?->can('results.view') ||
+                                    auth()->user()?->can('report-cards.view') ||
+                                    auth()->user()?->can('transcripts.view')
+                                )
+
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-edit-alt"></i>
+
+                                        <span>Examination</span>
+
+                                    </div>
+
+                                @endif
+
+
+                                {{-- Examinations --}}
+
+                                @if(
+                                    auth()->user()?->can('examinations.view') ||
+                                    auth()->user()?->can('examinations.create')
+                                )
+
+                                    <a href="{{ route('admin.examinations.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-edit-alt"></i>
+
+                                        <span>Examinations</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Exam Schedules --}}
+
+                                @if(
+                                    auth()->user()?->can('exam-schedules.view') ||
+                                    auth()->user()?->can('exam-schedules.manage')
+                                )
+
+                                    <a href="{{ route('admin.exam-schedules.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-calendar-event"></i>
+
+                                        <span>Exam Schedules</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Marks --}}
+
+                                @if(
+                                    auth()->user()?->can('marks.view') ||
+                                    auth()->user()?->can('marks.enter') ||
+                                    auth()->user()?->can('marks.update') ||
+                                    auth()->user()?->can('marks.approve')
+                                )
+
+                                    <a href="{{ route('admin.marks.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-pencil"></i>
+
+                                        <span>Subject Marks</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Grading --}}
+
+                                @if(
+                                    auth()->user()?->can('grading.view') ||
+                                    auth()->user()?->can('grading.manage')
+                                )
+
+                                    <a href="{{ route('admin.grading.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-bar-chart-alt-2"></i>
+
+                                        <span>Grading</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Results --}}
+
+                                @if(
                                     auth()->user()?->can('results.view') ||
                                     auth()->user()?->can('results.calculate') ||
                                     auth()->user()?->can('results.approve') ||
-                                    auth()->user()?->can('results.publish') ||
+                                    auth()->user()?->can('results.publish')
+                                )
+
+                                    <a href="{{ route('admin.results.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-spreadsheet"></i>
+
+                                        <span>Results</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Report Cards --}}
+
+                                @if(
                                     auth()->user()?->can('report-cards.view') ||
-                                    auth()->user()?->can('report-cards.generate') ||
+                                    auth()->user()?->can('report-cards.generate')
+                                )
+
+                                    <a href="{{ route('admin.report-cards.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-file"></i>
+
+                                        <span>Report Cards</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Transcripts --}}
+
+                                @if(
                                     auth()->user()?->can('transcripts.view') ||
                                     auth()->user()?->can('transcripts.generate')
                                 )
 
-                                    <div class="dropdown-divider"></div>
+                                    <a href="{{ route('admin.transcripts.index') }}"
+                                       class="dropdown-item">
 
+                                        <i class="bx bx-file-blank"></i>
 
-                                    {{-- ================================================= --}}
-                                    {{-- Examinations --}}
-                                    {{-- ================================================= --}}
-                                    @if(
-                                        auth()->user()?->can('examinations.view') ||
-                                        auth()->user()?->can('examinations.create')
-                                    )
+                                        <span>Transcripts</span>
 
-                                        <a href="{{ route('admin.examinations.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-edit-alt me-2"></i>
-
-                                            Examinations
-
-                                        </a>
-
-                                    @endif
-
-
-                                    {{-- ================================================= --}}
-                                    {{-- Exam Schedules --}}
-                                    {{-- ================================================= --}}
-                                    @if(
-                                        auth()->user()?->can('exam-schedules.view') ||
-                                        auth()->user()?->can('exam-schedules.manage')
-                                    )
-
-                                        <a href="{{ route('admin.exam-schedules.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-calendar-event me-2"></i>
-
-                                            Exam Schedules
-
-                                        </a>
-
-                                    @endif
-
-
-                                    {{-- ================================================= --}}
-                                    {{-- Subject Marks --}}
-                                    {{-- ================================================= --}}
-                                    @if(
-                                        auth()->user()?->can('marks.view') ||
-                                        auth()->user()?->can('marks.enter') ||
-                                        auth()->user()?->can('marks.update') ||
-                                        auth()->user()?->can('marks.approve')
-                                    )
-
-                                        <a href="{{ route('admin.marks.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-pencil me-2"></i>
-
-                                            Subject Marks
-
-                                        </a>
-
-                                    @endif
-
-
-                                    {{-- ================================================= --}}
-                                    {{-- Grading --}}
-                                    {{-- ================================================= --}}
-                                    @if(
-                                        auth()->user()?->can('grading.view') ||
-                                        auth()->user()?->can('grading.manage')
-                                    )
-
-                                        <a href="{{ route('admin.grading.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-bar-chart-alt-2 me-2"></i>
-
-                                            Grading
-
-                                        </a>
-
-                                    @endif
-
-
-                                    {{-- ================================================= --}}
-                                    {{-- Results --}}
-                                    {{-- ================================================= --}}
-                                    @if(
-                                        auth()->user()?->can('results.view') ||
-                                        auth()->user()?->can('results.calculate') ||
-                                        auth()->user()?->can('results.approve') ||
-                                        auth()->user()?->can('results.publish')
-                                    )
-
-                                        <a href="{{ route('admin.results.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-spreadsheet me-2"></i>
-
-                                            Results
-
-                                        </a>
-
-                                    @endif
-
-
-                                    {{-- ================================================= --}}
-                                    {{-- Report Cards --}}
-                                    {{-- ================================================= --}}
-                                    @if(
-                                        auth()->user()?->can('report-cards.view') ||
-                                        auth()->user()?->can('report-cards.generate')
-                                    )
-
-                                        <a href="{{ route('admin.report-cards.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-file me-2"></i>
-
-                                            Report Cards
-
-                                        </a>
-
-                                    @endif
-
-
-                                    {{-- ================================================= --}}
-                                    {{-- Transcripts --}}
-                                    {{-- ================================================= --}}
-                                    @if(
-                                        auth()->user()?->can('transcripts.view') ||
-                                        auth()->user()?->can('transcripts.generate')
-                                    )
-
-                                        <a href="{{ route('admin.transcripts.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-file-blank me-2"></i>
-
-                                            Transcripts
-
-                                        </a>
-
-                                    @endif
+                                    </a>
 
                                 @endif
 
@@ -787,29 +763,33 @@
                     @endif
 
 
-                    {{-- ===================================================== --}}
-                    {{-- Staff --}}
-                    {{-- ===================================================== --}}
+                    {{-- =========================================================
+                         STAFF
+                         ========================================================= --}}
+
                     @if(
-                    auth()->user()?->can('staff.view') ||
-                    auth()->user()?->can('staff.create') ||
-                    auth()->user()?->can('staff.update') ||
-                    auth()->user()?->can('staff.delete') ||
-                    auth()->user()?->can('instructors.view') ||
-                    auth()->user()?->can('instructors.create') ||
-                    auth()->user()?->can('instructors.update') ||
-                    auth()->user()?->can('instructors.delete') ||
-                    auth()->user()?->can('staff-attendance.view') ||
-                    auth()->user()?->can('staff-attendance.mark') ||
-                    auth()->user()?->can('staff-attendance.update') ||
-                    auth()->user()?->can('staff-attendance.reports') ||
-                    auth()->user()?->can('leaves.view') ||
-                    auth()->user()?->can('leaves.create') ||
-                    auth()->user()?->can('leaves.update') ||
-                    auth()->user()?->can('leaves.delete') ||
-                    auth()->user()?->can('leaves.approve') ||
-                    auth()->user()?->can('leaves.reject') ||
-                    auth()->user()?->can('leaves.reports')
+                        auth()->user()?->can('staff.view') ||
+                        auth()->user()?->can('staff.create') ||
+                        auth()->user()?->can('staff.update') ||
+                        auth()->user()?->can('staff.delete') ||
+
+                        auth()->user()?->can('instructors.view') ||
+                        auth()->user()?->can('instructors.create') ||
+                        auth()->user()?->can('instructors.update') ||
+                        auth()->user()?->can('instructors.delete') ||
+
+                        auth()->user()?->can('staff-attendance.view') ||
+                        auth()->user()?->can('staff-attendance.mark') ||
+                        auth()->user()?->can('staff-attendance.update') ||
+                        auth()->user()?->can('staff-attendance.reports') ||
+
+                        auth()->user()?->can('leaves.view') ||
+                        auth()->user()?->can('leaves.create') ||
+                        auth()->user()?->can('leaves.update') ||
+                        auth()->user()?->can('leaves.delete') ||
+                        auth()->user()?->can('leaves.approve') ||
+                        auth()->user()?->can('leaves.reject') ||
+                        auth()->user()?->can('leaves.reports')
                     )
 
                         <li class="nav-item dropdown">
@@ -830,102 +810,114 @@
                             </a>
 
 
-                            <div class="dropdown-menu"
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
                                  aria-labelledby="topnav-staff">
 
 
-                                {{-- ================================================= --}}
+                                {{-- Staff Management Heading --}}
+
+                                <div class="sms-menu-heading">
+
+                                    <i class="bx bx-group"></i>
+
+                                    <span>Staff Management</span>
+
+                                </div>
+
+
                                 {{-- Staff List --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('staff.view'))
 
                                     <a href="{{ route('admin.staff.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-group me-2"></i>
+                                        <i class="bx bx-group"></i>
 
-                                        Staff List
+                                        <span>Staff List</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Add Staff --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('staff.create'))
 
                                     <a href="{{ route('admin.staff.create') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-user-plus me-2"></i>
+                                        <i class="bx bx-user-plus"></i>
 
-                                        Add Staff
+                                        <span>Add Staff</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Instructors --}}
-                                {{-- ================================================= --}}
-                                @if(auth()->user()?->can('instructors.view'))
 
-                                    <div class="dropdown-divider"></div>
+                                @if(auth()->user()?->can('instructors.view'))
 
                                     <a href="{{ route('admin.instructors.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-chalkboard me-2"></i>
+                                        <i class="bx bx-chalkboard"></i>
 
-                                        Instructors
+                                        <span>Instructors</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Add Instructor --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('instructors.create'))
 
                                     <a href="{{ route('admin.instructors.create') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-user-check me-2"></i>
+                                        <i class="bx bx-user-check"></i>
 
-                                        Add Instructor
+                                        <span>Add Instructor</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Staff Attendance --}}
-                                {{-- ================================================= --}}
+                                {{-- Staff Attendance Heading --}}
+
                                 @if(
                                     auth()->user()?->can('staff-attendance.view') ||
-                                    auth()->user()?->can('staff-attendance.mark')
+                                    auth()->user()?->can('staff-attendance.mark') ||
+                                    auth()->user()?->can('staff-attendance.reports')
                                 )
 
-                                    <div class="dropdown-divider"></div>
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-calendar-check"></i>
+
+                                        <span>Staff Attendance</span>
+
+                                    </div>
 
                                 @endif
 
 
-                                {{-- Staff Attendance List --}}
+                                {{-- Staff Attendance --}}
+
                                 @if(auth()->user()?->can('staff-attendance.view'))
 
                                     <a href="{{ route('admin.staff-attendance.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-calendar-check me-2"></i>
+                                        <i class="bx bx-calendar-check"></i>
 
-                                        Staff Attendance
+                                        <span>Staff Attendance</span>
 
                                     </a>
 
@@ -933,63 +925,67 @@
 
 
                                 {{-- Mark Staff Attendance --}}
+
                                 @if(auth()->user()?->can('staff-attendance.mark'))
 
                                     <a href="{{ route('admin.staff-attendance.create') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-user-check me-2"></i>
+                                        <i class="bx bx-user-check"></i>
 
-                                        Mark Staff Attendance
+                                        <span>Mark Attendance</span>
 
                                     </a>
 
                                 @endif
 
-                                {{-- ================================================= --}}
+
                                 {{-- Staff Attendance Reports --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('staff-attendance.reports'))
 
                                     <a href="{{ route('admin.staff-attendance.reports') }}"
-                                    class="dropdown-item">
+                                       class="dropdown-item">
 
-                                        <i class="bx bx-bar-chart-alt-2 me-2"></i>
+                                        <i class="bx bx-bar-chart-alt-2"></i>
 
-                                        Staff Attendance Reports
-                                        
+                                        <span>Attendance Reports</span>
+
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Leave Management --}}
-                                {{-- ================================================= --}}
+                                {{-- Leave Management Heading --}}
+
                                 @if(
                                     auth()->user()?->can('leaves.view') ||
                                     auth()->user()?->can('leaves.create') ||
-                                    auth()->user()?->can('leaves.update') ||
-                                    auth()->user()?->can('leaves.delete') ||
                                     auth()->user()?->can('leaves.approve') ||
-                                    auth()->user()?->can('leaves.reject') ||
                                     auth()->user()?->can('leaves.reports')
                                 )
 
-                                    <div class="dropdown-divider"></div>
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-calendar-minus"></i>
+
+                                        <span>Leave Management</span>
+
+                                    </div>
 
                                 @endif
 
 
                                 {{-- Leave Management --}}
+
                                 @if(auth()->user()?->can('leaves.view'))
 
                                     <a href="{{ route('admin.leaves.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-calendar-minus me-2"></i>
+                                        <i class="bx bx-calendar-minus"></i>
 
-                                        Leave Management
+                                        <span>Leave Management</span>
 
                                     </a>
 
@@ -997,14 +993,15 @@
 
 
                                 {{-- New Leave Request --}}
+
                                 @if(auth()->user()?->can('leaves.create'))
 
                                     <a href="{{ route('admin.leaves.create') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-calendar-plus me-2"></i>
+                                        <i class="bx bx-calendar-plus"></i>
 
-                                        New Leave Request
+                                        <span>New Leave Request</span>
 
                                     </a>
 
@@ -1012,14 +1009,15 @@
 
 
                                 {{-- Leave Reports --}}
+
                                 @if(auth()->user()?->can('leaves.reports'))
 
                                     <a href="{{ route('admin.leaves.reports') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-file-find me-2"></i>
+                                        <i class="bx bx-file-find"></i>
 
-                                        Leave Reports
+                                        <span>Leave Reports</span>
 
                                     </a>
 
@@ -1033,25 +1031,33 @@
                     @endif
 
 
-                    {{-- ===================================================== --}}
-                    {{-- Finance --}}
-                    {{-- ===================================================== --}}
+                    {{-- =========================================================
+                         FINANCE
+                         ========================================================= --}}
+
                     @if(
                         auth()->user()?->can('fees.view') ||
                         auth()->user()?->can('fees.manage') ||
+
                         auth()->user()?->can('fee-structures.view') ||
                         auth()->user()?->can('fee-structures.manage') ||
+
                         auth()->user()?->can('invoices.view') ||
                         auth()->user()?->can('invoices.create') ||
                         auth()->user()?->can('invoices.update') ||
                         auth()->user()?->can('invoices.delete') ||
+
                         auth()->user()?->can('payments.view') ||
                         auth()->user()?->can('payments.create') ||
+
                         auth()->user()?->can('payment-refunds.view') ||
                         auth()->user()?->can('payment-refunds.approve') ||
                         auth()->user()?->can('payment-refunds.reject') ||
                         auth()->user()?->can('payment-refunds.process') ||
-                        auth()->user()?->can('payment-refunds.cancel')
+                        auth()->user()?->can('payment-refunds.cancel') ||
+
+                        auth()->user()?->can('scholarships.view') ||
+                        auth()->user()?->can('scholarships.manage')
                     )
 
                         <li class="nav-item dropdown">
@@ -1072,13 +1078,25 @@
                             </a>
 
 
-                            <div class="dropdown-menu"
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
                                  aria-labelledby="topnav-finance">
 
 
-                                {{-- ================================================= --}}
+                                {{-- =================================================
+                                     FEE SETUP
+                                     ================================================= --}}
+
+                                <div class="sms-menu-heading">
+
+                                    <i class="bx bx-wallet"></i>
+
+                                    <span>Fee Setup</span>
+
+                                </div>
+
+
                                 {{-- Fee Categories --}}
-                                {{-- ================================================= --}}
+
                                 @if(
                                     auth()->user()?->can('fees.view') ||
                                     auth()->user()?->can('fees.manage')
@@ -1087,18 +1105,17 @@
                                     <a href="{{ route('admin.fee-categories.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-category me-2"></i>
+                                        <i class="bx bx-category"></i>
 
-                                        Fee Categories
+                                        <span>Fee Categories</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Fee Structures --}}
-                                {{-- ================================================= --}}
+
                                 @if(
                                     auth()->user()?->can('fee-structures.view') ||
                                     auth()->user()?->can('fee-structures.manage')
@@ -1107,18 +1124,36 @@
                                     <a href="{{ route('admin.fee-structures.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-layer me-2"></i>
+                                        <i class="bx bx-layer"></i>
 
-                                        Fee Structures
+                                        <span>Fee Structures</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
+                                {{-- Scholarships --}}
+
+                                @if(
+                                    auth()->user()?->can('scholarships.view') ||
+                                    auth()->user()?->can('scholarships.manage')
+                                )
+
+                                    <a href="{{ route('admin.scholarships.index') }}"
+                                       class="dropdown-item scholarship-item">
+
+                                        <i class="bx bx-award"></i>
+
+                                        <span>Scholarships</span>
+
+                                    </a>
+
+                                @endif
+
+
                                 {{-- Fee Installments --}}
-                                {{-- ================================================= --}}
+
                                 @if(
                                     auth()->user()?->can('fees.view') ||
                                     auth()->user()?->can('fees.manage')
@@ -1127,84 +1162,98 @@
                                     <a href="{{ route('admin.fee-installments.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-calendar me-2"></i>
+                                        <i class="bx bx-calendar"></i>
 
-                                        Fee Installments
+                                        <span>Fee Installments</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Student Fee Assignment --}}
-                                {{-- ================================================= --}}
+
                                 @if(
                                     auth()->user()?->can('fees.view') ||
                                     auth()->user()?->can('fees.manage')
                                 )
 
-                                    <div class="dropdown-divider"></div>
-
-                                    <a href="{{-- route('admin.student-fee-assignments.index') --}}"
+                                    <a href="{{ route('admin.student-fees.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-user-check me-2"></i>
+                                        <i class="bx bx-user-check"></i>
 
-                                        Student Fee Assignment
+                                        <span>Student Fee Assignment</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
-                                {{-- Invoices --}}
-                                {{-- ================================================= --}}
-                                @if(auth()->user()?->can('invoices.view'))
+                                {{-- =================================================
+                                     BILLING & PAYMENTS
+                                     ================================================= --}}
 
-                                    <div class="dropdown-divider"></div>
+                                @if(
+                                    auth()->user()?->can('invoices.view') ||
+                                    auth()->user()?->can('invoices.create') ||
+                                    auth()->user()?->can('payments.view') ||
+                                    auth()->user()?->can('payment-refunds.view')
+                                )
+
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-receipt"></i>
+
+                                        <span>Billing & Payments</span>
+
+                                    </div>
+
+                                @endif
+
+
+                                {{-- Invoices --}}
+
+                                @if(auth()->user()?->can('invoices.view'))
 
                                     <a href="{{ route('admin.invoices.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-file me-2"></i>
+                                        <i class="bx bx-file"></i>
 
-                                        Invoices
+                                        <span>Invoices</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Payments --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('payments.view'))
 
                                     <a href="{{ route('admin.payments.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-money me-2"></i>
+                                        <i class="bx bx-money"></i>
 
-                                        Payments
+                                        <span>Payments</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Payment Refunds --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('payment-refunds.view'))
 
                                     <a href="{{ route('admin.payment-refunds.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-revision me-2"></i>
+                                        <i class="bx bx-revision"></i>
 
-                                        Payment Refunds
+                                        <span>Payment Refunds</span>
 
                                     </a>
 
@@ -1218,9 +1267,10 @@
                     @endif
 
 
-                    {{-- ===================================================== --}}
-                    {{-- Administration --}}
-                    {{-- ===================================================== --}}
+                    {{-- =========================================================
+                         ADMINISTRATION
+                         ========================================================= --}}
+
                     @if(
                         auth()->user()?->can('users.view') ||
                         auth()->user()?->can('users.create') ||
@@ -1250,51 +1300,48 @@
                                  aria-labelledby="topnav-administration">
 
 
-                                {{-- ================================================= --}}
                                 {{-- Users --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('users.view'))
 
                                     <a href="{{ route('admin.users.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-user me-2"></i>
+                                        <i class="bx bx-user"></i>
 
-                                        Users
+                                        <span>Users</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Roles --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('roles.view'))
 
                                     <a href="{{ route('admin.roles.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-shield me-2"></i>
+                                        <i class="bx bx-shield"></i>
 
-                                        Roles
+                                        <span>Roles</span>
 
                                     </a>
 
                                 @endif
 
 
-                                {{-- ================================================= --}}
                                 {{-- Permissions --}}
-                                {{-- ================================================= --}}
+
                                 @if(auth()->user()?->can('permissions.view'))
 
                                     <a href="{{ route('admin.permissions.index') }}"
                                        class="dropdown-item">
 
-                                        <i class="bx bx-lock-alt me-2"></i>
+                                        <i class="bx bx-lock-alt"></i>
 
-                                        Permissions
+                                        <span>Permissions</span>
 
                                     </a>
 
@@ -1315,4 +1362,5 @@
         </nav>
 
     </div>
+
 </div>

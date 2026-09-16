@@ -14,7 +14,7 @@ class ScholarshipController extends Controller
     public function index(Request $request): View
     {
         $user = Auth::user();
-        abort_unless($user?->can('fees.view'), 403);
+        abort_unless($user?->can('scholarships.view'), 403);
 
         $query = Scholarships::query()
             ->where('school_id', $user->school_id)
@@ -44,7 +44,7 @@ class ScholarshipController extends Controller
 
     public function create(): View
     {
-        abort_unless(Auth::user()?->can('fees.manage'), 403);
+        abort_unless(Auth::user()?->can('scholarships.manage'), 403);
 
         return view('admin.scholarships.create');
     }
@@ -52,7 +52,7 @@ class ScholarshipController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $user = Auth::user();
-        abort_unless($user?->can('fees.manage'), 403);
+        abort_unless($user?->can('scholarships.manage'), 403);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -93,7 +93,7 @@ class ScholarshipController extends Controller
     public function show(Scholarships $scholarship): View
     {
         $user = Auth::user();
-        abort_unless($user?->can('fees.view'), 403);
+        abort_unless($user?->can('scholarships.view'), 403);
         $this->authorizeSchool($scholarship);
 
         $scholarship->loadCount('studentFees');
@@ -107,7 +107,7 @@ class ScholarshipController extends Controller
     public function edit(Scholarships $scholarship): View
     {
         $user = Auth::user();
-        abort_unless($user?->can('fees.manage'), 403);
+        abort_unless($user?->can('scholarships.manage'), 403);
         $this->authorizeSchool($scholarship);
 
         return view('admin.scholarships.edit', compact('scholarship'));
@@ -116,7 +116,7 @@ class ScholarshipController extends Controller
     public function update(Request $request, Scholarships $scholarship): RedirectResponse
     {
         $user = Auth::user();
-        abort_unless($user?->can('fees.manage'), 403);
+        abort_unless($user?->can('scholarships.manage'), 403);
         $this->authorizeSchool($scholarship);
 
         $validated = $request->validate([
@@ -158,7 +158,7 @@ class ScholarshipController extends Controller
     public function toggleStatus(Scholarships $scholarship): RedirectResponse
     {
         $user = Auth::user();
-        abort_unless($user?->can('fees.manage'), 403);
+        abort_unless($user?->can('scholarships.manage'), 403);
         $this->authorizeSchool($scholarship);
 
         $scholarship->update(['is_active' => ! $scholarship->is_active]);
@@ -174,10 +174,10 @@ class ScholarshipController extends Controller
     public function destroy(Scholarships $scholarship): RedirectResponse
     {
         $user = Auth::user();
-        abort_unless($user?->can('fees.manage'), 403);
+        abort_unless($user?->can('scholarships.manage'), 403);
         $this->authorizeSchool($scholarship);
 
-        if ($scholarship->studentFees()->exists()) {
+        if ($scholarship->studentFees()->withTrashed()->exists()) {
             return back()->with('error', 'This scholarship cannot be deleted because it has been assigned to student fees. Deactivate it instead.');
         }
 

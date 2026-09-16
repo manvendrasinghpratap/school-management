@@ -464,6 +464,8 @@
                                     @foreach($scholarships as $scholarship)
 
                                         <option value="{{ $scholarship->id }}"
+                                                data-type="{{ $scholarship->type }}"
+                                                data-value="{{ $scholarship->value }}"
                                             {{ (string) old('scholarship_id', $studentFee->scholarship_id) === (string) $scholarship->id ? 'selected' : '' }}>
 
                                             {{ $scholarship->name }}
@@ -875,182 +877,133 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    const feeStructureSelect =
-        document.getElementById('fee_structure_id');
+    const feeStructureSelect = document.getElementById('fee_structure_id');
+    const scholarshipSelect = document.getElementById('scholarship_id');
+    const structureAmount = document.getElementById('structure_amount');
+    const amountInput = document.getElementById('amount');
+    const discountInput = document.getElementById('discount');
+    const previewAmount = document.getElementById('preview_amount');
+    const previewDiscount = document.getElementById('preview_discount');
+    const previewNet = document.getElementById('preview_net');
 
-    const structureAmount =
-        document.getElementById('structure_amount');
+    function selectedScholarship() {
+        if (!scholarshipSelect) return null;
+        const option = scholarshipSelect.options[scholarshipSelect.selectedIndex];
+        if (!option || !option.value) return null;
+        return {
+            type: option.dataset.type || '',
+            value: parseFloat(option.dataset.value || '0') || 0,
+        };
+    }
 
-    const amountInput =
-        document.getElementById('amount');
+    function calculateScholarshipDiscount(amount) {
+        const scholarship = selectedScholarship();
 
-    const discountInput =
-        document.getElementById('discount');
-
-    const previewAmount =
-        document.getElementById('preview_amount');
-
-    const previewDiscount =
-        document.getElementById('preview_discount');
-
-    const previewNet =
-        document.getElementById('preview_net');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Structure Amount
-    |--------------------------------------------------------------------------
-    */
-
-    function updateStructureAmount()
-    {
-        if (!feeStructureSelect) {
-            return;
+        if (!scholarship || amount <= 0) {
+            return 0;
         }
 
+        if (scholarship.type === 'percentage') {
+            const percentage = Math.min(
+                Math.max(scholarship.value, 0),
+                100
+            );
 
-        const selectedOption =
-            feeStructureSelect.options[
-                feeStructureSelect.selectedIndex
-            ];
+            // Calculate percentage first, then round to 2 decimal places.
+            const discount = Math.round(
+                amount * (percentage / 100) * 100
+            ) / 100;
 
+            return Math.min(amount, discount);
+        }
 
-        if (
-            !selectedOption ||
-            !selectedOption.value
-        ) {
+        if (scholarship.type === 'fixed') {
+            return Math.min(
+                amount,
+                Math.max(scholarship.value, 0)
+            );
+        }
 
-            if (structureAmount) {
-                structureAmount.value = '';
+        return 0;
+    }
+
+    function updateDiscountState(recalculate = true) {
+        const scholarship = selectedScholarship();
+
+        if (!discountInput) return;
+
+        if (scholarship) {
+            discountInput.readOnly = true;
+            discountInput.classList.add('bg-light');
+
+            if (recalculate) {
+                const amount = parseFloat(amountInput?.value || '0') || 0;
+                discountInput.value = calculateScholarshipDiscount(amount).toFixed(2);
             }
+        } else {
+            discountInput.readOnly = false;
+            discountInput.classList.remove('bg-light');
+        }
+    }
 
+    function updateStructureAmount() {
+        if (!feeStructureSelect) return;
+
+        const option = feeStructureSelect.options[feeStructureSelect.selectedIndex];
+        if (!option || !option.value) {
+            if (structureAmount) structureAmount.value = '';
+            updateDiscountState();
+            updateNetPayable();
             return;
-
         }
 
+        const amount = parseFloat(option.dataset.amount || '0') || 0;
+        if (structureAmount) structureAmount.value = amount.toFixed(2);
 
-        const amount =
-            parseFloat(
-                selectedOption.dataset.amount
-            ) || 0;
-
-
-        if (structureAmount) {
-
-            structureAmount.value =
-                amount.toFixed(2);
-
+        if (!amountInput.value) {
+            amountInput.value = amount.toFixed(2);
         }
 
-
+        updateDiscountState();
         updateNetPayable();
     }
 
+    function updateNetPayable() {
+        const amount = parseFloat(amountInput?.value || '0') || 0;
+        let discount = parseFloat(discountInput?.value || '0') || 0;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Net Payable
-    |--------------------------------------------------------------------------
-    */
-
-    function updateNetPayable()
-    {
-        if (!amountInput || !discountInput) {
-            return;
+        const scholarship = selectedScholarship();
+        if (scholarship) {
+            discount = calculateScholarshipDiscount(amount);
+            if (discountInput) discountInput.value = discount.toFixed(2);
         }
 
+        discount = Math.min(Math.max(discount, 0), amount);
 
-        const amount =
-            parseFloat(
-                amountInput.value
-            ) || 0;
-
-
-        const discount =
-            parseFloat(
-                discountInput.value
-            ) || 0;
-
-
-        const net =
-            Math.max(
-                0,
-                amount - discount
-            );
-
-
-        if (previewAmount) {
-
-            previewAmount.textContent =
-                amount.toFixed(2);
-
-        }
-
-
-        if (previewDiscount) {
-
-            previewDiscount.textContent =
-                discount.toFixed(2);
-
-        }
-
-
-        if (previewNet) {
-
-            previewNet.textContent =
-                net.toFixed(2);
-
-        }
+        if (previewAmount) previewAmount.textContent = amount.toFixed(2);
+        if (previewDiscount) previewDiscount.textContent = discount.toFixed(2);
+        if (previewNet) previewNet.textContent = Math.max(0, amount - discount).toFixed(2);
     }
 
+    scholarshipSelect?.addEventListener('change', function () {
+        updateDiscountState(true);
+        updateNetPayable();
+    });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Events
-    |--------------------------------------------------------------------------
-    */
+    amountInput?.addEventListener('input', function () {
+        updateDiscountState(true);
+        updateNetPayable();
+    });
 
-    if (feeStructureSelect) {
+    discountInput?.addEventListener('input', function () {
+        updateNetPayable();
+    });
 
-        feeStructureSelect.addEventListener(
-            'change',
-            updateStructureAmount
-        );
-
-    }
-
-
-    if (amountInput) {
-
-        amountInput.addEventListener(
-            'input',
-            updateNetPayable
-        );
-
-    }
-
-
-    if (discountInput) {
-
-        discountInput.addEventListener(
-            'input',
-            updateNetPayable
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Initial Load
-    |--------------------------------------------------------------------------
-    */
+    feeStructureSelect?.addEventListener('change', updateStructureAmount);
 
     updateStructureAmount();
-
+    updateDiscountState(true);
     updateNetPayable();
-
 });
 
 </script>

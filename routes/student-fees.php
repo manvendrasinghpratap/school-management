@@ -81,19 +81,6 @@ Route::prefix('admin/student-fees')
             ->middleware('can:fees.manage')
             ->name('admin.student-fees.store');
 
-
-        Route::get('/filter-classes', [StudentFeeController::class, 'filterClasses'])
-        ->middleware('can:fees.manage')
-        ->name('admin.student-fees.filter-classes');
-
-        Route::get('/filter-sections', [StudentFeeController::class, 'filterSections'])
-        ->middleware('can:fees.manage')
-        ->name('admin.student-fees.filter-sections');
-
-        Route::get('/filter-students', [StudentFeeController::class, 'filterStudents'])
-        ->middleware('can:fees.manage')
-        ->name('admin.student-fees.filter-students');
-
         /*
         |--------------------------------------------------------------------------
         | View

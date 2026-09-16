@@ -487,7 +487,6 @@ class StudentFeeController extends Controller
             'academicYear',
             'classModel',
             'term',
-            'scholarships',
         ])
 
         ->orderByDesc('fee_structures.academic_year_id');
@@ -527,6 +526,33 @@ class StudentFeeController extends Controller
         'fee_structures' => $feeStructures,
     ]);
 }
+
+    /**
+     * Calculate the actual monetary discount from a scholarship.
+     *
+     * Scholarship value is the rule/value; StudentFee.discount stores the
+     * actual monetary discount applied to this assignment.
+     */
+    private function calculateScholarshipDiscount(?Scholarships $scholarship, float $amount): float
+    {
+        if (!$scholarship || $amount <= 0) {
+            return 0.00;
+        }
+
+        $value = round((float) $scholarship->value, 2);
+
+        if ($scholarship->type === 'percentage') {
+            $value = min(max($value, 0), 100);
+
+            return round($amount * ($value / 100), 2);
+        }
+
+        if ($scholarship->type === 'fixed') {
+            return min(round(max($value, 0), 2), $amount);
+        }
+
+        return 0.00;
+    }
 
     /**
      * Store a student fee assignment.
@@ -599,13 +625,29 @@ class StudentFeeController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
+        $scholarship = null;
+
+        if (!empty($validated['scholarship_id'])) {
+            $scholarship = Scholarships::query()
+                ->where('school_id', $schoolId)
+                ->where('id', $validated['scholarship_id'])
+                ->where('is_active', true)
+                ->firstOrFail();
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Amount Validation
         |--------------------------------------------------------------------------
         */
         $amount = round((float) $validated['amount'], 2);
-        $discount = round((float) ($validated['discount'] ?? 0), 2);
+
+        // With a scholarship, the server calculates the discount from the
+        // selected scholarship rule. Without one, preserve the existing
+        // manual discount functionality.
+        $discount = $scholarship
+            ? $this->calculateScholarshipDiscount($scholarship, $amount)
+            : round((float) ($validated['discount'] ?? 0), 2);
 
         if ($amount <= 0) {
             return back()
@@ -951,13 +993,33 @@ class StudentFeeController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
+        $scholarship = null;
+
+        if (!empty($validated['scholarship_id'])) {
+            $scholarshipQuery = Scholarships::query()
+                ->where('school_id', $schoolId)
+                ->where('id', $validated['scholarship_id']);
+
+            // Allow an existing inactive scholarship to remain attached to an
+            // un-paid historical assignment, but do not allow a new inactive
+            // scholarship to be selected.
+            if ((int) $validated['scholarship_id'] !== (int) $studentFee->scholarship_id) {
+                $scholarshipQuery->where('is_active', true);
+            }
+
+            $scholarship = $scholarshipQuery->firstOrFail();
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Amount / Discount
         |--------------------------------------------------------------------------
         */
         $amount = round((float) $validated['amount'], 2);
-        $discount = round((float) ($validated['discount'] ?? 0), 2);
+
+        $discount = $scholarship
+            ? $this->calculateScholarshipDiscount($scholarship, $amount)
+            : round((float) ($validated['discount'] ?? 0), 2);
 
         if ($discount > $amount) {
             return back()
