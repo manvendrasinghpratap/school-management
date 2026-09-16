@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/payment-refunds.php');
     require base_path('routes/finance-report.php');
     require base_path('routes/scholarships.php');
+    require base_path('routes/reports.php');
 });
 
 

@@ -341,6 +341,439 @@
         </div>
 
     </div>
+
+    {{-- =========================================================
+         CURRENT YEAR / OPERATIONAL DASHBOARD
+    ========================================================= --}}
+
+    @if(!empty($enrollmentDashboard) || !empty($attendanceDashboard) || !empty($examinationDashboard))
+        <div class="row mb-4">
+
+            {{-- Enrollment Summary --}}
+            @if(!empty($enrollmentDashboard))
+                <div class="col-xl-4 col-lg-6 mb-3 mb-xl-0">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bx bx-user-check me-2"></i>
+                                    Enrollment Summary
+                                </h5>
+                                @can('enrollments.view')
+                                    <a href="{{ route('admin.student-enrollments.index') }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        View All
+                                    </a>
+                                @endcan
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="border rounded p-3 h-100">
+                                        <small class="text-muted d-block mb-1">Enrolled Students</small>
+                                        <h4 class="mb-0 text-primary">
+                                            {{ number_format($enrollmentDashboard['enrolled_students']) }}
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="border rounded p-3 h-100">
+                                        <small class="text-muted d-block mb-1">Active Enrollments</small>
+                                        <h4 class="mb-0 text-success">
+                                            {{ number_format($enrollmentDashboard['active_enrollments']) }}
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="alert alert-info mb-0 py-2">
+                                        <i class="bx bx-info-circle me-1"></i>
+                                        <strong>{{ number_format($enrollmentDashboard['students_without_enrollment']) }}</strong>
+                                        active student{{ $enrollmentDashboard['students_without_enrollment'] == 1 ? '' : 's' }}
+                                        without a current-year active enrollment.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Student Attendance --}}
+            @if(!empty($attendanceDashboard['student']))
+                <div class="col-xl-4 col-lg-6 mb-3 mb-xl-0">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bx bx-calendar-check me-2"></i>
+                                    Student Attendance
+                                </h5>
+                                @can('attendance.view')
+                                    <a href="{{ route('admin.attendance.index') }}"
+                                       class="btn btn-sm btn-outline-success">
+                                        View All
+                                    </a>
+                                @endcan
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <small class="text-muted d-block mb-3">
+                                Today — {{ \Carbon\Carbon::parse($attendanceDashboard['date'])->format('d M Y') }}
+                            </small>
+
+                            <div class="row g-2 text-center">
+                                <div class="col-3">
+                                    <div class="bg-success-subtle rounded p-2">
+                                        <h5 class="mb-0 text-success">{{ $attendanceDashboard['student']['present'] }}</h5>
+                                        <small class="text-muted">Present</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="bg-danger-subtle rounded p-2">
+                                        <h5 class="mb-0 text-danger">{{ $attendanceDashboard['student']['absent'] }}</h5>
+                                        <small class="text-muted">Absent</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="bg-warning-subtle rounded p-2">
+                                        <h5 class="mb-0 text-warning">{{ $attendanceDashboard['student']['late'] }}</h5>
+                                        <small class="text-muted">Late</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="bg-info-subtle rounded p-2">
+                                        <h5 class="mb-0 text-info">{{ $attendanceDashboard['student']['excused'] }}</h5>
+                                        <small class="text-muted">Excused</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-3">
+                                <span class="text-muted">Recorded Students</span>
+                                <strong>{{ number_format($attendanceDashboard['student']['recorded_students']) }}</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-2">
+                                <span class="text-muted">Attendance Rate</span>
+                                <strong class="text-success">{{ number_format($attendanceDashboard['student']['rate'], 2) }}%</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Staff Attendance --}}
+            @if(!empty($attendanceDashboard['staff']))
+                <div class="col-xl-4 col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bx bx-user-check me-2"></i>
+                                    Staff Attendance
+                                </h5>
+                                @can('staff-attendance.view')
+                                    <a href="{{ route('admin.staff-attendance.index') }}"
+                                       class="btn btn-sm btn-outline-info">
+                                        View All
+                                    </a>
+                                @endcan
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <small class="text-muted d-block mb-3">
+                                Today — {{ \Carbon\Carbon::parse($attendanceDashboard['date'])->format('d M Y') }}
+                            </small>
+
+                            <div class="row g-2 text-center">
+                                <div class="col-4">
+                                    <div class="bg-success-subtle rounded p-2">
+                                        <h5 class="mb-0 text-success">{{ $attendanceDashboard['staff']['present'] }}</h5>
+                                        <small class="text-muted">Present</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="bg-danger-subtle rounded p-2">
+                                        <h5 class="mb-0 text-danger">{{ $attendanceDashboard['staff']['absent'] }}</h5>
+                                        <small class="text-muted">Absent</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="bg-warning-subtle rounded p-2">
+                                        <h5 class="mb-0 text-warning">{{ $attendanceDashboard['staff']['late'] }}</h5>
+                                        <small class="text-muted">Late</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <div class="bg-primary-subtle rounded p-2">
+                                        <h5 class="mb-0 text-primary">{{ $attendanceDashboard['staff']['half_day'] }}</h5>
+                                        <small class="text-muted">Half Day</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <div class="bg-secondary-subtle rounded p-2">
+                                        <h5 class="mb-0 text-secondary">{{ $attendanceDashboard['staff']['leave'] }}</h5>
+                                        <small class="text-muted">Leave</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-3">
+                                <span class="text-muted">Recorded Staff</span>
+                                <strong>{{ number_format($attendanceDashboard['staff']['recorded_staff']) }}</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-2">
+                                <span class="text-muted">Attendance Rate</span>
+                                <strong class="text-success">{{ number_format($attendanceDashboard['staff']['rate'], 2) }}%</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        {{-- Examination & Results --}}
+        @if(!empty($examinationDashboard))
+            <div class="row mb-4">
+                @if(auth()->user()?->can('examinations.view'))
+                    <div class="col-xl-5">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bx bx-edit-alt me-2"></i>
+                                        Examination Summary
+                                    </h5>
+                                    <a href="{{ route('admin.examinations.index') }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        View All
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-4">
+                                        <div class="border rounded p-3 text-center">
+                                            <small class="text-muted d-block">Examinations</small>
+                                            <h4 class="mb-0">{{ number_format($examinationDashboard['examination_count']) }}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border rounded p-3 text-center">
+                                            <small class="text-muted d-block">Today</small>
+                                            <h4 class="mb-0 text-success">{{ number_format($examinationDashboard['today_count']) }}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border rounded p-3 text-center">
+                                            <small class="text-muted d-block">Upcoming</small>
+                                            <h4 class="mb-0 text-primary">{{ number_format($examinationDashboard['upcoming_count']) }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h6 class="mb-3">Examination Schedule</h6>
+
+                                @forelse($examinationDashboard['examinations'] as $exam)
+                                    <div class="d-flex align-items-center py-2 border-bottom">
+                                        <div class="avatar-sm">
+                                            <span class="avatar-title rounded-circle bg-primary-subtle text-primary">
+                                                <i class="bx bx-calendar-event"></i>
+                                            </span>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <h6 class="mb-1">{{ $exam->name }}</h6>
+                                            <small class="text-muted">
+                                                {{ $exam->start_date?->format('d M Y') ?? '—' }}
+                                                @if($exam->end_date)
+                                                    - {{ $exam->end_date->format('d M Y') }}
+                                                @endif
+                                            </small>
+                                        </div>
+                                        <span class="badge bg-light text-dark">
+                                            {{ ucfirst(str_replace('_', ' ', $exam->status ?? 'N/A')) }}
+                                        </span>
+                                    </div>
+                                @empty
+                                    <div class="text-center py-4 text-muted">
+                                        <i class="bx bx-calendar-x font-size-24 d-block mb-2"></i>
+                                        No examinations found for the current academic period.
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if(!empty($examinationDashboard['results']) && auth()->user()?->can('results.view'))
+                    <div class="col-xl-7">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bx bx-spreadsheet me-2"></i>
+                                        Results Summary
+                                    </h5>
+                                    <a href="{{ route('admin.results.index') }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        View Results
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-3">
+                                        <div class="border rounded p-3 text-center">
+                                            <small class="text-muted d-block">Total</small>
+                                            <h4 class="mb-0">{{ number_format($examinationDashboard['results']['total']) }}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="border rounded p-3 text-center">
+                                            <small class="text-muted d-block">Draft</small>
+                                            <h4 class="mb-0 text-warning">{{ number_format($examinationDashboard['results']['draft']) }}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="border rounded p-3 text-center">
+                                            <small class="text-muted d-block">Approved</small>
+                                            <h4 class="mb-0 text-primary">{{ number_format($examinationDashboard['results']['approved']) }}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="border rounded p-3 text-center">
+                                            <small class="text-muted d-block">Published</small>
+                                            <h4 class="mb-0 text-success">{{ number_format($examinationDashboard['results']['published']) }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h6 class="mb-3">Recent Results</h6>
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Student</th>
+                                                <th>Examination</th>
+                                                <th class="text-end">Average</th>
+                                                <th>Grade</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($examinationDashboard['results']['recent'] as $result)
+                                                <tr>
+                                                    <td>
+                                                        @if($result->student)
+                                                            <strong>
+                                                                {{ $result->student->first_name }}
+                                                                {{ $result->student->last_name }}
+                                                            </strong>
+                                                            <small class="d-block text-muted">
+                                                                {{ $result->student->student_number }}
+                                                            </small>
+                                                        @else
+                                                            —
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $result->examination?->name ?? '—' }}</td>
+                                                    <td class="text-end">
+                                                        {{ number_format((float) $result->average, 2) }}%
+                                                    </td>
+                                                    <td>{{ $result->grade ?? '—' }}</td>
+                                                    <td>
+                                                        <span class="badge
+                                                            @if($result->status === 'published') bg-success-subtle text-success
+                                                            @elseif($result->status === 'approved') bg-primary-subtle text-primary
+                                                            @else bg-warning-subtle text-warning
+                                                            @endif">
+                                                            {{ ucfirst($result->status ?? 'Draft') }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-4">
+                                                        No results available for the current academic period.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
+    @endif
+
+    {{-- Alerts & Pending Tasks --}}
+    @if(!empty($alertsTasks))
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="bx bx-bell me-2"></i>
+                                Alerts & Pending Tasks
+                            </h5>
+                            <span class="badge bg-warning-subtle text-warning">
+                                {{ number_format(count($alertsTasks)) }}
+                                item{{ count($alertsTasks) === 1 ? '' : 's' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        @foreach($alertsTasks as $task)
+                            @php
+                                $taskClasses = match($task['type'] ?? 'info') {
+                                    'danger' => 'alert-danger',
+                                    'warning' => 'alert-warning',
+                                    'success' => 'alert-success',
+                                    'primary' => 'alert-primary',
+                                    default => 'alert-info',
+                                };
+                            @endphp
+
+                            <div class="alert {{ $taskClasses }} d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="bx {{ $task['icon'] ?? 'bx-info-circle' }} font-size-20 me-3"></i>
+                                    <div>
+                                        <strong class="d-block">{{ $task['title'] }}</strong>
+                                        <small>{{ $task['message'] }}</small>
+                                    </div>
+                                </div>
+
+                                @can($task['permission'])
+                                    <a href="{{ isset($task['route_parameter'])
+                                        ? route($task['route'], $task['route_parameter'])
+                                        : route($task['route']) }}"
+                                       class="btn btn-sm btn-light ms-3 text-nowrap">
+                                        {{ $task['action'] ?? 'Open' }}
+                                    </a>
+                                @endcan
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- =========================================================
      FINANCE DASHBOARD
 ========================================================= --}}
@@ -1106,6 +1539,55 @@
                             <i class="bx bx-calendar-event me-1"></i>
                             Add Term
                         </a>
+
+
+                        @can('attendance.view')
+                            <a href="{{ route('admin.attendance.index') }}"
+                               class="btn btn-outline-success">
+                                <i class="bx bx-calendar-check me-1"></i>
+                                Student Attendance
+                            </a>
+                        @endcan
+
+                        @can('staff-attendance.view')
+                            <a href="{{ route('admin.staff-attendance.index') }}"
+                               class="btn btn-outline-info">
+                                <i class="bx bx-user-check me-1"></i>
+                                Staff Attendance
+                            </a>
+                        @endcan
+
+                        @can('examinations.view')
+                            <a href="{{ route('admin.examinations.index') }}"
+                               class="btn btn-outline-dark">
+                                <i class="bx bx-edit-alt me-1"></i>
+                                Examinations
+                            </a>
+                        @endcan
+
+                        @can('results.view')
+                            <a href="{{ route('admin.results.index') }}"
+                               class="btn btn-outline-secondary">
+                                <i class="bx bx-spreadsheet me-1"></i>
+                                Results
+                            </a>
+                        @endcan
+
+                        @can('enrollments.view')
+                            <a href="{{ route('admin.student-enrollments.index') }}"
+                               class="btn btn-outline-primary">
+                                <i class="bx bx-user-check me-1"></i>
+                                Enrollments
+                            </a>
+                        @endcan
+
+                        @can('reports.view')
+                            <a href="{{ route('admin.reports.index') }}"
+                               class="btn btn-outline-warning">
+                                <i class="bx bx-bar-chart-alt-2 me-1"></i>
+                                Reports & Analytics
+                            </a>
+                        @endcan
 
                     </div>
 

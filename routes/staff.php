@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\ReportsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])
@@ -35,4 +36,7 @@ Route::middleware(['auth'])
         Route::delete('staff/{staff}', [StaffController::class, 'destroy'])
             ->name('staff.destroy')
             ->middleware('permission:staff.delete');
+
+        Route::get('/staff/excel',[ReportsController::class, 'staffExcel'])->name('staff.excel');
+        Route::get('/staff/pdf',[ReportsController::class, 'staffPdf'])->name('staff.pdf');
     });
