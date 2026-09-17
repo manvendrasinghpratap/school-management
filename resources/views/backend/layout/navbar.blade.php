@@ -1268,6 +1268,175 @@
 
 
                     {{-- =========================================================
+                         WAVE 1
+                         COMMUNICATION + EVENTS + IDENTITY
+                         ========================================================= --}}
+
+                    @if(
+                        auth()->user()?->can('announcements.view') ||
+                        auth()->user()?->can('events.view') ||
+                        auth()->user()?->can('certificates.view') ||
+                        auth()->user()?->can('id-cards.view')
+                    )
+
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-wave1"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                <i class="bx bx-layer me-2"></i>
+
+                                <span>Communication & Services</span>
+
+                                <div class="arrow-down"></div>
+
+                            </a>
+
+
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
+                                 aria-labelledby="topnav-wave1">
+
+
+                                {{-- Communication --}}
+
+                                @if(auth()->user()?->can('announcements.view'))
+
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-megaphone"></i>
+
+                                        <span>Communication</span>
+
+                                    </div>
+
+
+                                    <a href="{{ route('admin.announcements.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-megaphone"></i>
+
+                                        <span>Announcements</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Events --}}
+
+                                @if(auth()->user()?->can('events.view'))
+
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-calendar-event"></i>
+
+                                        <span>Events</span>
+
+                                    </div>
+
+
+                                    <a href="{{ route('admin.events.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-calendar-event"></i>
+
+                                        <span>School Events</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Certificates --}}
+
+                                @if(auth()->user()?->can('certificates.view'))
+
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-award"></i>
+
+                                        <span>Certificates</span>
+
+                                    </div>
+
+
+                                    <a href="{{ route('admin.certificates.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-award"></i>
+
+                                        <span>Certificates</span>
+
+                                    </a>
+
+
+                                    @can('certificate-templates.manage')
+
+                                        <a href="{{ route('admin.certificates.templates') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-layout"></i>
+
+                                            <span>Certificate Templates</span>
+
+                                        </a>
+
+                                    @endcan
+
+                                @endif
+
+
+                                {{-- ID Cards --}}
+
+                                @if(auth()->user()?->can('id-cards.view'))
+
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-id-card"></i>
+
+                                        <span>ID Cards</span>
+
+                                    </div>
+
+
+                                    <a href="{{ route('admin.id-cards.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-id-card"></i>
+
+                                        <span>ID Cards</span>
+
+                                    </a>
+
+
+                                    @can('id-cards.generate')
+
+                                        <a href="{{ route('admin.id-cards.templates') }}"
+                                           class="dropdown-item">
+
+                                            <i class="bx bx-layout"></i>
+
+                                            <span>ID Card Templates</span>
+
+                                        </a>
+
+                                    @endcan
+
+                                @endif
+
+
+                            </div>
+
+                        </li>
+
+                    @endif
+
+
+                    {{-- =========================================================
                          ADMINISTRATION
                          ========================================================= --}}
 

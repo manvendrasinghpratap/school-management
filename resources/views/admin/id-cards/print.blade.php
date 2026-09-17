@@ -1,0 +1,5 @@
+<!doctype html><html><head><meta charset="utf-8"><title>{{ $idCard->card_number }}</title><style>
+body{font-family:Arial,sans-serif;background:#eee;padding:30px}.cardx{width:86mm;min-height:54mm;background:#fff;border:1px solid #333;border-radius:8px;padding:14px;margin:auto;box-sizing:border-box}.center{text-align:center}.muted{color:#666;font-size:12px}@media print{body{background:#fff;padding:0}.no-print{display:none}}
+</style></head><body>
+<div class="cardx"><div class="center"><strong>{{ optional($idCard->school)->name ?? 'School' }}</strong><hr><h3>{{ $idCard->holder_name }}</h3><div>{{ $idCard->student?->student_number ?? $idCard->staff?->staff_number ?? '' }}</div><div class="muted">Card: {{ $idCard->card_number }}</div><div class="muted">Issued: {{ $idCard->issued_at->format('d M Y') }} · Expires: {{ optional($idCard->expires_at)->format('d M Y') ?? 'N/A' }}</div></div></div><div class="center no-print" style="margin-top:20px"><button onclick="window.print()">Print</button></div>
+</body></html>
