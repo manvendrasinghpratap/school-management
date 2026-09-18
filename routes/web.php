@@ -59,6 +59,8 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/scholarships.php');
     require base_path('routes/reports.php');
     require base_path('routes/wave1.php');
+    require base_path('routes/wave2.php');
+    require base_path('routes/library_reservations.php');
 });
 
 

@@ -424,6 +424,261 @@
                     @endif
 
 
+
+
+                    {{-- =========================================================
+                         LIBRARY
+                         Completed: Books + Categories + Authors + Publishers
+                         + Members + Book Issues (Issue / Return / Renew)
+                         ========================================================= --}}
+
+                    @if(
+                        auth()->user()?->can('library.view') ||
+                        auth()->user()?->can('library.create') ||
+                        auth()->user()?->can('library.update') ||
+                        auth()->user()?->can('library.delete') ||
+                        auth()->user()?->can('library.members.view') ||
+                        auth()->user()?->can('library.members.manage') ||
+                        auth()->user()?->can('library.issues.view') ||
+                        auth()->user()?->can('library.issues.manage')
+                    )
+
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-library"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                <i class="bx bx-library me-2"></i>
+
+                                <span>Library</span>
+
+                                <div class="arrow-down"></div>
+
+                            </a>
+
+
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
+                                 aria-labelledby="topnav-library">
+
+                                {{-- =================================================
+                                     LIBRARY MANAGEMENT
+                                     ================================================= --}}
+
+                                <div class="sms-menu-heading">
+
+                                    <i class="bx bx-library"></i>
+
+                                    <span>Library Management</span>
+
+                                </div>
+
+
+                                {{-- Books --}}
+
+                                @if(
+                                    auth()->user()?->can('library.view') ||
+                                    auth()->user()?->can('library.create') ||
+                                    auth()->user()?->can('library.update') ||
+                                    auth()->user()?->can('library.delete')
+                                )
+
+                                    <a href="{{ route('admin.library.books.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-book"></i>
+
+                                        <span>Books</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Categories --}}
+
+                                @if(
+                                    auth()->user()?->can('library.view') ||
+                                    auth()->user()?->can('library.create') ||
+                                    auth()->user()?->can('library.update') ||
+                                    auth()->user()?->can('library.delete')
+                                )
+
+                                    <a href="{{ route('admin.library.categories.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-category"></i>
+
+                                        <span>Book Categories</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Authors --}}
+
+                                @if(
+                                    auth()->user()?->can('library.view') ||
+                                    auth()->user()?->can('library.create') ||
+                                    auth()->user()?->can('library.update') ||
+                                    auth()->user()?->can('library.delete')
+                                )
+
+                                    <a href="{{ route('admin.library.authors.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-user"></i>
+
+                                        <span>Authors</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Publishers --}}
+
+                                @if(
+                                    auth()->user()?->can('library.view') ||
+                                    auth()->user()?->can('library.create') ||
+                                    auth()->user()?->can('library.update') ||
+                                    auth()->user()?->can('library.delete')
+                                )
+
+                                    <a href="{{ route('admin.library.publishers.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-buildings"></i>
+
+                                        <span>Publishers</span>
+
+                                    </a>
+
+                                @endif
+                                @if(
+                                    auth()->user()?->can('library.reservations.view') ||
+                                    auth()->user()?->can('library.reservations.manage')
+                                )
+                                    <a href="{{ route('admin.library.reservations.index') }}" class="dropdown-item">
+                                        <i class="bx bx-bookmark"></i>
+                                      <span>Reservations</span>
+                                    </a>
+                                @endif
+                                {{-- =================================================
+                                     MEMBERS
+                                     ================================================= --}}
+
+                                @if(
+                                    auth()->user()?->can('library.members.view') ||
+                                    auth()->user()?->can('library.members.manage')
+                                )
+
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-group"></i>
+
+                                        <span>Library Members</span>
+
+                                    </div>
+
+                                @endif
+
+
+                                {{-- Member List --}}
+
+                                @if(auth()->user()?->can('library.members.view'))
+
+                                    <a href="{{ route('admin.library.members.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-group"></i>
+
+                                        <span>Members</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Add Member --}}
+
+                                @if(auth()->user()?->can('library.members.manage'))
+
+                                    <a href="{{ route('admin.library.members.create') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-user-plus"></i>
+
+                                        <span>Add Member</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- =================================================
+                                     CIRCULATION
+                                     ================================================= --}}
+
+                                @if(
+                                    auth()->user()?->can('library.issues.view') ||
+                                    auth()->user()?->can('library.issues.manage')
+                                )
+
+                                    <div class="sms-menu-heading">
+
+                                        <i class="bx bx-transfer"></i>
+
+                                        <span>Circulation</span>
+
+                                    </div>
+
+                                @endif
+
+
+                                {{-- Book Issues --}}
+
+                                @if(auth()->user()?->can('library.issues.view'))
+
+                                    <a href="{{ route('admin.library.issues.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-list-check"></i>
+
+                                        <span>Book Issues</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Issue Book --}}
+
+                                @if(auth()->user()?->can('library.issues.manage'))
+
+                                    <a href="{{ route('admin.library.issues.create') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-book-add"></i>
+
+                                        <span>Issue Book</span>
+
+                                    </a>
+
+                                @endif
+
+
+                            </div>
+
+                        </li>
+
+                    @endif
+
+
                     {{-- =========================================================
                          ACADEMICS
                          ========================================================= --}}
@@ -435,6 +690,8 @@
                         auth()->user()?->can('classes.view') ||
                         auth()->user()?->can('sections.view') ||
                         auth()->user()?->can('courses.view') ||
+                        auth()->user()?->can('timetable.view') ||
+                        auth()->user()?->can('timetable.manage') ||
 
                         auth()->user()?->can('examinations.view') ||
                         auth()->user()?->can('examinations.create') ||
@@ -587,6 +844,24 @@
                                         <i class="bx bx-book"></i>
 
                                         <span>Subjects / Courses</span>
+
+                                    </a>
+
+                                @endif
+
+
+                                {{-- Timetable --}}
+
+                                @if(
+                                    auth()->user()?->can('timetable.view') ||
+                                    auth()->user()?->can('timetable.manage')
+                                )
+
+                                    <a href="{{ route('admin.timetables.index') }}"
+                                       class="dropdown-item">
+
+                                        <i class="bx bx-time-five"></i>
+                                        <span>Timetable</span>
 
                                     </a>
 
@@ -1435,6 +1710,82 @@
 
                     @endif
 
+
+
+
+                    {{-- =========================================================
+                         REPORTS & ANALYTICS
+                         Completed central reporting module
+                         ========================================================= --}}
+
+                    @if(auth()->user()?->can('reports.view'))
+
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-reports"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                <i class="bx bx-bar-chart-alt-2 me-2"></i>
+
+                                <span>Reports & Analytics</span>
+
+                                <div class="arrow-down"></div>
+
+                            </a>
+
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
+                                 aria-labelledby="topnav-reports">
+
+                                <div class="sms-menu-heading">
+                                    <i class="bx bx-bar-chart-alt-2"></i>
+                                    <span>Reports</span>
+                                </div>
+
+                                <a href="{{ route('admin.reports.index') }}"
+                                   class="dropdown-item">
+                                    <i class="bx bx-dashboard"></i>
+                                    <span>Reports Dashboard</span>
+                                </a>
+
+                                <a href="{{ route('admin.reports.students') }}"
+                                   class="dropdown-item">
+                                    <i class="bx bx-user"></i>
+                                    <span>Student Reports</span>
+                                </a>
+
+                                <a href="{{ route('admin.reports.enrollment') }}"
+                                   class="dropdown-item">
+                                    <i class="bx bx-user-plus"></i>
+                                    <span>Enrollment Reports</span>
+                                </a>
+
+                                <a href="{{ route('admin.reports.academic-performance') }}"
+                                   class="dropdown-item">
+                                    <i class="bx bx-line-chart"></i>
+                                    <span>Academic Performance</span>
+                                </a>
+
+                                <a href="{{ route('admin.reports.attendance') }}"
+                                   class="dropdown-item">
+                                    <i class="bx bx-calendar-check"></i>
+                                    <span>Attendance Reports</span>
+                                </a>
+
+                                <a href="{{ route('admin.reports.staff') }}"
+                                   class="dropdown-item">
+                                    <i class="bx bx-group"></i>
+                                    <span>Staff Reports</span>
+                                </a>
+
+                            </div>
+
+                        </li>
+
+                    @endif
 
                     {{-- =========================================================
                          ADMINISTRATION
