@@ -1,0 +1,2 @@
+@extends('backend.layout.default')
+@section('content')<div class="container-fluid"><h4>Add Transport Fee</h4>@include('admin.transport._flash')<form method="POST" action="{{route('admin.transport.fees.store')}}">@csrf @include('admin.transport.fees.form')<button class="btn btn-primary">Save Fee</button> <a href="{{route('admin.transport.fees.index')}}" class="btn btn-light">Cancel</a></form></div>@endsection

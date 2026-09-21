@@ -1,0 +1,2 @@
+@extends('backend.layout.default')
+@section('content')<div class="container-fluid"><h4 class="mb-3">Add Driver</h4>@include('admin.transport._flash')<form method="POST" action="{{ route('admin.transport.drivers.store') }}">@csrf @include('admin.transport.drivers.form')<button class="btn btn-primary">Save Driver</button> <a href="{{ route('admin.transport.drivers.index') }}" class="btn btn-light">Cancel</a></form></div>@endsection

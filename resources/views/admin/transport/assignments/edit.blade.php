@@ -1,0 +1,2 @@
+@extends('backend.layout.default')
+@section('content')<div class="container-fluid"><h4>Edit Route Assignment</h4>@include('admin.transport._flash')<form method="POST" action="{{route('admin.transport.assignments.update',$assignment)}}">@csrf @method('PUT') @include('admin.transport.assignments.form',['assignment'=>$assignment])<button class="btn btn-primary">Update Assignment</button> <a href="{{route('admin.transport.assignments.index')}}" class="btn btn-light">Cancel</a></form></div>@endsection

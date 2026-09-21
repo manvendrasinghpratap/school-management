@@ -1,0 +1,2 @@
+@extends('backend.layout.default')
+@section('content')<div class="container-fluid"><h4>Edit Stop — {{ $route->name }}</h4>@include('admin.transport._flash')<form method="POST" action="{{route('admin.transport.stops.update',$stop)}}">@csrf @method('PUT')<input type="hidden" name="route_id" value="{{$route->id}}">@include('admin.transport.stops.form',['stop'=>$stop])<button class="btn btn-primary">Update Stop</button> <a href="{{route('admin.transport.routes.stops.index',$route)}}" class="btn btn-light">Cancel</a></form></div>@endsection
