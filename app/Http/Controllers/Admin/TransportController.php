@@ -18,12 +18,15 @@ use App\Models\TransportStop;
 use App\Models\Vehicle;
 use App\Models\Staff;
 use App\Services\TransportService;
+use App\Services\AcademicHierarchyService;
 use Illuminate\Http\Request;
 
 class TransportController extends Controller
 {
-    public function __construct(private TransportService $service)
-    {
+    public function __construct(
+        private TransportService $service,
+        private AcademicHierarchyService $academicHierarchy
+    ) {
     }
 
     private function sid(): int
@@ -315,7 +318,22 @@ class TransportController extends Controller
                 ->get(),
         ]);
     }
+    public function showRoute(TransportRoute $transportRoute)
+{
+    $this->own($transportRoute);
 
+    $transportRoute->load([
+        'vehicle',
+        'driver',
+        'stops' => function ($query) {
+            $query->orderBy('sequence_no');
+        },
+    ]);
+
+    return view('admin.transport.routes.show', [
+        'transportRoute' => $transportRoute,
+    ]);
+}
     public function storeRoute(StoreTransportRouteRequest $r)
     {
         $this->service->saveRoute(
@@ -373,19 +391,11 @@ class TransportController extends Controller
             );
     }
 
-    public function destroyRoute(
-        TransportRoute $transportRoute
-    ) {
+    public function destroyRoute(TransportRoute $transportRoute)
+    {
         $this->own($transportRoute);
-
-        $this->service->delete(
-            $transportRoute
-        );
-
-        return back()->with(
-            'success',
-            'Transport route deleted successfully.'
-        );
+        $this->service->delete($transportRoute);
+        return back()->with('success','Transport route deleted successfully.');
     }
 
     /*
@@ -579,15 +589,26 @@ class TransportController extends Controller
                     ->orderBy('name')
                     ->get(),
 
-                'students' => Student::where(
-                    'school_id',
-                    $this->sid()
-                )
-                    ->orderBy('first_name')
-                    ->orderBy('last_name')
-                    ->get(),
+                'academicYears' => $this->academicHierarchy->academicYears(),
+
+                'currentAcademicYear' => $this->academicHierarchy->currentAcademicYear(),
             ]
         );
+    }
+
+    public function showAssignment(RouteStudent $assignment)
+    {
+        $this->own($assignment);
+
+        $assignment->load([
+            'student',
+            'route.vehicle',
+            'route.driver',
+        ]);
+
+        return view('admin.transport.assignments.show', [
+            'assignment' => $assignment,
+        ]);
     }
 
     public function storeAssignment(
@@ -624,13 +645,12 @@ class TransportController extends Controller
                     ->orderBy('name')
                     ->get(),
 
-                'students' => Student::where(
-                    'school_id',
-                    $this->sid()
-                )
-                    ->orderBy('first_name')
-                    ->orderBy('last_name')
-                    ->get(),
+                'academicYears' => $this->academicHierarchy->academicYears(),
+
+                'currentAcademicYear' => $this->academicHierarchy->currentAcademicYear(),
+
+                'academicHierarchy' => $this->academicHierarchy
+                    ->studentHierarchy($assignment->student_id),
             ]
         );
     }
