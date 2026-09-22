@@ -19,16 +19,42 @@ class HostelRoom extends Model
         'room_type',
         'capacity',
         'monthly_fee',
-        'status'
+        'status',
     ];
 
-    protected $casts=['monthly_fee'=>'decimal:2'];
-public function hostel(){ return $this->belongsTo(Hostel::class); }
-public function beds(){ return $this->hasMany(HostelBed::class,'room_id'); }
-public function allocations(){ return $this->hasMany(HostelAllocation::class,'room_id'); }
+    protected $casts = [
+        'id' => 'integer',
+        'school_id' => 'integer',
+        'hostel_id' => 'integer',
+        'capacity' => 'integer',
+        'monthly_fee' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function hostel()
+    {
+        return $this->belongsTo(Hostel::class, 'hostel_id');
+    }
+
+    public function beds()
+    {
+        return $this->hasMany(HostelBed::class, 'room_id');
+    }
+
+    public function allocations()
+    {
+        return $this->hasMany(HostelAllocation::class, 'room_id');
+    }
 
     public function scopeForSchool($query, int $schoolId)
     {
-        return $query->where($this->getTable().'.school_id', $schoolId);
+        return $query->where($this->getTable() . '.school_id', $schoolId);
     }
 }

@@ -18,15 +18,38 @@ class HostelFee extends Model
         'amount',
         'status',
         'invoice_id',
-        'notes'
+        'notes',
     ];
 
-    protected $casts=['fee_month'=>'date','amount'=>'decimal:2'];
-public function allocation(){ return $this->belongsTo(HostelAllocation::class,'hostel_allocation_id'); }
-public function invoice(){ return $this->belongsTo(Invoice::class,'invoice_id'); }
+    protected $casts = [
+        'id' => 'integer',
+        'school_id' => 'integer',
+        'hostel_allocation_id' => 'integer',
+        'fee_month' => 'date',
+        'amount' => 'decimal:2',
+        'invoice_id' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function allocation()
+    {
+        return $this->belongsTo(HostelAllocation::class, 'hostel_allocation_id');
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
 
     public function scopeForSchool($query, int $schoolId)
     {
-        return $query->where($this->getTable().'.school_id', $schoolId);
+        return $query->where($this->getTable() . '.school_id', $schoolId);
     }
 }

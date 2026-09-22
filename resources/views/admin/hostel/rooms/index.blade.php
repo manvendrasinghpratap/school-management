@@ -1,7 +1,51 @@
 @extends('backend.layout.default')
-@section('title','Hostel Rooms')
+
 @section('content')
-<div class="container-fluid"><div class="d-flex justify-content-between mb-3"><h4>{{ $hostel->name }} — Rooms</h4><a href="{{ route('admin.hostel.index') }}" class="btn btn-light">Back</a></div>
-<form method="POST" action="{{ route('admin.hostel.rooms.store',$hostel) }}" class="card card-body mb-3">@csrf<div class="row g-2"><div class="col-md-2"><input name="room_number" class="form-control" placeholder="Room No." required></div><div class="col-md-2"><input name="floor" class="form-control" placeholder="Floor"></div><div class="col-md-2"><input name="room_type" class="form-control" placeholder="Type"></div><div class="col-md-2"><input name="capacity" type="number" value="1" class="form-control" placeholder="Capacity"></div><div class="col-md-2"><input name="monthly_fee" type="number" step="0.01" value="0" class="form-control" placeholder="Fee"></div><div class="col-md-2"><button class="btn btn-primary w-100">Add Room</button></div></div></form>
-<div class="card"><div class="table-responsive"><table class="table"><thead><tr><th>Room</th><th>Floor</th><th>Type</th><th>Capacity</th><th>Beds</th><th>Fee</th><th>Status</th></tr></thead><tbody>@forelse($rooms as $r)<tr><td>{{ $r->room_number }}</td><td>{{ $r->floor ?: '—' }}</td><td>{{ $r->room_type ?: '—' }}</td><td>{{ $r->capacity }}</td><td>{{ $r->beds_count }}</td><td>{{ number_format($r->monthly_fee,2) }}</td><td>{{ ucfirst($r->status) }}</td></tr>@empty<tr><td colspan="7">No rooms found.</td></tr>@endforelse</tbody></table></div><div class="p-3">{{ $rooms->links() }}</div></div></div>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-1">{{ $hostel->name }} — Rooms</h4>
+            <a href="{{ route('admin.hostel.hostels.show', $hostel) }}">← Back to Hostel</a>
+        </div>
+        @can('hostel.rooms.manage')
+            <a href="{{ route('admin.hostel.rooms.create', $hostel) }}" class="btn btn-primary">Add Room</a>
+        @endcan
+    </div>
+    @include('admin.hostel._flash')
+
+    <div class="card"><div class="card-body">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead><tr><th>Room</th><th>Floor</th><th>Type</th><th>Capacity</th><th>Beds</th><th>Fee</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                @forelse($rooms as $room)
+                    <tr>
+                        <td>{{ $room->room_number }}</td>
+                        <td>{{ $room->floor ?: '—' }}</td>
+                        <td>{{ $room->room_type ?: '—' }}</td>
+                        <td>{{ $room->capacity }}</td>
+                        <td>{{ $room->beds_count }}</td>
+                        <td>₹{{ number_format((float)$room->monthly_fee,2) }}</td>
+                        <td>{{ ucfirst($room->status) }}</td>
+                        <td class="text-nowrap">
+                            <a href="{{ route('admin.hostel.rooms.show', $room) }}" class="btn btn-sm btn-outline-info">View</a>
+                            @can('hostel.rooms.manage')
+                                <a href="{{ route('admin.hostel.rooms.edit', $room) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a href="{{ route('admin.hostel.beds.index', $room) }}" class="btn btn-sm btn-outline-secondary">Beds</a>
+                                <form method="POST" action="{{ route('admin.hostel.rooms.destroy', $room) }}" class="d-inline" onsubmit="return confirm('Delete this room?')">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            @endcan
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="8" class="text-center text-muted">No rooms found.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        {{ $rooms->links() }}
+    </div></div>
+</div>
 @endsection

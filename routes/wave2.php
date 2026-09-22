@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin\HostelController;
-use App\Http\Controllers\Admin\HostelMasterController;
 use App\Http\Controllers\Admin\LibraryController;
 use App\Http\Controllers\Admin\LibraryMasterController;
 use App\Http\Controllers\Admin\LibraryOperationsController;
@@ -583,53 +582,6 @@ Route::get(
         )
             ->middleware('permission:hostel.allocations.manage')
             ->name('allocations.checkout');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | HOSTEL ROOM BEDS
-        |--------------------------------------------------------------------------
-        |
-        | More specific route before /{hostel}/rooms.
-        |
-        */
-
-        Route::get(
-            '/rooms/{room}/beds',
-            [HostelMasterController::class, 'beds']
-        )
-            ->middleware('permission:hostel.rooms.manage')
-            ->name('rooms.beds.index');
-
-
-        Route::post(
-            '/rooms/{room}/beds',
-            [HostelMasterController::class, 'storeBed']
-        )
-            ->middleware('permission:hostel.rooms.manage')
-            ->name('rooms.beds.store');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | HOSTEL ROOMS
-        |--------------------------------------------------------------------------
-        */
-
-        Route::get(
-            '/{hostel}/rooms',
-            [HostelController::class, 'rooms']
-        )
-            ->middleware('permission:hostel.rooms.manage')
-            ->name('rooms.index');
-
-
-        Route::post(
-            '/{hostel}/rooms',
-            [HostelController::class, 'storeRoom']
-        )
-            ->middleware('permission:hostel.rooms.manage')
-            ->name('rooms.store');
 
 
     });
