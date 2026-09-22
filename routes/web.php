@@ -63,6 +63,8 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/library_reservations.php');
     require base_path('routes/transport.php');
     require base_path('routes/academic_hierarchy.php');
+    require base_path('routes/transport_fees.php');
+
 });
 
 
