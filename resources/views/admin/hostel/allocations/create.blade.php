@@ -80,7 +80,7 @@
         <a href="{{ route('admin.hostel.allocations.index') }}" class="btn btn-light mt-3">Cancel</a>
     </form>
 </div>
-
+<script src="{{ asset('assets/js/academic-hierarchy.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const hostel = document.getElementById('hostel_id');

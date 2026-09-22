@@ -680,6 +680,170 @@
 
 
                     {{-- =========================================================
+                         TRANSPORT
+                         Completed: Drivers + Vehicles + Routes + Stops
+                         + Student Assignments + Transport Fees
+                         ========================================================= --}}
+
+                    @if(
+                        auth()->user()?->can('transport.view') ||
+                        auth()->user()?->can('transport.manage') ||
+                        auth()->user()?->can('transport.assign') ||
+                        auth()->user()?->can('transport.fees.view') ||
+                        auth()->user()?->can('transport.fees.manage')
+                    )
+
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-transport"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                <i class="bx bx-bus me-2"></i>
+                                <span>Transport</span>
+                                <div class="arrow-down"></div>
+
+                            </a>
+
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
+                                 aria-labelledby="topnav-transport">
+
+                                <div class="sms-menu-heading">
+                                    <i class="bx bx-bus"></i>
+                                    <span>Transport Management</span>
+                                </div>
+
+                                @if(auth()->user()?->can('transport.view') || auth()->user()?->can('transport.manage'))
+                                    <a href="{{ route('admin.transport.drivers.index') }}" class="dropdown-item">
+                                        <i class="bx bx-user"></i>
+                                        <span>Drivers</span>
+                                    </a>
+
+                                    <a href="{{ route('admin.transport.vehicles.index') }}" class="dropdown-item">
+                                        <i class="bx bx-car"></i>
+                                        <span>Vehicles</span>
+                                    </a>
+
+                                    <a href="{{ route('admin.transport.routes.index') }}" class="dropdown-item">
+                                        <i class="bx bx-map"></i>
+                                        <span>Transport Routes</span>
+                                    </a>
+                                @endif
+
+                                @if(auth()->user()?->can('transport.view') || auth()->user()?->can('transport.assign'))
+                                    <a href="{{ route('admin.transport.assignments.index') }}" class="dropdown-item">
+                                        <i class="bx bx-user-check"></i>
+                                        <span>Student Assignments</span>
+                                    </a>
+                                @endif
+
+                                @if(auth()->user()?->can('transport.fees.view') || auth()->user()?->can('transport.fees.manage'))
+                                    <div class="sms-menu-heading">
+                                        <i class="bx bx-money"></i>
+                                        <span>Transport Fees</span>
+                                    </div>
+
+                                    <a href="{{ route('admin.transport.fees.index') }}" class="dropdown-item">
+                                        <i class="bx bx-money"></i>
+                                        <span>Transport Fees</span>
+                                    </a>
+                                @endif
+
+                            </div>
+
+                        </li>
+
+                    @endif
+
+
+                    {{-- =========================================================
+                         HOSTEL
+                         Completed: Hostels + Rooms + Beds
+                         + Student Allocations + Hostel Fees
+                         ========================================================= --}}
+
+                    @if(
+                        auth()->user()?->can('hostel.view') ||
+                        auth()->user()?->can('hostel.manage') ||
+                        auth()->user()?->can('hostel.rooms.manage') ||
+                        auth()->user()?->can('hostel.allocations.view') ||
+                        auth()->user()?->can('hostel.allocations.manage') ||
+                        auth()->user()?->can('hostel.fees.view') ||
+                        auth()->user()?->can('hostel.fees.manage')
+                    )
+
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle arrow-none"
+                               href="#"
+                               id="topnav-hostel"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                <i class="bx bx-home-alt me-2"></i>
+                                <span>Hostel</span>
+                                <div class="arrow-down"></div>
+
+                            </a>
+
+                            <div class="dropdown-menu sms-wide-menu sms-two-column"
+                                 aria-labelledby="topnav-hostel">
+
+                                @if(auth()->user()?->can('hostel.view') || auth()->user()?->can('hostel.manage'))
+                                    <div class="sms-menu-heading">
+                                        <i class="bx bx-home-alt"></i>
+                                        <span>Hostel Management</span>
+                                    </div>
+
+                                    <a href="{{ route('admin.hostel.index') }}" class="dropdown-item">
+                                        <i class="bx bx-building-house"></i>
+                                        <span>Hostels</span>
+                                    </a>
+                                @endif
+
+                                @if(auth()->user()?->can('hostel.rooms.manage'))
+                                    <a href="{{ route('admin.hostel.index') }}" class="dropdown-item">
+                                        <i class="bx bx-door-open"></i>
+                                        <span>Rooms & Beds</span>
+                                    </a>
+                                @endif
+
+                                @if(auth()->user()?->can('hostel.allocations.view') || auth()->user()?->can('hostel.allocations.manage'))
+                                    <div class="sms-menu-heading">
+                                        <i class="bx bx-user-check"></i>
+                                        <span>Student Accommodation</span>
+                                    </div>
+
+                                    <a href="{{ route('admin.hostel.allocations.index') }}" class="dropdown-item">
+                                        <i class="bx bx-home-heart"></i>
+                                        <span>Hostel Allocations</span>
+                                    </a>
+                                @endif
+
+                                @if(auth()->user()?->can('hostel.fees.view') || auth()->user()?->can('hostel.fees.manage'))
+                                    <div class="sms-menu-heading">
+                                        <i class="bx bx-money"></i>
+                                        <span>Hostel Fees</span>
+                                    </div>
+
+                                    <a href="{{ route('admin.hostel.fees.index') }}" class="dropdown-item">
+                                        <i class="bx bx-money"></i>
+                                        <span>Hostel Fees</span>
+                                    </a>
+                                @endif
+
+                            </div>
+
+                        </li>
+
+                    @endif
+
+
+                    {{-- =========================================================
                          ACADEMICS
                          ========================================================= --}}
 
