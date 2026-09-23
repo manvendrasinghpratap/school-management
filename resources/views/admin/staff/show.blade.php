@@ -216,6 +216,16 @@
                                 Edit Staff
                             </a>
 
+                            @if(auth()->user()?->can('staff.documents.view'))
+                                <a
+                                    href="{{ route('admin.staff.documents.index', $staff) }}"
+                                    class="btn btn-info"
+                                >
+                                    <i class="ri-file-list-3-line me-1"></i>
+                                    Staff Documents
+                                </a>
+                            @endif
+
                             <a
                                 href="{{ route('admin.staff.index') }}"
                                 class="btn btn-light"

@@ -2,16 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Notifications extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'user_id',
-    ];
-
-    public function user() { return $this->belongsTo(Users::class, 'user_id'); }
+    protected $table = 'notifications';
+    protected $fillable = ['user_id', 'title', 'body', 'type', 'read_at', 'data'];
+    protected $casts = ['read_at' => 'datetime', 'data' => 'array'];
+    public function user(): BelongsTo { return $this->belongsTo(User::class, 'user_id'); }
+    public function scopeUnread($query) { return $query->whereNull('read_at'); }
 }

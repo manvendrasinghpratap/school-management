@@ -4,20 +4,14 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () { return view('frontend'); });
-Route::get('/backend', function () { return view('backend'); }); 
-
-Route::get('/admin/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/backend', function () { return view('backend'); });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
-    // Modular Feature Routes
+
     require base_path('routes/school-settings.php');
-    // require base_path('routes/schools.php');
     require base_path('routes/rbac.php');
     require base_path('routes/user-management.php');
     require base_path('routes/students.php');
@@ -41,7 +35,7 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/staff-attendance.php');
     require base_path('routes/examinations.php');
     require base_path('routes/exam-schedules.php');
-    require base_path('routes/marks.php'); 
+    require base_path('routes/marks.php');
     require base_path('routes/grading.php');
     require base_path('routes/grade-calculation.php');
     require base_path('routes/results.php');
@@ -65,8 +59,8 @@ Route::middleware('auth')->group(function () {
     require base_path('routes/academic_hierarchy.php');
     require base_path('routes/transport_fees.php');
     require base_path('routes/hostel.php');
-
+    require base_path('routes/wave4.php');
+    require base_path('routes/portal.php');
 });
-
 
 require __DIR__.'/auth.php';

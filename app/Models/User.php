@@ -89,6 +89,11 @@ class User extends Authenticatable
         return $this->hasOne(Staff::class);
     }
 
+    public function designation(): BelongsTo
+    {
+        return $this->belongsTo(Designation::class, 'designation_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes

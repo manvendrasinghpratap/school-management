@@ -1,0 +1,2 @@
+@extends('portal.layouts.app',['title'=>'Assigned Courses'])
+@section('content')<h2>Assigned Courses</h2><div class="row g-3">@forelse($assignments as $item)<div class="col-md-6"><div class="card"><div class="card-body"><h5>{{ $item['course']?->name }}</h5><p>{{ $item['course']?->course_code }}</p><p class="text-muted">{{ $item['class']?->name }} {{ $item['section']?->name ? '· '.$item['section']->name : '' }}</p></div></div></div>@empty<div class="alert alert-info">No course assignments.</div>@endforelse</div>@endsection

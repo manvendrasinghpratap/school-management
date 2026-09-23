@@ -1,0 +1,2 @@
+@extends('portal.layouts.app',['title'=>'Documents'])
+@section('content')<h2>Documents</h2><div class="list-group">@forelse($documents as $document)<a class="list-group-item list-group-item-action" href="{{ asset('storage/'.$document->file_path) }}" target="_blank"><strong>{{ $document->document_name ?: $document->document_type }}</strong><div class="small text-muted">{{ $document->description }}</div></a>@empty<div class="alert alert-info">No documents available.</div>@endforelse</div>@endsection

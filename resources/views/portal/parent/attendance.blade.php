@@ -1,0 +1,2 @@
+@extends('portal.layouts.app',['title'=>'Child Attendance'])
+@section('content')<h2>{{ $student->full_name }} — Attendance</h2><div class="card"><div class="table-responsive"><table class="table"><thead><tr><th>Date</th><th>Course</th><th>Status</th></tr></thead><tbody>@forelse($items as $item)<tr><td>{{ $item->attendance_date?->format('d M Y') }}</td><td>{{ $item->course?->name ?? 'General' }}</td><td>{{ ucfirst($item->status) }}</td></tr>@empty<tr><td colspan="3">No records.</td></tr>@endforelse</tbody></table></div></div>{{ $items->links() }}@endsection

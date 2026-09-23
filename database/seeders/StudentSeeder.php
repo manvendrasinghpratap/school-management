@@ -137,7 +137,7 @@ class StudentSeeder extends Seeder
                 'first_name' => 'Shiv',
                 'middle_name' => 'Prakash',
                 'last_name' => 'Shukla',
-                'date_of_birth' => '2001-01-30',
+                'date_of_birth' => '2015-09-18',
                 'nationality' => 'India',
                 'gender' => 'male',
                 'phone' => '6666666666',

@@ -58,8 +58,9 @@ class StoreUserRequest extends FormRequest
                 'nullable',
                 'integer',
                 Rule::exists('designations', 'id')
-                    ->where(function ($query) {
-                        $query->where('is_deleted', 0)
+                    ->where(function ($query) use ($schoolId) {
+                        $query->where('account_id', $schoolId)
+                            ->where('is_deleted', 0)
                             ->where('status', 1);
                     }),
             ],

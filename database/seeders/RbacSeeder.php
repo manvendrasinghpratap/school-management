@@ -245,6 +245,34 @@ class RbacSeeder extends Seeder
             'inventory.view',
             'inventory.manage',
 
+            /*
+            |--------------------------------------------------------------------------
+            | Wave 4 - Administration
+            |--------------------------------------------------------------------------
+            */
+
+            'suppliers.view',
+            'suppliers.manage',
+
+            'assets.view',
+            'assets.manage',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Wave 4 - HR / Admissions
+            |--------------------------------------------------------------------------
+            */
+
+            'designations.view',
+            'designations.manage',
+
+            'staff.documents.view',
+            'staff.documents.manage',
+
+            'admissions.view',
+            'admissions.manage',
+            'admissions.convert',
+
             'discipline.view',
             'discipline.manage',
 
@@ -337,6 +365,9 @@ class RbacSeeder extends Seeder
 
                 'staff.view',
 
+                // Staff Documents
+                'staff.documents.view',
+
                 'courses.view',
 
                 'student-courses.view',
@@ -367,6 +398,9 @@ class RbacSeeder extends Seeder
 
                 'events.view',
                 'events.manage',
+
+                // Admissions
+                'admissions.view',
 
                 // Student Promotion
                 'promotions.view',
@@ -538,9 +572,18 @@ class RbacSeeder extends Seeder
                 'students.documents.view',
                 'students.documents.manage',
 
+                // Staff Documents
+                'staff.documents.view',
+                'staff.documents.manage',
+
                 'guardians.view',
                 'guardians.create',
                 'guardians.update',
+
+                // Admissions
+                'admissions.view',
+                'admissions.manage',
+                'admissions.convert',
 
                 'enrollments.view',
                 'enrollments.create',
@@ -659,7 +702,12 @@ class RbacSeeder extends Seeder
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // Seed default scholarship definitions after RBAC is synchronized.
+        /*
+        |--------------------------------------------------------------------------
+        | Seed default scholarship definitions
+        |--------------------------------------------------------------------------
+        */
+
         $this->call(ScholarshipSeeder::class);
     }
 }

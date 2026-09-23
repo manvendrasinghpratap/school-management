@@ -15,6 +15,7 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         $user = $this->route('user');
+        $schoolId = auth()->user()?->school_id;
 
         return [
             'name' => [
@@ -61,6 +62,7 @@ class UpdateUserRequest extends FormRequest
                 Rule::exists('designations', 'id')
                     ->where(
                         fn ($query) => $query
+                            ->where('account_id', $schoolId)
                             ->where('status', 1)
                             ->where('is_deleted', 0)
                     ),

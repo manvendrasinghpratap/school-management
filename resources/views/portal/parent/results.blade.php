@@ -1,0 +1,2 @@
+@extends('portal.layouts.app',['title'=>'Child Results'])
+@section('content')<h2>{{ $student->full_name }} — Results</h2>@forelse($results as $r)<div class="card mb-3"><div class="card-body"><h5>{{ $r->examination?->name }}</h5><span>Total {{ $r->total_score }}</span> · <span>Average {{ $r->average }}</span> · <span>Grade {{ $r->grade }}</span> · <span>Position {{ $r->position }}</span></div></div>@empty<div class="alert alert-info">No published results.</div>@endforelse@endsection

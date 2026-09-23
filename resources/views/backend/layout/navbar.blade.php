@@ -1,2050 +1,879 @@
+@php
+    use Illuminate\Support\Facades\Route;
+
+    $user = auth()->user();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Permission-aware menu definition
+    |--------------------------------------------------------------------------
+    | Keep route names and permission names aligned with the existing SMS
+    | application. A parent menu is shown only when at least one child is
+    | visible to the current user.
+    |--------------------------------------------------------------------------
+    */
+    $menuGroups = [
+       
+        [
+            'key' => 'students',
+            'label' => 'Students',
+            'icon' => 'bx-user',
+            'wide' => true,
+            'sections' => [
+                [
+                    'title' => 'Student Management',
+                    'icon' => 'bx-user',
+                    'items' => [
+                        ['label' => 'Student List', 'icon' => 'bx-list-ul', 'route' => 'admin.students.index', 'permissions' => ['students.view']],
+                        ['label' => 'Student Registration', 'icon' => 'bx-user-plus', 'route' => 'admin.students.create', 'permissions' => ['students.create']],
+                        ['label' => 'Guardians', 'icon' => 'bx-group', 'route' => 'admin.guardians.index', 'permissions' => ['guardians.view']],
+                        ['label' => 'Enrollments', 'icon' => 'bx-book-add', 'route' => 'admin.student-enrollments.index', 'permissions' => ['enrollments.view']],
+                        ['label' => 'Add Enrollment', 'icon' => 'bx-user-check', 'route' => 'admin.student-enrollments.create', 'permissions' => ['enrollments.create']],
+                    ],
+                ],
+                [
+                    'title' => 'Student Lifecycle',
+                    'icon' => 'bx-transfer',
+                    'items' => [
+                        ['label' => 'Promotions', 'icon' => 'bx-transfer', 'route' => 'admin.student-promotions.index', 'permissions' => ['promotions.view', 'promotions.create']],
+                        ['label' => 'Graduation', 'icon' => 'bx-award', 'route' => 'admin.graduations.index', 'permissions' => ['graduation.view', 'graduation.manage']],
+                        ['label' => 'Alumni', 'icon' => 'bx-group', 'route' => 'admin.alumni.index', 'permissions' => ['alumni.view', 'alumni.manage']],
+                    ],
+                ],
+                [
+                    'title' => 'Attendance',
+                    'icon' => 'bx-calendar-check',
+                    'items' => [
+                        ['label' => 'Student Attendance', 'icon' => 'bx-calendar-check', 'route' => 'admin.attendance.index', 'permissions' => ['attendance.view']],
+                        ['label' => 'Mark Attendance', 'icon' => 'bx-user-check', 'route' => 'admin.attendance.create', 'permissions' => ['attendance.mark']],
+                        ['label' => 'Attendance Reports', 'icon' => 'bx-bar-chart-alt-2', 'route' => 'admin.attendance.reports', 'permissions' => ['attendance.reports']],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'key' => 'academics',
+            'label' => 'Academics',
+            'icon' => 'bx-book-open',
+            'wide' => true,
+            'sections' => [
+                [
+                    'title' => 'Academic Setup',
+                    'icon' => 'bx-book',
+                    'items' => [
+                        ['label' => 'Academic Years', 'icon' => 'bx-calendar', 'route' => 'admin.academic-years.index', 'permissions' => ['academic-years.view']],
+                        ['label' => 'Terms / Semesters', 'icon' => 'bx-calendar-event', 'route' => 'admin.terms.index', 'permissions' => ['terms.view']],
+                        ['label' => 'Departments', 'icon' => 'bx-sitemap', 'route' => 'admin.departments.index', 'permissions' => ['departments.view']],
+                        ['label' => 'Classes', 'icon' => 'bx-building', 'route' => 'admin.classes.index', 'permissions' => ['classes.view']],
+                        ['label' => 'Sections / Streams', 'icon' => 'bx-grid-alt', 'route' => 'admin.sections.index', 'permissions' => ['sections.view']],
+                        ['label' => 'Subjects / Courses', 'icon' => 'bx-book', 'route' => 'admin.courses.index', 'permissions' => ['courses.view']],
+                        ['label' => 'Timetable', 'icon' => 'bx-time-five', 'route' => 'admin.timetables.index', 'permissions' => ['timetable.view', 'timetable.manage']],
+                    ],
+                ],
+                [
+                    'title' => 'Examinations',
+                    'icon' => 'bx-edit-alt',
+                    'items' => [
+                        ['label' => 'Examinations', 'icon' => 'bx-edit-alt', 'route' => 'admin.examinations.index', 'permissions' => ['examinations.view', 'examinations.create', 'examinations.update', 'examinations.delete']],
+                        ['label' => 'Exam Schedules', 'icon' => 'bx-calendar-event', 'route' => 'admin.exam-schedules.index', 'permissions' => ['exam-schedules.view', 'exam-schedules.manage']],
+                        ['label' => 'Subject Marks', 'icon' => 'bx-pencil', 'route' => 'admin.marks.index', 'permissions' => ['marks.view', 'marks.enter', 'marks.update', 'marks.approve']],
+                        ['label' => 'Grading', 'icon' => 'bx-bar-chart-alt-2', 'route' => 'admin.grading.index', 'permissions' => ['grading.view', 'grading.manage']],
+                        ['label' => 'Results', 'icon' => 'bx-spreadsheet', 'route' => 'admin.results.index', 'permissions' => ['results.view', 'results.calculate', 'results.approve', 'results.publish']],
+                        ['label' => 'Report Cards', 'icon' => 'bx-file', 'route' => 'admin.report-cards.index', 'permissions' => ['report-cards.view', 'report-cards.generate']],
+                        ['label' => 'Transcripts', 'icon' => 'bx-file-blank', 'route' => 'admin.transcripts.index', 'permissions' => ['transcripts.view', 'transcripts.generate']],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'key' => 'staff',
+            'label' => 'Staff',
+            'icon' => 'bx-group',
+            'wide' => true,
+            'sections' => [
+                [
+                    'title' => 'Staff Management',
+                    'icon' => 'bx-group',
+                    'items' => [
+                        ['label' => 'Staff List', 'icon' => 'bx-group', 'route' => 'admin.staff.index', 'permissions' => ['staff.view']],
+                        ['label' => 'Add Staff', 'icon' => 'bx-user-plus', 'route' => 'admin.staff.create', 'permissions' => ['staff.create']],
+                        ['label' => 'Instructors', 'icon' => 'bx-chalkboard', 'route' => 'admin.instructors.index', 'permissions' => ['instructors.view', 'instructors.create', 'instructors.update', 'instructors.delete']],
+                    ],
+                ],
+                [
+                    'title' => 'Attendance & Leave',
+                    'icon' => 'bx-calendar-check',
+                    'items' => [
+                        ['label' => 'Staff Attendance', 'icon' => 'bx-calendar-check', 'route' => 'admin.staff-attendance.index', 'permissions' => ['staff-attendance.view']],
+                        ['label' => 'Mark Attendance', 'icon' => 'bx-user-check', 'route' => 'admin.staff-attendance.create', 'permissions' => ['staff-attendance.mark']],
+                        ['label' => 'Attendance Reports', 'icon' => 'bx-bar-chart-alt-2', 'route' => 'admin.staff-attendance.reports', 'permissions' => ['staff-attendance.reports']],
+                        ['label' => 'Leave Management', 'icon' => 'bx-calendar-minus', 'route' => 'admin.leaves.index', 'permissions' => ['leaves.view', 'leaves.create', 'leaves.update', 'leaves.delete', 'leaves.approve', 'leaves.reject', 'leaves.reports']],
+                        ['label' => 'New Leave Request', 'icon' => 'bx-calendar-plus', 'route' => 'admin.leaves.create', 'permissions' => ['leaves.create']],
+                        ['label' => 'Leave Reports', 'icon' => 'bx-file-find', 'route' => 'admin.leaves.reports', 'permissions' => ['leaves.reports']],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'key' => 'finance',
+            'label' => 'Finance',
+            'icon' => 'bx-wallet',
+            'wide' => true,
+            'sections' => [
+                [
+                    'title' => 'Fee Setup',
+                    'icon' => 'bx-wallet',
+                    'items' => [
+                        ['label' => 'Fee Categories', 'icon' => 'bx-category', 'route' => 'admin.fee-categories.index', 'permissions' => ['fees.view', 'fees.manage']],
+                        ['label' => 'Fee Structures', 'icon' => 'bx-layer', 'route' => 'admin.fee-structures.index', 'permissions' => ['fee-structures.view', 'fee-structures.manage']],
+                        ['label' => 'Fee Installments', 'icon' => 'bx-calendar', 'route' => 'admin.fee-installments.index', 'permissions' => ['fees.view', 'fees.manage']],
+                        ['label' => 'Student Fee Assignment', 'icon' => 'bx-user-check', 'route' => 'admin.student-fees.index', 'permissions' => ['fees.view', 'fees.manage']],
+                        ['label' => 'Scholarships', 'icon' => 'bx-award', 'route' => 'admin.scholarships.index', 'permissions' => ['scholarships.view', 'scholarships.manage']],
+                    ],
+                ],
+                [
+                    'title' => 'Billing & Payments',
+                    'icon' => 'bx-receipt',
+                    'items' => [
+                        ['label' => 'Invoices', 'icon' => 'bx-file', 'route' => 'admin.invoices.index', 'permissions' => ['invoices.view', 'invoices.create', 'invoices.update', 'invoices.delete']],
+                        ['label' => 'Payments', 'icon' => 'bx-money', 'route' => 'admin.payments.index', 'permissions' => ['payments.view', 'payments.create']],
+                        ['label' => 'Payment Refunds', 'icon' => 'bx-revision', 'route' => 'admin.payment-refunds.index', 'permissions' => ['payment-refunds.view', 'payment-refunds.approve', 'payment-refunds.reject', 'payment-refunds.process', 'payment-refunds.cancel']],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'key' => 'services',
+            'label' => 'Services',
+            'icon' => 'bx-grid-alt',
+            'wide' => true,
+            'sections' => [
+                [
+                    'title' => 'Library',
+                    'icon' => 'bx-library',
+                    'items' => [
+                        ['label' => 'Books', 'icon' => 'bx-book', 'route' => 'admin.library.books.index', 'permissions' => ['library.view', 'library.create', 'library.update', 'library.delete']],
+                        ['label' => 'Book Categories', 'icon' => 'bx-category', 'route' => 'admin.library.categories.index', 'permissions' => ['library.view', 'library.create', 'library.update', 'library.delete']],
+                        ['label' => 'Authors', 'icon' => 'bx-user', 'route' => 'admin.library.authors.index', 'permissions' => ['library.view', 'library.create', 'library.update', 'library.delete']],
+                        ['label' => 'Publishers', 'icon' => 'bx-buildings', 'route' => 'admin.library.publishers.index', 'permissions' => ['library.view', 'library.create', 'library.update', 'library.delete']],
+                        ['label' => 'Members', 'icon' => 'bx-group', 'route' => 'admin.library.members.index', 'permissions' => ['library.members.view', 'library.members.manage']],
+                        ['label' => 'Add Member', 'icon' => 'bx-user-plus', 'route' => 'admin.library.members.create', 'permissions' => ['library.members.manage']],
+                        ['label' => 'Book Issues', 'icon' => 'bx-list-check', 'route' => 'admin.library.issues.index', 'permissions' => ['library.issues.view', 'library.issues.manage']],
+                        ['label' => 'Issue Book', 'icon' => 'bx-book-add', 'route' => 'admin.library.issues.create', 'permissions' => ['library.issues.manage']],
+                        ['label' => 'Reservations', 'icon' => 'bx-bookmark', 'route' => 'admin.library.reservations.index', 'permissions' => ['library.reservations.view', 'library.reservations.manage']],
+                    ],
+                ],
+                [
+                    'title' => 'Transport',
+                    'icon' => 'bx-bus',
+                    'items' => [
+                        ['label' => 'Drivers', 'icon' => 'bx-user', 'route' => 'admin.transport.drivers.index', 'permissions' => ['transport.view', 'transport.manage']],
+                        ['label' => 'Vehicles', 'icon' => 'bx-car', 'route' => 'admin.transport.vehicles.index', 'permissions' => ['transport.view', 'transport.manage']],
+                        ['label' => 'Transport Routes', 'icon' => 'bx-map', 'route' => 'admin.transport.routes.index', 'permissions' => ['transport.view', 'transport.manage']],
+                        ['label' => 'Student Assignments', 'icon' => 'bx-user-check', 'route' => 'admin.transport.assignments.index', 'permissions' => ['transport.view', 'transport.assign']],
+                        ['label' => 'Transport Fees', 'icon' => 'bx-money', 'route' => 'admin.transport.fees.index', 'permissions' => ['transport.fees.view', 'transport.fees.manage']],
+                    ],
+                ],
+                [
+                    'title' => 'Hostel',
+                    'icon' => 'bx-home-alt',
+                    'items' => [
+                        ['label' => 'Hostels', 'icon' => 'bx-building-house', 'route' => 'admin.hostel.index', 'permissions' => ['hostel.view', 'hostel.manage']],
+                        ['label' => 'Rooms & Beds', 'icon' => 'bx-door-open', 'route' => 'admin.hostel.index', 'permissions' => ['hostel.rooms.manage']],
+                        ['label' => 'Hostel Allocations', 'icon' => 'bx-home-heart', 'route' => 'admin.hostel.allocations.index', 'permissions' => ['hostel.allocations.view', 'hostel.allocations.manage']],
+                        ['label' => 'Hostel Fees', 'icon' => 'bx-money', 'route' => 'admin.hostel.fees.index', 'permissions' => ['hostel.fees.view', 'hostel.fees.manage']],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'key' => 'communication',
+            'label' => 'Communication',
+            'icon' => 'bx-megaphone',
+            'wide' => true,
+            'sections' => [
+                [
+                    'title' => 'Communication & Events',
+                    'icon' => 'bx-megaphone',
+                    'items' => [
+                        ['label' => 'Announcements', 'icon' => 'bx-megaphone', 'route' => 'admin.announcements.index', 'permissions' => ['announcements.view']],
+                        ['label' => 'School Events', 'icon' => 'bx-calendar-event', 'route' => 'admin.events.index', 'permissions' => ['events.view']],
+                    ],
+                ],
+                [
+                    'title' => 'Identity & Documents',
+                    'icon' => 'bx-id-card',
+                    'items' => [
+                        ['label' => 'Certificates', 'icon' => 'bx-award', 'route' => 'admin.certificates.index', 'permissions' => ['certificates.view']],
+                        ['label' => 'Certificate Templates', 'icon' => 'bx-layout', 'route' => 'admin.certificates.templates', 'permissions' => ['certificate-templates.manage']],
+                        ['label' => 'ID Cards', 'icon' => 'bx-id-card', 'route' => 'admin.id-cards.index', 'permissions' => ['id-cards.view']],
+                        ['label' => 'ID Card Templates', 'icon' => 'bx-layout', 'route' => 'admin.id-cards.templates', 'permissions' => ['id-cards.generate']],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'key' => 'reports',
+            'label' => 'Reports',
+            'icon' => 'bx-bar-chart-alt-2',
+            'sections' => [
+                [
+                    'title' => 'Reports & Analytics',
+                    'icon' => 'bx-bar-chart-alt-2',
+                    'items' => [
+                        ['label' => 'Reports Dashboard', 'icon' => 'bx-dashboard', 'route' => 'admin.reports.index', 'permissions' => ['reports.view']],
+                        ['label' => 'Student Reports', 'icon' => 'bx-user', 'route' => 'admin.reports.students', 'permissions' => ['reports.view']],
+                        ['label' => 'Enrollment Reports', 'icon' => 'bx-user-plus', 'route' => 'admin.reports.enrollment', 'permissions' => ['reports.view']],
+                        ['label' => 'Academic Performance', 'icon' => 'bx-line-chart', 'route' => 'admin.reports.academic-performance', 'permissions' => ['reports.view']],
+                        ['label' => 'Attendance Reports', 'icon' => 'bx-calendar-check', 'route' => 'admin.reports.attendance', 'permissions' => ['reports.view']],
+                        ['label' => 'Staff Reports', 'icon' => 'bx-group', 'route' => 'admin.reports.staff', 'permissions' => ['reports.view']],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'key' => 'administration',
+            'label' => 'Administration',
+            'icon' => 'bx-cog',
+            'wide' => false,
+            'sections' => [
+                [
+                    'title' => 'Access Control',
+                    'icon' => 'bx-shield',
+                    'items' => [
+                        ['label' => 'Users', 'icon' => 'bx-user', 'route' => 'admin.users.index', 'permissions' => ['users.view']],
+                        ['label' => 'Roles', 'icon' => 'bx-shield', 'route' => 'admin.roles.index', 'permissions' => ['roles.view']],
+                        ['label' => 'Permissions', 'icon' => 'bx-lock-alt', 'route' => 'admin.permissions.index', 'permissions' => ['permissions.view']],
+                    ],
+                ],
+                [
+                    'title' => 'School Operations',
+                    'icon' => 'bx-package',
+                    'items' => [
+                        ['label' => 'Designations', 'icon' => 'bx-id-card', 'route' => 'admin.designations.index', 'permissions' => ['designations.view']],
+                        ['label' => 'Admissions', 'icon' => 'bx-user-plus', 'route' => 'admin.admissions.index', 'permissions' => ['admissions.view']],
+                        ['label' => 'Suppliers', 'icon' => 'bx-store', 'route' => 'admin.suppliers.index', 'permissions' => ['suppliers.view']],
+                        ['label' => 'Inventory', 'icon' => 'bx-package', 'route' => 'admin.inventory.index', 'permissions' => ['inventory.view']],
+                        ['label' => 'Assets', 'icon' => 'bx-cube', 'route' => 'admin.assets.index', 'permissions' => ['assets.view']],
+                        ['label' => 'Visitors', 'icon' => 'bx-door-open', 'route' => 'admin.visitors.index', 'permissions' => ['visitors.view']],
+                        ['label' => 'Complaints', 'icon' => 'bx-message-square-error', 'route' => 'admin.complaints.index', 'permissions' => ['complaints.view']],
+                        ['label' => 'Discipline', 'icon' => 'bx-error', 'route' => 'admin.discipline.index', 'permissions' => ['discipline.view']],
+                        ['label' => 'Medical Records', 'icon' => 'bx-first-aid', 'route' => 'admin.medical.index', 'permissions' => ['medical.view']],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $hasPermission = function (array $permissions) use ($user): bool {
+        foreach ($permissions as $permission) {
+            if ($user?->can($permission)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    $isVisibleItem = function (array $item) use ($hasPermission, $user): bool {
+        if (!Route::has($item['route'])) {
+            return false;
+        }
+
+        if (
+            $item['route'] === 'admin.school.settings.edit' &&
+            ! $user?->school_id
+        ) {
+            return false;
+        }
+
+        return $hasPermission($item['permissions'] ?? []);
+    };
+
+    foreach ($menuGroups as &$group) {
+        if (!empty($group['items'])) {
+            $group['visible_items'] = array_values(array_filter(
+                $group['items'],
+                $isVisibleItem
+            ));
+        }
+
+        if (!empty($group['sections'])) {
+            $visibleSections = [];
+            foreach ($group['sections'] as $section) {
+                $visibleItems = array_values(array_filter(
+                    $section['items'] ?? [],
+                    $isVisibleItem
+                ));
+                if ($visibleItems) {
+                    $section['visible_items'] = $visibleItems;
+                    $visibleSections[] = $section;
+                }
+            }
+            $group['visible_sections'] = $visibleSections;
+        }
+    }
+    unset($group);
+
+    $isItemActive = function (array $item): bool {
+        return request()->routeIs($item['route']);
+    };
+
+    $isGroupActive = function (array $group) use ($isItemActive): bool {
+        foreach ($group['visible_items'] ?? [] as $item) {
+            if ($isItemActive($item)) {
+                return true;
+            }
+        }
+
+        foreach ($group['visible_sections'] ?? [] as $section) {
+            foreach ($section['visible_items'] ?? [] as $item) {
+                if ($isItemActive($item)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    };
+@endphp
+
 <div class="topnav">
-
     <div class="container-fluid">
-
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
 
             <div class="collapse navbar-collapse" id="topnav-menu-content">
+                <ul class="navbar-nav align-items-lg-center sms-navbar-list">
 
-                <ul class="navbar-nav">
-
-
-                    {{-- =========================================================
-                         DASHBOARD
-                         ========================================================= --}}
-
-                    @if(auth()->user()?->can('dashboard.view'))
-
+                    {{-- Dashboard --}}
+                    @if($user?->can('dashboard.view') && Route::has('admin.dashboard'))
                         <li class="nav-item">
-
-                            <a class="nav-link"
+                            <a class="nav-link sms-topnav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
                                href="{{ route('admin.dashboard') }}">
-
                                 <i class="bx bx-home-circle me-2"></i>
-
                                 <span>Dashboard</span>
-
                             </a>
-
                         </li>
-
                     @endif
 
-
-                    {{-- =========================================================
-                         SCHOOL
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('schools.view') ||
-                        auth()->user()?->can('schools.update') ||
-                        auth()->user()?->can('settings.view')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-school"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-building-house me-2"></i>
-
-                                <span>School</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-                            <div class="dropdown-menu"
-                                 aria-labelledby="topnav-school">
-
-                                @if(
-                                    auth()->user()?->can('schools.view') ||
-                                    auth()->user()?->can('schools.update')
-                                )
-
-                                    <a href="{{ route('admin.school.setup') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-building"></i>
-
-                                        <span>School Setup</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                @if(
-                                    auth()->user()?->school_id &&
-                                    auth()->user()?->can('settings.view')
-                                )
-
-                                    <a href="{{ route('admin.school.settings.edit', auth()->user()->school_id) }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-cog"></i>
-
-                                        <span>System Settings</span>
-
-                                    </a>
-
-                                @endif
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-                    {{-- =========================================================
-                         STUDENTS
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('students.view') ||
-                        auth()->user()?->can('students.create') ||
-                        auth()->user()?->can('students.update') ||
-                        auth()->user()?->can('students.delete') ||
-                        auth()->user()?->can('students.documents.view') ||
-                        auth()->user()?->can('students.documents.manage') ||
-                        auth()->user()?->can('guardians.view') ||
-                        auth()->user()?->can('enrollments.view') ||
-                        auth()->user()?->can('enrollments.create') ||
-                        auth()->user()?->can('promotions.view') ||
-                        auth()->user()?->can('promotions.create') ||
-                        auth()->user()?->can('graduation.view') ||
-                        auth()->user()?->can('graduation.manage') ||
-                        auth()->user()?->can('alumni.view') ||
-                        auth()->user()?->can('alumni.manage') ||
-                        auth()->user()?->can('attendance.view') ||
-                        auth()->user()?->can('attendance.mark') ||
-                        auth()->user()?->can('attendance.update') ||
-                        auth()->user()?->can('attendance.reports')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-students"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-user me-2"></i>
-
-                                <span>Students</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-students">
-
-
-                                {{-- Student List --}}
-
-                                @if(auth()->user()?->can('students.view'))
-
-                                    <a href="{{ route('admin.students.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-list-ul"></i>
-
-                                        <span>Student List</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Student Registration --}}
-
-                                @if(auth()->user()?->can('students.create'))
-
-                                    <a href="{{ route('admin.students.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user-plus"></i>
-
-                                        <span>Student Registration</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Student Information Heading --}}
-
-                                @if(
-                                    auth()->user()?->can('students.documents.view') ||
-                                    auth()->user()?->can('students.documents.manage') ||
-                                    auth()->user()?->can('guardians.view')
-                                )
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-file"></i>
-
-                                        <span>Student Information</span>
-
-                                    </div>
-
-                                @endif
-
-
-                                {{-- Guardians --}}
-
-                                @if(auth()->user()?->can('guardians.view'))
-
-                                    <a href="{{ route('admin.guardians.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-group"></i>
-
-                                        <span>Guardians</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Enrollments --}}
-
-                                @if(auth()->user()?->can('enrollments.view'))
-
-                                    <a href="{{ route('admin.student-enrollments.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-book-add"></i>
-
-                                        <span>Enrollments</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Add Enrollment --}}
-
-                                @if(auth()->user()?->can('enrollments.create'))
-
-                                    <a href="{{ route('admin.student-enrollments.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user-check"></i>
-
-                                        <span>Add Enrollment</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Promotions --}}
-
-                                @if(
-                                    auth()->user()?->can('promotions.view') ||
-                                    auth()->user()?->can('promotions.create')
-                                )
-
-                                    @if(auth()->user()?->can('promotions.view'))
-
-                                        <a href="{{ route('admin.student-promotions.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-transfer"></i>
-
-                                            <span>Promotions</span>
-
-                                        </a>
-
-                                    @elseif(auth()->user()?->can('promotions.create'))
-
-                                        <a href="{{ route('admin.student-promotions.create') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-transfer"></i>
-
-                                            <span>Promotions</span>
-
-                                        </a>
-
+                    @foreach($menuGroups as $group)
+                        @php
+                            $visibleItems = $group['visible_items'] ?? [];
+                            $visibleSections = $group['visible_sections'] ?? [];
+                            $hasMenuContent = !empty($visibleItems) || !empty($visibleSections);
+                        @endphp
+
+                        @if($hasMenuContent)
+                            <li class="nav-item dropdown">
+                                @php
+                                    $groupActive = $isGroupActive($group);
+                                    $dropAlignRight = in_array(
+                                        $group['key'],
+                                        ['reports', 'administration'],
+                                        true
+                                    );
+                                @endphp
+                                <a class="nav-link dropdown-toggle arrow-none sms-topnav-link {{ $groupActive ? 'active' : '' }}"
+                                   href="#"
+                                   id="topnav-{{ $group['key'] }}"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   data-bs-auto-close="outside"
+                                   aria-haspopup="true"
+                                   aria-expanded="false">
+                                    <i class="bx {{ $group['icon'] }} me-2"></i>
+                                    <span>{{ $group['label'] }}</span>
+                                    <div class="arrow-down"></div>
+                                </a>
+
+                                <div class="dropdown-menu {{ !empty($group['wide']) ? 'sms-mega-menu' : 'sms-admin-menu' }} {{ $dropAlignRight ? 'dropdown-menu-end' : '' }}"
+                                     aria-labelledby="topnav-{{ $group['key'] }}">
+
+                                    @if($visibleItems)
+                                        @foreach($visibleItems as $item)
+                                            @php
+                                                $itemUrl = $item['route'] === 'admin.school.settings.edit'
+                                                    ? route($item['route'], $user?->school_id)
+                                                    : route($item['route']);
+
+                                                $itemActive = $isItemActive($item);
+                                            @endphp
+
+                                            <a href="{{ $itemUrl }}"
+                                               class="dropdown-item sms-menu-item {{ $itemActive ? 'active' : '' }}">
+                                                <i class="bx {{ $item['icon'] }}"></i>
+                                                <span>{{ $item['label'] }}</span>
+                                            </a>
+                                        @endforeach
                                     @endif
 
-                                @endif
+                                    @if($visibleSections)
+                                        <div class="sms-mega-grid">
+                                            @foreach($visibleSections as $section)
+                                                <div class="sms-menu-column">
+                                                    <div class="sms-menu-section">
+                                                        <div class="sms-menu-heading">
+                                                            <i class="bx {{ $section['icon'] }}"></i>
+                                                            <span>{{ $section['title'] }}</span>
+                                                        </div>
 
+                                                        @foreach($section['visible_items'] as $item)
+                                                            @php
+                                                                $itemUrl = $item['route'] === 'admin.school.settings.edit'
+                                                                    ? route($item['route'], $user?->school_id)
+                                                                    : route($item['route']);
 
-                                {{-- Graduation --}}
+                                                                $itemActive = $isItemActive($item);
+                                                            @endphp
 
-                                @if(
-                                    auth()->user()?->can('graduation.view') ||
-                                    auth()->user()?->can('graduation.manage')
-                                )
-
-                                    @if(auth()->user()?->can('graduation.view'))
-
-                                        <a href="{{ route('admin.graduations.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-award"></i>
-
-                                            <span>Graduation</span>
-
-                                        </a>
-
-                                    @elseif(auth()->user()?->can('graduation.manage'))
-
-                                        <a href="{{ route('admin.graduations.create') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-award"></i>
-
-                                            <span>Graduation</span>
-
-                                        </a>
-
+                                                            <a href="{{ $itemUrl }}"
+                                                               class="dropdown-item sms-menu-item {{ $itemActive ? 'active' : '' }}">
+                                                                <i class="bx {{ $item['icon'] }}"></i>
+                                                                <span>{{ $item['label'] }}</span>
+                                                            </a>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     @endif
-
-                                @endif
-
-
-                                {{-- Alumni --}}
-
-                                @if(
-                                    auth()->user()?->can('alumni.view') ||
-                                    auth()->user()?->can('alumni.manage')
-                                )
-
-                                    @if(auth()->user()?->can('alumni.view'))
-
-                                        <a href="{{ route('admin.alumni.index') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-group"></i>
-
-                                            <span>Alumni</span>
-
-                                        </a>
-
-                                    @elseif(auth()->user()?->can('alumni.manage'))
-
-                                        <a href="{{ route('admin.alumni.create') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-group"></i>
-
-                                            <span>Alumni</span>
-
-                                        </a>
-
-                                    @endif
-
-                                @endif
-
-
-                                {{-- Attendance Heading --}}
-
-                                @if(
-                                    auth()->user()?->can('attendance.view') ||
-                                    auth()->user()?->can('attendance.mark') ||
-                                    auth()->user()?->can('attendance.reports')
-                                )
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-calendar-check"></i>
-
-                                        <span>Attendance</span>
-
-                                    </div>
-
-                                @endif
-
-
-                                {{-- Student Attendance --}}
-
-                                @if(auth()->user()?->can('attendance.view'))
-
-                                    <a href="{{ route('admin.attendance.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar-check"></i>
-
-                                        <span>Student Attendance</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Mark Attendance --}}
-
-                                @if(auth()->user()?->can('attendance.mark'))
-
-                                    <a href="{{ route('admin.attendance.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user-check"></i>
-
-                                        <span>Mark Attendance</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Attendance Reports --}}
-
-                                @if(auth()->user()?->can('attendance.reports'))
-
-                                    <a href="{{ route('admin.attendance.reports') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-bar-chart-alt-2"></i>
-
-                                        <span>Attendance Reports</span>
-
-                                    </a>
-
-                                @endif
-
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-
-
-                    {{-- =========================================================
-                         LIBRARY
-                         Completed: Books + Categories + Authors + Publishers
-                         + Members + Book Issues (Issue / Return / Renew)
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('library.view') ||
-                        auth()->user()?->can('library.create') ||
-                        auth()->user()?->can('library.update') ||
-                        auth()->user()?->can('library.delete') ||
-                        auth()->user()?->can('library.members.view') ||
-                        auth()->user()?->can('library.members.manage') ||
-                        auth()->user()?->can('library.issues.view') ||
-                        auth()->user()?->can('library.issues.manage')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-library"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-library me-2"></i>
-
-                                <span>Library</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-library">
-
-                                {{-- =================================================
-                                     LIBRARY MANAGEMENT
-                                     ================================================= --}}
-
-                                <div class="sms-menu-heading">
-
-                                    <i class="bx bx-library"></i>
-
-                                    <span>Library Management</span>
-
                                 </div>
-
-
-                                {{-- Books --}}
-
-                                @if(
-                                    auth()->user()?->can('library.view') ||
-                                    auth()->user()?->can('library.create') ||
-                                    auth()->user()?->can('library.update') ||
-                                    auth()->user()?->can('library.delete')
-                                )
-
-                                    <a href="{{ route('admin.library.books.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-book"></i>
-
-                                        <span>Books</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Categories --}}
-
-                                @if(
-                                    auth()->user()?->can('library.view') ||
-                                    auth()->user()?->can('library.create') ||
-                                    auth()->user()?->can('library.update') ||
-                                    auth()->user()?->can('library.delete')
-                                )
-
-                                    <a href="{{ route('admin.library.categories.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-category"></i>
-
-                                        <span>Book Categories</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Authors --}}
-
-                                @if(
-                                    auth()->user()?->can('library.view') ||
-                                    auth()->user()?->can('library.create') ||
-                                    auth()->user()?->can('library.update') ||
-                                    auth()->user()?->can('library.delete')
-                                )
-
-                                    <a href="{{ route('admin.library.authors.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user"></i>
-
-                                        <span>Authors</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Publishers --}}
-
-                                @if(
-                                    auth()->user()?->can('library.view') ||
-                                    auth()->user()?->can('library.create') ||
-                                    auth()->user()?->can('library.update') ||
-                                    auth()->user()?->can('library.delete')
-                                )
-
-                                    <a href="{{ route('admin.library.publishers.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-buildings"></i>
-
-                                        <span>Publishers</span>
-
-                                    </a>
-
-                                @endif
-                                @if(
-                                    auth()->user()?->can('library.reservations.view') ||
-                                    auth()->user()?->can('library.reservations.manage')
-                                )
-                                    <a href="{{ route('admin.library.reservations.index') }}" class="dropdown-item">
-                                        <i class="bx bx-bookmark"></i>
-                                      <span>Reservations</span>
-                                    </a>
-                                @endif
-                                {{-- =================================================
-                                     MEMBERS
-                                     ================================================= --}}
-
-                                @if(
-                                    auth()->user()?->can('library.members.view') ||
-                                    auth()->user()?->can('library.members.manage')
-                                )
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-group"></i>
-
-                                        <span>Library Members</span>
-
-                                    </div>
-
-                                @endif
-
-
-                                {{-- Member List --}}
-
-                                @if(auth()->user()?->can('library.members.view'))
-
-                                    <a href="{{ route('admin.library.members.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-group"></i>
-
-                                        <span>Members</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Add Member --}}
-
-                                @if(auth()->user()?->can('library.members.manage'))
-
-                                    <a href="{{ route('admin.library.members.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user-plus"></i>
-
-                                        <span>Add Member</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- =================================================
-                                     CIRCULATION
-                                     ================================================= --}}
-
-                                @if(
-                                    auth()->user()?->can('library.issues.view') ||
-                                    auth()->user()?->can('library.issues.manage')
-                                )
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-transfer"></i>
-
-                                        <span>Circulation</span>
-
-                                    </div>
-
-                                @endif
-
-
-                                {{-- Book Issues --}}
-
-                                @if(auth()->user()?->can('library.issues.view'))
-
-                                    <a href="{{ route('admin.library.issues.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-list-check"></i>
-
-                                        <span>Book Issues</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Issue Book --}}
-
-                                @if(auth()->user()?->can('library.issues.manage'))
-
-                                    <a href="{{ route('admin.library.issues.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-book-add"></i>
-
-                                        <span>Issue Book</span>
-
-                                    </a>
-
-                                @endif
-
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-                    {{-- =========================================================
-                         TRANSPORT
-                         Completed: Drivers + Vehicles + Routes + Stops
-                         + Student Assignments + Transport Fees
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('transport.view') ||
-                        auth()->user()?->can('transport.manage') ||
-                        auth()->user()?->can('transport.assign') ||
-                        auth()->user()?->can('transport.fees.view') ||
-                        auth()->user()?->can('transport.fees.manage')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-transport"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-bus me-2"></i>
-                                <span>Transport</span>
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-transport">
-
-                                <div class="sms-menu-heading">
-                                    <i class="bx bx-bus"></i>
-                                    <span>Transport Management</span>
-                                </div>
-
-                                @if(auth()->user()?->can('transport.view') || auth()->user()?->can('transport.manage'))
-                                    <a href="{{ route('admin.transport.drivers.index') }}" class="dropdown-item">
-                                        <i class="bx bx-user"></i>
-                                        <span>Drivers</span>
-                                    </a>
-
-                                    <a href="{{ route('admin.transport.vehicles.index') }}" class="dropdown-item">
-                                        <i class="bx bx-car"></i>
-                                        <span>Vehicles</span>
-                                    </a>
-
-                                    <a href="{{ route('admin.transport.routes.index') }}" class="dropdown-item">
-                                        <i class="bx bx-map"></i>
-                                        <span>Transport Routes</span>
-                                    </a>
-                                @endif
-
-                                @if(auth()->user()?->can('transport.view') || auth()->user()?->can('transport.assign'))
-                                    <a href="{{ route('admin.transport.assignments.index') }}" class="dropdown-item">
-                                        <i class="bx bx-user-check"></i>
-                                        <span>Student Assignments</span>
-                                    </a>
-                                @endif
-
-                                @if(auth()->user()?->can('transport.fees.view') || auth()->user()?->can('transport.fees.manage'))
-                                    <div class="sms-menu-heading">
-                                        <i class="bx bx-money"></i>
-                                        <span>Transport Fees</span>
-                                    </div>
-
-                                    <a href="{{ route('admin.transport.fees.index') }}" class="dropdown-item">
-                                        <i class="bx bx-money"></i>
-                                        <span>Transport Fees</span>
-                                    </a>
-                                @endif
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-                    {{-- =========================================================
-                         HOSTEL
-                         Completed: Hostels + Rooms + Beds
-                         + Student Allocations + Hostel Fees
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('hostel.view') ||
-                        auth()->user()?->can('hostel.manage') ||
-                        auth()->user()?->can('hostel.rooms.manage') ||
-                        auth()->user()?->can('hostel.allocations.view') ||
-                        auth()->user()?->can('hostel.allocations.manage') ||
-                        auth()->user()?->can('hostel.fees.view') ||
-                        auth()->user()?->can('hostel.fees.manage')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-hostel"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-home-alt me-2"></i>
-                                <span>Hostel</span>
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-hostel">
-
-                                @if(auth()->user()?->can('hostel.view') || auth()->user()?->can('hostel.manage'))
-                                    <div class="sms-menu-heading">
-                                        <i class="bx bx-home-alt"></i>
-                                        <span>Hostel Management</span>
-                                    </div>
-
-                                    <a href="{{ route('admin.hostel.index') }}" class="dropdown-item">
-                                        <i class="bx bx-building-house"></i>
-                                        <span>Hostels</span>
-                                    </a>
-                                @endif
-
-                                @if(auth()->user()?->can('hostel.rooms.manage'))
-                                    <a href="{{ route('admin.hostel.index') }}" class="dropdown-item">
-                                        <i class="bx bx-door-open"></i>
-                                        <span>Rooms & Beds</span>
-                                    </a>
-                                @endif
-
-                                @if(auth()->user()?->can('hostel.allocations.view') || auth()->user()?->can('hostel.allocations.manage'))
-                                    <div class="sms-menu-heading">
-                                        <i class="bx bx-user-check"></i>
-                                        <span>Student Accommodation</span>
-                                    </div>
-
-                                    <a href="{{ route('admin.hostel.allocations.index') }}" class="dropdown-item">
-                                        <i class="bx bx-home-heart"></i>
-                                        <span>Hostel Allocations</span>
-                                    </a>
-                                @endif
-
-                                @if(auth()->user()?->can('hostel.fees.view') || auth()->user()?->can('hostel.fees.manage'))
-                                    <div class="sms-menu-heading">
-                                        <i class="bx bx-money"></i>
-                                        <span>Hostel Fees</span>
-                                    </div>
-
-                                    <a href="{{ route('admin.hostel.fees.index') }}" class="dropdown-item">
-                                        <i class="bx bx-money"></i>
-                                        <span>Hostel Fees</span>
-                                    </a>
-                                @endif
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-                    {{-- =========================================================
-                         ACADEMICS
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('academic-years.view') ||
-                        auth()->user()?->can('terms.view') ||
-                        auth()->user()?->can('departments.view') ||
-                        auth()->user()?->can('classes.view') ||
-                        auth()->user()?->can('sections.view') ||
-                        auth()->user()?->can('courses.view') ||
-                        auth()->user()?->can('timetable.view') ||
-                        auth()->user()?->can('timetable.manage') ||
-
-                        auth()->user()?->can('examinations.view') ||
-                        auth()->user()?->can('examinations.create') ||
-                        auth()->user()?->can('examinations.update') ||
-                        auth()->user()?->can('examinations.delete') ||
-
-                        auth()->user()?->can('exam-schedules.view') ||
-                        auth()->user()?->can('exam-schedules.manage') ||
-
-                        auth()->user()?->can('marks.view') ||
-                        auth()->user()?->can('marks.enter') ||
-                        auth()->user()?->can('marks.update') ||
-                        auth()->user()?->can('marks.approve') ||
-
-                        auth()->user()?->can('grading.view') ||
-                        auth()->user()?->can('grading.manage') ||
-
-                        auth()->user()?->can('results.view') ||
-                        auth()->user()?->can('results.calculate') ||
-                        auth()->user()?->can('results.approve') ||
-                        auth()->user()?->can('results.publish') ||
-
-                        auth()->user()?->can('report-cards.view') ||
-                        auth()->user()?->can('report-cards.generate') ||
-
-                        auth()->user()?->can('transcripts.view') ||
-                        auth()->user()?->can('transcripts.generate')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-academics"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-book-open me-2"></i>
-
-                                <span>Academics</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-academics">
-
-
-                                {{-- Academic Setup Heading --}}
-
-                                <div class="sms-menu-heading">
-
-                                    <i class="bx bx-book"></i>
-
-                                    <span>Academic Setup</span>
-
-                                </div>
-
-
-                                {{-- Academic Years --}}
-
-                                @if(auth()->user()?->can('academic-years.view'))
-
-                                    <a href="{{ route('admin.academic-years.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar"></i>
-
-                                        <span>Academic Years</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Terms --}}
-
-                                @if(auth()->user()?->can('terms.view'))
-
-                                    <a href="{{ route('admin.terms.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar-event"></i>
-
-                                        <span>Terms / Semesters</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Departments --}}
-
-                                @if(auth()->user()?->can('departments.view'))
-
-                                    <a href="{{ route('admin.departments.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-sitemap"></i>
-
-                                        <span>Departments</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Classes --}}
-
-                                @if(auth()->user()?->can('classes.view'))
-
-                                    <a href="{{ route('admin.classes.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-building"></i>
-
-                                        <span>Classes</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Sections --}}
-
-                                @if(auth()->user()?->can('sections.view'))
-
-                                    <a href="{{ route('admin.sections.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-grid-alt"></i>
-
-                                        <span>Sections / Streams</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Subjects --}}
-
-                                @if(auth()->user()?->can('courses.view'))
-
-                                    <a href="{{ route('admin.courses.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-book"></i>
-
-                                        <span>Subjects / Courses</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Timetable --}}
-
-                                @if(
-                                    auth()->user()?->can('timetable.view') ||
-                                    auth()->user()?->can('timetable.manage')
-                                )
-
-                                    <a href="{{ route('admin.timetables.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-time-five"></i>
-                                        <span>Timetable</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Examination Heading --}}
-
-                                @if(
-                                    auth()->user()?->can('examinations.view') ||
-                                    auth()->user()?->can('examinations.create') ||
-                                    auth()->user()?->can('exam-schedules.view') ||
-                                    auth()->user()?->can('exam-schedules.manage') ||
-                                    auth()->user()?->can('marks.view') ||
-                                    auth()->user()?->can('marks.enter') ||
-                                    auth()->user()?->can('grading.view') ||
-                                    auth()->user()?->can('results.view') ||
-                                    auth()->user()?->can('report-cards.view') ||
-                                    auth()->user()?->can('transcripts.view')
-                                )
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-edit-alt"></i>
-
-                                        <span>Examination</span>
-
-                                    </div>
-
-                                @endif
-
-
-                                {{-- Examinations --}}
-
-                                @if(
-                                    auth()->user()?->can('examinations.view') ||
-                                    auth()->user()?->can('examinations.create')
-                                )
-
-                                    <a href="{{ route('admin.examinations.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-edit-alt"></i>
-
-                                        <span>Examinations</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Exam Schedules --}}
-
-                                @if(
-                                    auth()->user()?->can('exam-schedules.view') ||
-                                    auth()->user()?->can('exam-schedules.manage')
-                                )
-
-                                    <a href="{{ route('admin.exam-schedules.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar-event"></i>
-
-                                        <span>Exam Schedules</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Marks --}}
-
-                                @if(
-                                    auth()->user()?->can('marks.view') ||
-                                    auth()->user()?->can('marks.enter') ||
-                                    auth()->user()?->can('marks.update') ||
-                                    auth()->user()?->can('marks.approve')
-                                )
-
-                                    <a href="{{ route('admin.marks.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-pencil"></i>
-
-                                        <span>Subject Marks</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Grading --}}
-
-                                @if(
-                                    auth()->user()?->can('grading.view') ||
-                                    auth()->user()?->can('grading.manage')
-                                )
-
-                                    <a href="{{ route('admin.grading.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-bar-chart-alt-2"></i>
-
-                                        <span>Grading</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Results --}}
-
-                                @if(
-                                    auth()->user()?->can('results.view') ||
-                                    auth()->user()?->can('results.calculate') ||
-                                    auth()->user()?->can('results.approve') ||
-                                    auth()->user()?->can('results.publish')
-                                )
-
-                                    <a href="{{ route('admin.results.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-spreadsheet"></i>
-
-                                        <span>Results</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Report Cards --}}
-
-                                @if(
-                                    auth()->user()?->can('report-cards.view') ||
-                                    auth()->user()?->can('report-cards.generate')
-                                )
-
-                                    <a href="{{ route('admin.report-cards.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-file"></i>
-
-                                        <span>Report Cards</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Transcripts --}}
-
-                                @if(
-                                    auth()->user()?->can('transcripts.view') ||
-                                    auth()->user()?->can('transcripts.generate')
-                                )
-
-                                    <a href="{{ route('admin.transcripts.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-file-blank"></i>
-
-                                        <span>Transcripts</span>
-
-                                    </a>
-
-                                @endif
-
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-                    {{-- =========================================================
-                         STAFF
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('staff.view') ||
-                        auth()->user()?->can('staff.create') ||
-                        auth()->user()?->can('staff.update') ||
-                        auth()->user()?->can('staff.delete') ||
-
-                        auth()->user()?->can('instructors.view') ||
-                        auth()->user()?->can('instructors.create') ||
-                        auth()->user()?->can('instructors.update') ||
-                        auth()->user()?->can('instructors.delete') ||
-
-                        auth()->user()?->can('staff-attendance.view') ||
-                        auth()->user()?->can('staff-attendance.mark') ||
-                        auth()->user()?->can('staff-attendance.update') ||
-                        auth()->user()?->can('staff-attendance.reports') ||
-
-                        auth()->user()?->can('leaves.view') ||
-                        auth()->user()?->can('leaves.create') ||
-                        auth()->user()?->can('leaves.update') ||
-                        auth()->user()?->can('leaves.delete') ||
-                        auth()->user()?->can('leaves.approve') ||
-                        auth()->user()?->can('leaves.reject') ||
-                        auth()->user()?->can('leaves.reports')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-staff"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-group me-2"></i>
-
-                                <span>Staff</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-staff">
-
-
-                                {{-- Staff Management Heading --}}
-
-                                <div class="sms-menu-heading">
-
-                                    <i class="bx bx-group"></i>
-
-                                    <span>Staff Management</span>
-
-                                </div>
-
-
-                                {{-- Staff List --}}
-
-                                @if(auth()->user()?->can('staff.view'))
-
-                                    <a href="{{ route('admin.staff.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-group"></i>
-
-                                        <span>Staff List</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Add Staff --}}
-
-                                @if(auth()->user()?->can('staff.create'))
-
-                                    <a href="{{ route('admin.staff.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user-plus"></i>
-
-                                        <span>Add Staff</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Instructors --}}
-
-                                @if(auth()->user()?->can('instructors.view'))
-
-                                    <a href="{{ route('admin.instructors.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-chalkboard"></i>
-
-                                        <span>Instructors</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Add Instructor --}}
-
-                                @if(auth()->user()?->can('instructors.create'))
-
-                                    <a href="{{ route('admin.instructors.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user-check"></i>
-
-                                        <span>Add Instructor</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Staff Attendance Heading --}}
-
-                                @if(
-                                    auth()->user()?->can('staff-attendance.view') ||
-                                    auth()->user()?->can('staff-attendance.mark') ||
-                                    auth()->user()?->can('staff-attendance.reports')
-                                )
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-calendar-check"></i>
-
-                                        <span>Staff Attendance</span>
-
-                                    </div>
-
-                                @endif
-
-
-                                {{-- Staff Attendance --}}
-
-                                @if(auth()->user()?->can('staff-attendance.view'))
-
-                                    <a href="{{ route('admin.staff-attendance.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar-check"></i>
-
-                                        <span>Staff Attendance</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Mark Staff Attendance --}}
-
-                                @if(auth()->user()?->can('staff-attendance.mark'))
-
-                                    <a href="{{ route('admin.staff-attendance.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user-check"></i>
-
-                                        <span>Mark Attendance</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Staff Attendance Reports --}}
-
-                                @if(auth()->user()?->can('staff-attendance.reports'))
-
-                                    <a href="{{ route('admin.staff-attendance.reports') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-bar-chart-alt-2"></i>
-
-                                        <span>Attendance Reports</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Leave Management Heading --}}
-
-                                @if(
-                                    auth()->user()?->can('leaves.view') ||
-                                    auth()->user()?->can('leaves.create') ||
-                                    auth()->user()?->can('leaves.approve') ||
-                                    auth()->user()?->can('leaves.reports')
-                                )
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-calendar-minus"></i>
-
-                                        <span>Leave Management</span>
-
-                                    </div>
-
-                                @endif
-
-
-                                {{-- Leave Management --}}
-
-                                @if(auth()->user()?->can('leaves.view'))
-
-                                    <a href="{{ route('admin.leaves.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar-minus"></i>
-
-                                        <span>Leave Management</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- New Leave Request --}}
-
-                                @if(auth()->user()?->can('leaves.create'))
-
-                                    <a href="{{ route('admin.leaves.create') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar-plus"></i>
-
-                                        <span>New Leave Request</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Leave Reports --}}
-
-                                @if(auth()->user()?->can('leaves.reports'))
-
-                                    <a href="{{ route('admin.leaves.reports') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-file-find"></i>
-
-                                        <span>Leave Reports</span>
-
-                                    </a>
-
-                                @endif
-
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-                    {{-- =========================================================
-                         FINANCE
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('fees.view') ||
-                        auth()->user()?->can('fees.manage') ||
-
-                        auth()->user()?->can('fee-structures.view') ||
-                        auth()->user()?->can('fee-structures.manage') ||
-
-                        auth()->user()?->can('invoices.view') ||
-                        auth()->user()?->can('invoices.create') ||
-                        auth()->user()?->can('invoices.update') ||
-                        auth()->user()?->can('invoices.delete') ||
-
-                        auth()->user()?->can('payments.view') ||
-                        auth()->user()?->can('payments.create') ||
-
-                        auth()->user()?->can('payment-refunds.view') ||
-                        auth()->user()?->can('payment-refunds.approve') ||
-                        auth()->user()?->can('payment-refunds.reject') ||
-                        auth()->user()?->can('payment-refunds.process') ||
-                        auth()->user()?->can('payment-refunds.cancel') ||
-
-                        auth()->user()?->can('scholarships.view') ||
-                        auth()->user()?->can('scholarships.manage')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-finance"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-wallet me-2"></i>
-
-                                <span>Finance</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-finance">
-
-
-                                {{-- =================================================
-                                     FEE SETUP
-                                     ================================================= --}}
-
-                                <div class="sms-menu-heading">
-
-                                    <i class="bx bx-wallet"></i>
-
-                                    <span>Fee Setup</span>
-
-                                </div>
-
-
-                                {{-- Fee Categories --}}
-
-                                @if(
-                                    auth()->user()?->can('fees.view') ||
-                                    auth()->user()?->can('fees.manage')
-                                )
-
-                                    <a href="{{ route('admin.fee-categories.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-category"></i>
-
-                                        <span>Fee Categories</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Fee Structures --}}
-
-                                @if(
-                                    auth()->user()?->can('fee-structures.view') ||
-                                    auth()->user()?->can('fee-structures.manage')
-                                )
-
-                                    <a href="{{ route('admin.fee-structures.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-layer"></i>
-
-                                        <span>Fee Structures</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Scholarships --}}
-
-                                @if(
-                                    auth()->user()?->can('scholarships.view') ||
-                                    auth()->user()?->can('scholarships.manage')
-                                )
-
-                                    <a href="{{ route('admin.scholarships.index') }}"
-                                       class="dropdown-item scholarship-item">
-
-                                        <i class="bx bx-award"></i>
-
-                                        <span>Scholarships</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Fee Installments --}}
-
-                                @if(
-                                    auth()->user()?->can('fees.view') ||
-                                    auth()->user()?->can('fees.manage')
-                                )
-
-                                    <a href="{{ route('admin.fee-installments.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar"></i>
-
-                                        <span>Fee Installments</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Student Fee Assignment --}}
-
-                                @if(
-                                    auth()->user()?->can('fees.view') ||
-                                    auth()->user()?->can('fees.manage')
-                                )
-
-                                    <a href="{{ route('admin.student-fees.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user-check"></i>
-
-                                        <span>Student Fee Assignment</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- =================================================
-                                     BILLING & PAYMENTS
-                                     ================================================= --}}
-
-                                @if(
-                                    auth()->user()?->can('invoices.view') ||
-                                    auth()->user()?->can('invoices.create') ||
-                                    auth()->user()?->can('payments.view') ||
-                                    auth()->user()?->can('payment-refunds.view')
-                                )
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-receipt"></i>
-
-                                        <span>Billing & Payments</span>
-
-                                    </div>
-
-                                @endif
-
-
-                                {{-- Invoices --}}
-
-                                @if(auth()->user()?->can('invoices.view'))
-
-                                    <a href="{{ route('admin.invoices.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-file"></i>
-
-                                        <span>Invoices</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Payments --}}
-
-                                @if(auth()->user()?->can('payments.view'))
-
-                                    <a href="{{ route('admin.payments.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-money"></i>
-
-                                        <span>Payments</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Payment Refunds --}}
-
-                                @if(auth()->user()?->can('payment-refunds.view'))
-
-                                    <a href="{{ route('admin.payment-refunds.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-revision"></i>
-
-                                        <span>Payment Refunds</span>
-
-                                    </a>
-
-                                @endif
-
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-                    {{-- =========================================================
-                         WAVE 1
-                         COMMUNICATION + EVENTS + IDENTITY
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('announcements.view') ||
-                        auth()->user()?->can('events.view') ||
-                        auth()->user()?->can('certificates.view') ||
-                        auth()->user()?->can('id-cards.view')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-wave1"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-layer me-2"></i>
-
-                                <span>Communication & Services</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-wave1">
-
-
-                                {{-- Communication --}}
-
-                                @if(auth()->user()?->can('announcements.view'))
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-megaphone"></i>
-
-                                        <span>Communication</span>
-
-                                    </div>
-
-
-                                    <a href="{{ route('admin.announcements.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-megaphone"></i>
-
-                                        <span>Announcements</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Events --}}
-
-                                @if(auth()->user()?->can('events.view'))
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-calendar-event"></i>
-
-                                        <span>Events</span>
-
-                                    </div>
-
-
-                                    <a href="{{ route('admin.events.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-calendar-event"></i>
-
-                                        <span>School Events</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Certificates --}}
-
-                                @if(auth()->user()?->can('certificates.view'))
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-award"></i>
-
-                                        <span>Certificates</span>
-
-                                    </div>
-
-
-                                    <a href="{{ route('admin.certificates.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-award"></i>
-
-                                        <span>Certificates</span>
-
-                                    </a>
-
-
-                                    @can('certificate-templates.manage')
-
-                                        <a href="{{ route('admin.certificates.templates') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-layout"></i>
-
-                                            <span>Certificate Templates</span>
-
-                                        </a>
-
-                                    @endcan
-
-                                @endif
-
-
-                                {{-- ID Cards --}}
-
-                                @if(auth()->user()?->can('id-cards.view'))
-
-                                    <div class="sms-menu-heading">
-
-                                        <i class="bx bx-id-card"></i>
-
-                                        <span>ID Cards</span>
-
-                                    </div>
-
-
-                                    <a href="{{ route('admin.id-cards.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-id-card"></i>
-
-                                        <span>ID Cards</span>
-
-                                    </a>
-
-
-                                    @can('id-cards.generate')
-
-                                        <a href="{{ route('admin.id-cards.templates') }}"
-                                           class="dropdown-item">
-
-                                            <i class="bx bx-layout"></i>
-
-                                            <span>ID Card Templates</span>
-
-                                        </a>
-
-                                    @endcan
-
-                                @endif
-
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-
-
-
-                    {{-- =========================================================
-                         REPORTS & ANALYTICS
-                         Completed central reporting module
-                         ========================================================= --}}
-
-                    @if(auth()->user()?->can('reports.view'))
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-reports"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-bar-chart-alt-2 me-2"></i>
-
-                                <span>Reports & Analytics</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-                            <div class="dropdown-menu sms-wide-menu sms-two-column"
-                                 aria-labelledby="topnav-reports">
-
-                                <div class="sms-menu-heading">
-                                    <i class="bx bx-bar-chart-alt-2"></i>
-                                    <span>Reports</span>
-                                </div>
-
-                                <a href="{{ route('admin.reports.index') }}"
-                                   class="dropdown-item">
-                                    <i class="bx bx-dashboard"></i>
-                                    <span>Reports Dashboard</span>
-                                </a>
-
-                                <a href="{{ route('admin.reports.students') }}"
-                                   class="dropdown-item">
-                                    <i class="bx bx-user"></i>
-                                    <span>Student Reports</span>
-                                </a>
-
-                                <a href="{{ route('admin.reports.enrollment') }}"
-                                   class="dropdown-item">
-                                    <i class="bx bx-user-plus"></i>
-                                    <span>Enrollment Reports</span>
-                                </a>
-
-                                <a href="{{ route('admin.reports.academic-performance') }}"
-                                   class="dropdown-item">
-                                    <i class="bx bx-line-chart"></i>
-                                    <span>Academic Performance</span>
-                                </a>
-
-                                <a href="{{ route('admin.reports.attendance') }}"
-                                   class="dropdown-item">
-                                    <i class="bx bx-calendar-check"></i>
-                                    <span>Attendance Reports</span>
-                                </a>
-
-                                <a href="{{ route('admin.reports.staff') }}"
-                                   class="dropdown-item">
-                                    <i class="bx bx-group"></i>
-                                    <span>Staff Reports</span>
-                                </a>
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
-                    {{-- =========================================================
-                         ADMINISTRATION
-                         ========================================================= --}}
-
-                    @if(
-                        auth()->user()?->can('users.view') ||
-                        auth()->user()?->can('users.create') ||
-                        auth()->user()?->can('roles.view') ||
-                        auth()->user()?->can('permissions.view')
-                    )
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle arrow-none"
-                               href="#"
-                               id="topnav-administration"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-
-                                <i class="bx bx-cog me-2"></i>
-
-                                <span>Administration</span>
-
-                                <div class="arrow-down"></div>
-
-                            </a>
-
-
-                            <div class="dropdown-menu"
-                                 aria-labelledby="topnav-administration">
-
-
-                                {{-- Users --}}
-
-                                @if(auth()->user()?->can('users.view'))
-
-                                    <a href="{{ route('admin.users.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-user"></i>
-
-                                        <span>Users</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Roles --}}
-
-                                @if(auth()->user()?->can('roles.view'))
-
-                                    <a href="{{ route('admin.roles.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-shield"></i>
-
-                                        <span>Roles</span>
-
-                                    </a>
-
-                                @endif
-
-
-                                {{-- Permissions --}}
-
-                                @if(auth()->user()?->can('permissions.view'))
-
-                                    <a href="{{ route('admin.permissions.index') }}"
-                                       class="dropdown-item">
-
-                                        <i class="bx bx-lock-alt"></i>
-
-                                        <span>Permissions</span>
-
-                                    </a>
-
-                                @endif
-
-
-                            </div>
-
-                        </li>
-
-                    @endif
-
+                            </li>
+                        @endif
+                    @endforeach
 
                 </ul>
-
             </div>
-
         </nav>
-
     </div>
-
 </div>
+
+<style>
+/* ================================================================
+   SMS ADMIN NAVBAR — PROFESSIONAL / RESPONSIVE
+   ================================================================ */
+
+.topnav {
+    position: relative;
+    z-index: 1030;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    background: #ffffff;
+    border-top: 1px solid rgba(30, 42, 60, .06);
+    border-bottom: 1px solid rgba(30, 42, 60, .08);
+    box-shadow: 0 3px 14px rgba(18, 38, 63, .06);
+}
+
+.topnav .container-fluid {
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+.topnav-menu {
+    min-height: 58px;
+    width: 100%;
+}
+
+.sms-navbar-list {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 0;
+    overflow: visible;
+    min-width: 0;
+}
+
+.topnav .navbar-nav > .nav-item {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.sms-topnav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 58px;
+    margin: 0;
+    padding: 0 7px !important;
+    border-radius: 8px 8px 0 0;
+    color: #4b5563 !important;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .005em;
+    line-height: 1.2;
+    transition: color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+.sms-topnav-link i {
+    flex: 0 0 auto;
+    margin-right: 5px !important;
+    font-size: 16px;
+    line-height: 1;
+    transition: transform .18s ease;
+}
+
+.sms-topnav-link > span {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sms-topnav-link .arrow-down {
+    flex: 0 0 auto;
+    margin-left: 5px;
+    transition: transform .18s ease;
+}
+
+.sms-topnav-link:hover,
+.sms-topnav-link:focus-visible {
+    color: #515def !important;
+    background: rgba(81, 93, 239, .06);
+    text-decoration: none;
+}
+
+.sms-topnav-link:hover i {
+    transform: translateY(-1px);
+}
+
+.sms-topnav-link.active {
+    color: #515def !important;
+    background: rgba(81, 93, 239, .08);
+    font-weight: 600;
+}
+
+.sms-topnav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 0;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: #515def;
+}
+
+.sms-topnav-link[aria-expanded="true"] {
+    color: #515def !important;
+    background: rgba(81, 93, 239, .07);
+}
+
+.sms-topnav-link[aria-expanded="true"] .arrow-down {
+    transform: rotate(180deg);
+}
+
+/* ---------------------------------------------------------------
+   DROPDOWNS
+   --------------------------------------------------------------- */
+
+.topnav .dropdown-menu.sms-mega-menu,
+.topnav .dropdown-menu.sms-admin-menu {
+    position: absolute;
+    margin-top: 4px !important;
+    border: 1px solid rgba(30, 42, 60, .08) !important;
+    border-radius: 12px !important;
+    background: #ffffff;
+    box-shadow: 0 20px 45px rgba(18, 38, 63, .16) !important;
+    overflow: hidden;
+}
+
+.topnav .dropdown-menu.sms-mega-menu {
+    width: 760px !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 28px) !important;
+    padding: 10px !important;
+}
+
+.topnav .dropdown-menu.sms-admin-menu {
+    width: 290px !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 28px) !important;
+    padding: 8px !important;
+}
+
+.dropdown-menu .sms-mega-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+}
+
+.sms-menu-column {
+    min-width: 0;
+    padding: 3px 9px 8px;
+}
+
+.sms-menu-column + .sms-menu-column {
+    border-left: 1px solid rgba(30, 42, 60, .07);
+}
+
+/* ---------------------------------------------------------------
+   MENU SECTIONS
+   --------------------------------------------------------------- */
+
+.sms-menu-section {
+    min-width: 0;
+    padding: 2px 0 8px;
+}
+
+.sms-menu-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    margin: 0 4px 7px;
+    padding: 7px 8px;
+    color: #747b8c;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.sms-menu-heading i {
+    flex: 0 0 19px;
+    width: 19px;
+    color: #515def;
+    font-size: 15px;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------
+   MENU ITEMS
+   --------------------------------------------------------------- */
+
+.sms-menu-item {
+    display: flex !important;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    min-height: 36px;
+    margin: 2px 0;
+    padding: 8px 10px !important;
+    border-radius: 8px;
+    color: #343a40 !important;
+    font-size: 13px;
+    line-height: 1.35;
+    transition: color .16s ease, background-color .16s ease, transform .16s ease;
+}
+
+.sms-menu-item i {
+    flex: 0 0 19px;
+    width: 19px;
+    color: #7b8497;
+    font-size: 15px;
+    text-align: center;
+    transition: color .16s ease, transform .16s ease;
+}
+
+.sms-menu-item span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sms-menu-item:hover,
+.sms-menu-item:focus-visible {
+    color: #515def !important;
+    background: rgba(81, 93, 239, .07);
+    text-decoration: none;
+    transform: translateX(2px);
+}
+
+.sms-menu-item:hover i {
+    color: #515def;
+}
+
+.sms-menu-item.active {
+    color: #515def !important;
+    background: rgba(81, 93, 239, .10);
+    font-weight: 600;
+}
+
+.sms-menu-item.active i {
+    color: #515def;
+}
+
+/* ---------------------------------------------------------------
+   EMPTY / SINGLE MENUS
+   --------------------------------------------------------------- */
+
+.sms-admin-menu .sms-menu-item {
+    min-height: 38px;
+}
+
+/* ---------------------------------------------------------------
+   LARGE DESKTOP
+   --------------------------------------------------------------- */
+
+@media (min-width: 1400px) {
+    .sms-topnav-link {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        font-size: 13px;
+    }
+}
+
+/* ---------------------------------------------------------------
+   DESKTOP FIT
+   --------------------------------------------------------------- */
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+    .sms-topnav-link {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+        font-size: 12.5px;
+    }
+
+    .sms-topnav-link i {
+        margin-right: 4px !important;
+        font-size: 15px;
+    }
+
+    .sms-mega-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* ---------------------------------------------------------------
+   TABLET
+   --------------------------------------------------------------- */
+
+@media (max-width: 1199.98px) and (min-width: 992px) {
+    .sms-topnav-link {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+        font-size: 11.5px;
+    }
+
+    .sms-topnav-link i {
+        margin-right: 5px !important;
+        font-size: 16px;
+    }
+
+    .topnav .dropdown-menu.sms-mega-menu {
+        width: 680px !important;
+        min-width: 0 !important;
+    }
+
+    .sms-mega-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* ---------------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------------- */
+
+@media (max-width: 991.98px) {
+    .topnav {
+        box-shadow: 0 2px 9px rgba(18, 38, 63, .08);
+        overflow-x: visible;
+    }
+
+    .topnav .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .topnav-menu {
+        min-height: auto;
+    }
+
+    .sms-navbar-list {
+        width: 100%;
+        flex-wrap: wrap;
+        overflow: visible;
+        padding: 6px 0 10px;
+    }
+
+    .topnav .navbar-nav > .nav-item {
+        width: 100%;
+    }
+
+    .sms-topnav-link {
+        width: 100%;
+        min-height: 44px;
+        justify-content: flex-start;
+        margin: 1px 8px;
+        padding: 0 12px !important;
+        border-radius: 8px;
+    }
+
+    .sms-topnav-link.active::after {
+        left: 0;
+        right: auto;
+        top: 7px;
+        bottom: 7px;
+        width: 3px;
+        height: auto;
+        border-radius: 0 3px 3px 0;
+    }
+
+    .topnav .dropdown-menu.sms-mega-menu,
+    .topnav .dropdown-menu.sms-admin-menu {
+        position: static !important;
+        width: calc(100% - 24px) !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        margin: 2px 12px 8px !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border-radius: 8px !important;
+    }
+
+    .sms-mega-grid {
+        display: block;
+    }
+
+    .sms-menu-column {
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+
+    .sms-menu-column + .sms-menu-column {
+        margin-top: 5px;
+        padding-top: 5px;
+        border-top: 1px solid rgba(30, 42, 60, .06);
+        border-left: 0;
+    }
+}
+
+</style>
+
+
+<script>
+(function () {
+    function initSmsDropdowns() {
+        if (typeof bootstrap === 'undefined' || !bootstrap.Dropdown) {
+            return;
+        }
+
+        document.querySelectorAll('.topnav [data-bs-toggle="dropdown"]').forEach(function (toggle) {
+            if (!bootstrap.Dropdown.getInstance(toggle)) {
+                new bootstrap.Dropdown(toggle, {
+                    autoClose: 'outside',
+                    popperConfig: function (defaultBsPopperConfig) {
+                        return Object.assign({}, defaultBsPopperConfig || {}, {
+                            strategy: 'fixed'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSmsDropdowns);
+    } else {
+        initSmsDropdowns();
+    }
+})();
+</script>

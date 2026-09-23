@@ -1,0 +1,2 @@
+@extends('portal.layouts.app',['title'=>'My Students'])
+@section('content')<h2>My Students</h2><div class="card"><div class="table-responsive"><table class="table"><thead><tr><th>Student</th><th>Number</th><th>Status</th></tr></thead><tbody>@forelse($students as $student)<tr><td>{{ $student->full_name }}</td><td>{{ $student->student_number }}</td><td>{{ ucfirst($student->status) }}</td></tr>@empty<tr><td colspan="3">No students found.</td></tr>@endforelse</tbody></table></div></div>@endsection

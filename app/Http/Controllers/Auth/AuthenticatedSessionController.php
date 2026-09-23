@@ -204,21 +204,44 @@ class AuthenticatedSessionController extends Controller
     }
 
     private function redirectByRole($user)
-    {   
-        switch ($user->user_type_id) {
-
-            case 1:
-                return route('administrator.dashboard');
-
-            case 2:
-                return route('admin.dashboard');
-
-            case 3:
-                return route('dashboard');
-
-            default:
-                return url('/');
-                //return route('home');
+    {
+        if ($user->hasRole('Student')) {
+            return route('portal.student.dashboard');
         }
+
+        if ($user->hasRole('Parent')) {
+            return route('portal.parent.dashboard');
+        }
+
+        if ($user->hasRole('Teacher')) {
+            return route('portal.teacher.dashboard');
+        }
+
+        if ($user->hasRole('Administrator')) {
+            return route('admin.dashboard');
+        }
+
+        if ($user->hasRole('Principal')) {
+            return route('admin.dashboard');
+        }
+
+        if ($user->hasRole('Examinations Officer')) {
+            return route('admin.dashboard');
+        }
+
+        if ($user->hasRole('Accountant')) {
+            return route('admin.dashboard');
+        }
+
+        if ($user->hasRole('Registrar')) {
+            return route('admin.dashboard');
+        }
+
+        if ($user->hasRole('Super Admin')) {
+            return route('admin.dashboard');
+        }
+
+        return url('/');
     }
+    
 }
